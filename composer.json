@@ -1,0 +1,12 @@
+{
+  "name": "prestashop/prestashop-accounts-auth",
+  "description": "Firebase auth class",
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "PrestaShop\\AccountsAuth\\": "src/"
+    }
+  },
+  "require": {}
+}
