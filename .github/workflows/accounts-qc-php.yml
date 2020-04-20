@@ -15,6 +15,7 @@ jobs:
         uses: prestashopcorp/github-action-php-cs-fixer@master
         with:
             other-cmds: --dry-run --diff --using-cache=no --diff-format udiff --rules=@PSR2
+
   phpunit:
     name: PHPUNIT
     runs-on: ubuntu-latest
