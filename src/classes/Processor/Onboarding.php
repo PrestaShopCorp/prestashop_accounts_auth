@@ -20,18 +20,38 @@
 
 namespace PrestaShop\AccountsAuth\Processor;
 
+use Configuration;
 use ModuleCore;
 
 class Onboarding
 {
+    public function run()
+    {
+        if(false == $this->modulePsAccountsInstalled()){
+            var_dump('ps_accounts isn\'t installed ');
+            die;
+        }
+
+        if( true != $this->isOnboarded()){
+            $this->start();
+        }
+
+        return ;
+    }
 
     public function modulePsAccountsInstalled()
     {
-        //TODO redirect to install ps_accounts
-        if( false == ModuleCore::getInstanceByName('ps_accounts')){
-            var_dump('Ps accounts is not installed');
-            die;
+        return ModuleCore::getInstanceByName('ps_accounts');
+    }
 
-        }
+    public function isOnboarded()
+    {
+        return Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
+            && Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
+            && Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA');
+    }
+
+    public function start(){
+        return (new PrestaShop\AccountsAuth\Presenter\Store\StorePresenter())->present();
     }
 }

@@ -22,7 +22,7 @@ namespace PrestaShop\AccountsAuth\Presenter\Store;
 
 use PrestaShop\AccountsAuth\Presenter\PresenterInterface;
 use PrestaShop\AccountsAuth\Presenter\Store\Modules\FirebaseModule;
-use PrestaShop\AccountsAuth\Presenter\Store\Modules\PsAccountsModule;
+use PrestaShop\Module\PsAccounts\Presenter\Store\Modules\PsAccountsModule;
 
 /**
  * Present the store to the vuejs app (vuex).
