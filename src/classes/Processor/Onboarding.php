@@ -22,18 +22,24 @@ namespace PrestaShop\AccountsAuth\Processor;
 
 use Configuration;
 use ModuleCore;
+use PrestaShop\AccountsAuth\Presenter\Store\StorePresenter;
 
 class Onboarding
 {
+    public function __construct()
+    {
+        $this->psAccount = $this->modulePsAccountsInstalled();
+    }
+
     public function run()
     {
-        if (false == $this->modulePsAccountsInstalled()) {
+        if (false == $this->psAccount) {
             var_dump('ps_accounts isn\'t installed ');
             exit;
         }
 
         if (true != $this->isOnboarded()) {
-            $this->start();
+            return $this->start();
         }
 
         return;
@@ -53,6 +59,6 @@ class Onboarding
 
     public function start()
     {
-        return (new PrestaShop\AccountsAuth\Presenter\Store\StorePresenter())->present();
+        return (new StorePresenter($this->psAccount, $this->psAccount->getContext()))->present();
     }
 }
