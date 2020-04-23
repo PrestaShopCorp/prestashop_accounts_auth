@@ -50,7 +50,7 @@ class FirebaseClient extends GenericClient
                 ],
                 'headers' => [
                     'Content-Type' => 'application/json',
-                ]
+                ],
             ],
         ]);
 

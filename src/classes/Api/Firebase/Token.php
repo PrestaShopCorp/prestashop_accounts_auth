@@ -68,7 +68,7 @@ class Token extends FirebaseClient
      */
     public function getRefreshTokenWithAdminToken($adminToken)
     {
-        $this->setRoute('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key='.$_ENV['FIREBASE_API_KEY']);
+        $this->setRoute('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=' . $_ENV['FIREBASE_API_KEY']);
         $response = $this->post([
             'json' => [
                 'token' => $adminToken,

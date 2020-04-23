@@ -27,16 +27,16 @@ class Onboarding
 {
     public function run()
     {
-        if(false == $this->modulePsAccountsInstalled()){
+        if (false == $this->modulePsAccountsInstalled()) {
             var_dump('ps_accounts isn\'t installed ');
-            die;
+            exit;
         }
 
-        if( true != $this->isOnboarded()){
+        if (true != $this->isOnboarded()) {
             $this->start();
         }
 
-        return ;
+        return;
     }
 
     public function modulePsAccountsInstalled()
@@ -51,7 +51,8 @@ class Onboarding
             && Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA');
     }
 
-    public function start(){
+    public function start()
+    {
         return (new PrestaShop\AccountsAuth\Presenter\Store\StorePresenter())->present();
     }
 }

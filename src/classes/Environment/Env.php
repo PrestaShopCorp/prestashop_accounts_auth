@@ -20,14 +20,11 @@
 
 namespace PrestaShop\AccountsAuth\Environment;
 
-use Dotenv\Dotenv;
-
 /**
  * Get the current environment used: prod or test // sandbox or live.
  */
 class Env
 {
-
     /**
      * Environment name: can be 'prod' or 'test'.
      *

@@ -53,7 +53,7 @@ class ResponseApiHandler
      * Check if the response is successful or not (response code 200 to 299).
      *
      * @param array $responseContents
-     * @param int   $httpStatusCode
+     * @param int $httpStatusCode
      *
      * @return bool
      */
