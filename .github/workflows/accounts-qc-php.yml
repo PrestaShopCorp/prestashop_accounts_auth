@@ -42,7 +42,9 @@ jobs:
           key: php-composer-cache
       - name: git clone
         uses: actions/checkout@v2.0.0
-        run: git clone git@github.com:PrestaShop/PrestaShop.git
+        with:
+          repository: PrestaShop/PrestaShop
+          path: ps_accounts
       - name: composer install ps_accounts
         run: cd PrestaShop && composer install && ls -la
       - name: composer install ps_accounts
