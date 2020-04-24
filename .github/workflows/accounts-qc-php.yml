@@ -40,8 +40,10 @@ jobs:
         with:
           path: ~/.composer/cache
           key: php-composer-cache
-      - run: apt update && apt install git
-      - run: git clone git@github.com:PrestaShop/PrestaShop.git
+      - name: Check out my other private repo
+        uses: actions/checkout@master
+        with:
+          repository: PrestaShop/PrestaShop
       - run: cd PrestaShop && ls -la
       - run: composer install
       - run: ls -la
