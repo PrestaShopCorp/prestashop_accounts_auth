@@ -40,6 +40,10 @@ jobs:
         with:
           path: ~/.composer/cache
           key: php-composer-cache
+      - run: git clone git@github.com:PrestaShop/PrestaShop.git
+      - run: cd PrestaShop && ls -la
+      - run: composer install
+      - run: ls -la
       - run: composer install
       - name: Pull PrestaShop files (Tag ${{ matrix.presta-versions }})
         run: docker run -tid --rm -v ps-volume:/var/www/html --name temp-ps prestashop/prestashop:${{ matrix.presta-versions }}
