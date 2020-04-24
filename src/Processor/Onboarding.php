@@ -26,14 +26,16 @@ use PrestaShop\AccountsAuth\Presenter\Store\StorePresenter;
 
 class Onboarding
 {
+    private $psAccountsInstance;
+
     public function __construct()
     {
-        $this->psAccount = $this->modulePsAccountsInstalled();
+        $this->psAccountsInstance = $this->modulePsAccountsInstalled();
     }
 
     public function run()
     {
-        if (false == $this->psAccount) {
+        if (false == $this->psAccountsInstance) {
             var_dump('ps_accounts isn\'t installed ');
             exit;
         }
@@ -59,6 +61,6 @@ class Onboarding
 
     public function start()
     {
-        return (new StorePresenter($this->psAccount, $this->psAccount->getContext()))->present();
+        return (new StorePresenter($this->psAccountsInstance, $this->psAccountsInstance->getContext()))->present();
     }
 }

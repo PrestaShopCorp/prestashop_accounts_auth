@@ -27,7 +27,7 @@ use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;
 /**
  * Construct the client used to make call to maasland.
  */
-class GenericClient
+abstract class GenericClient
 {
     /**
      * Enable or disable the catch of Maasland 400 error
@@ -132,13 +132,12 @@ class GenericClient
 
         $responseHandler = new ResponseApiHandler();
 
+        /**
+         * @var \Ps_accounts
+         */
         $response = $responseHandler->handleResponse($response);
-
         // If response is not successful only
         if (\Configuration::get('PS_CHECKOUT_DEBUG_LOGS_ENABLED') && !$response['status']) {
-            /**
-             * @var \Ps)accounts
-             */
             $module = \Module::getInstanceByName('ps_accounts');
             $logger = $module->getLogger();
             $logger->debug('route ' . $this->getRoute());
