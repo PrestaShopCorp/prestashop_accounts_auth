@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79095068e8ee8d6a2862fa66bb3ecbf1",
+    "content-hash": "d9df38d45a1524af754625c62fb22fea",
     "packages": [
         {
             "name": "guzzlehttp/guzzle",
@@ -1753,16 +1753,16 @@
         },
         {
             "name": "prestashop/php-dev-tools",
-            "version": "2.x-dev",
+            "version": "v3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PrestaShop/php-dev-tools.git",
-                "reference": "3ca38f40b49e6ea00923c189e211e8c9743c9349"
+                "reference": "55442b1dc4593961fba88d4631644507d6e27075"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PrestaShop/php-dev-tools/zipball/3ca38f40b49e6ea00923c189e211e8c9743c9349",
-                "reference": "3ca38f40b49e6ea00923c189e211e8c9743c9349",
+                "url": "https://api.github.com/repos/PrestaShop/php-dev-tools/zipball/55442b1dc4593961fba88d4631644507d6e27075",
+                "reference": "55442b1dc4593961fba88d4631644507d6e27075",
                 "shasum": ""
             },
             "require": {
@@ -1787,7 +1787,7 @@
                 "MIT"
             ],
             "description": "PrestaShop coding standards",
-            "time": "2019-11-29T09:53:18+00:00"
+            "time": "2020-03-10T18:11:25+00:00"
         },
         {
             "name": "psr/container",
@@ -2675,12 +2675,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "d364824a4808d47d7a0a01b61e2ef54703a267d2"
+                "reference": "bc8f774a88ff35f65cb91bc38ef3e31d27d24eb5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/d364824a4808d47d7a0a01b61e2ef54703a267d2",
-                "reference": "d364824a4808d47d7a0a01b61e2ef54703a267d2",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/bc8f774a88ff35f65cb91bc38ef3e31d27d24eb5",
+                "reference": "bc8f774a88ff35f65cb91bc38ef3e31d27d24eb5",
                 "shasum": ""
             },
             "require": {
@@ -2739,7 +2739,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2020-04-05T06:49:38+00:00"
+            "time": "2020-04-23T21:57:44+00:00"
         },
         {
             "name": "symfony/event-dispatcher-contracts",
