@@ -1,21 +1,33 @@
 # prestashop_accounts_auth
 
-Firebase auth class
-
 ## How install
 ```
 composer require prestashop/prestashop-accounts-auth
 ```
 
-Add
+In your PSX/AOS two way:
 
-```
-"minimum-stability": "dev"
-```
-in your `composer.json`
 
+- In the PSX / AOS module controllers, get onboarding presenter and go to the view for which is used by the
+[viewsjs component](https://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
+
+```php
+$onboarding = new PrestaShop\AccountsAuth\Processor\Onboarding();
+Media::addJsDef([
+    'store' => $onboarding->getPresenter(),
+]);
+```
+
+
+- In the PSX / AOS module controllers, call the function with return params. In this fact, the function do all the onboarding process and redirect after on your return params.
+```php
+$onboarding = new PrestaShop\AccountsAuth\Processor\Onboarding();
+$onboarding->process('AdminMyController');
+```
 
 ### Testing
+
+Run phpstan
 
 ```bash
 docker run -tid --rm -v ps-volume:/var/www/html --name temp-ps prestashop/prestashop;

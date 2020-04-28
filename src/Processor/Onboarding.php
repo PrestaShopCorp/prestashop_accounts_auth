@@ -23,6 +23,7 @@ namespace PrestaShop\AccountsAuth\Processor;
 use Configuration;
 use ModuleCore;
 use PrestaShop\AccountsAuth\Presenter\Store\StorePresenter;
+use Tools;
 
 class Onboarding
 {
@@ -33,23 +34,27 @@ class Onboarding
         $this->psAccountsInstance = $this->modulePsAccountsInstalled();
     }
 
-    public function run()
+    public function getPresenter()
     {
         if (false == $this->psAccountsInstance) {
-            var_dump('ps_accounts isn\'t installed ');
-            exit;
+            throw new Exception('ps_accounts module isn\'t installed');
         }
 
-        if (true != $this->isOnboarded()) {
-            return $this->start();
-        }
+        return (new StorePresenter($this->psAccountsInstance, $this->psAccountsInstance->getContext()))->present();
+    }
 
-        return;
+    public function process($returnTo)
+    {
+        $this->context->link->getModuleLink('module_name', 'controller_name', ['id' => $data->id]);
+
+        Tools::redirectAdmin(
+           $this->psAccountsInstance->getContext()->link->getAdminLink(ModuleCore::getInstanceByName('ps_accounts')->getAdminControllers()['onboarding'], true, [], ['return_to' => $returnTo])
+        );
     }
 
     public function modulePsAccountsInstalled()
     {
-        return ModuleCore::getInstanceByName('ps_accounts');
+        return $this->psAccountsInstance;
     }
 
     public function isOnboarded()
@@ -57,10 +62,5 @@ class Onboarding
         return Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
             && Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
             && Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA');
-    }
-
-    public function start()
-    {
-        return (new StorePresenter($this->psAccountsInstance, $this->psAccountsInstance->getContext()))->present();
     }
 }

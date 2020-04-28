@@ -5,5 +5,4 @@ parameters:
 		- ../../src
 	dynamicConstantNames:
 		- _PS_VERSION_
-	reportUnmatchedIgnoredErrors: true
 	level: 5
