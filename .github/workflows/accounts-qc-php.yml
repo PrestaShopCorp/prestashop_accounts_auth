@@ -1,5 +1,5 @@
 name: PHP tests
-on: [push, pull_request]
+on: [pull_request]
 jobs:
   php-linter:
     name: PHP Syntax check 5.6|7.2|7.3
@@ -40,15 +40,10 @@ jobs:
         with:
           path: ~/.composer/cache
           key: php-composer-cache
-      - name: git clone
-        uses: actions/checkout@v2
-        shell: bash
-        run: |
-          git clone git@github.com:PrestaShop/PrestaShop.git
-      - name: composer install ps_accounts
-        run: cd PrestaShop && composer install && ls -la
-      - name: composer install ps_accounts
-        run: composer install && ls -la
+      - name: git clone ps_accounts
+        run: git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/PrestaShopCorp/ps_accounts.git ~/ps_accounts
+      - name: composer install
+        run: composer install && cd ~/ps_accounts && composer install
       - name: Pull PrestaShop files (Tag ${{ matrix.presta-versions }})
         run: docker run -tid --rm -v ps-volume:/var/www/html --name temp-ps prestashop/prestashop:${{ matrix.presta-versions }}
       - name : Run PHPStan

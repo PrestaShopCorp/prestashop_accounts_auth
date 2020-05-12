@@ -5,4 +5,4 @@ parameters:
 		- ../../src
 	dynamicConstantNames:
 		- _PS_VERSION_
-	level: 5
+	level: 8
