@@ -23,7 +23,7 @@ namespace PrestaShop\AccountsAuth\Environment;
 /**
  * Allow to set the differents api key / api link depending on.
  */
-class FirebaseEnv extends Env
+class FirebaseEnv
 {
     /**
      * Firebase public api key.
@@ -39,6 +39,8 @@ class FirebaseEnv extends Env
 
     /**
      * getter for firebaseApiKey.
+     *
+     * @return string
      */
     public function getFirebaseApiKey()
     {
@@ -49,6 +51,8 @@ class FirebaseEnv extends Env
      * setter for firebaseApiKey.
      *
      * @param string $apiKey
+     * 
+     * @return void
      */
     private function setFirebaseApiKey($apiKey)
     {

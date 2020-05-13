@@ -1,6 +1,7 @@
 includes:
 	- %currentWorkingDirectory%/vendor/prestashop/php-dev-tools/phpstan/ps-module-extension.neon
 parameters:
+	checkMissingIterableValueType: false
 	paths:
 		- ../../src
 	dynamicConstantNames:

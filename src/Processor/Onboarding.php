@@ -30,7 +30,7 @@ class Onboarding
 
     public function __construct()
     {
-        $this->psAccountsInstance = ModuleCore::getInstanceByName('ps_adccounts');
+        $this->psAccountsInstance = ModuleCore::getInstanceByName('ps_accounts');
     }
 
     public function present()

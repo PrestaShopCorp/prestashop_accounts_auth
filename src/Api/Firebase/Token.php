@@ -64,6 +64,8 @@ class Token extends FirebaseClient
      *
      * @see https://firebase.google.com/docs/reference/rest/auth Firebase documentation
      *
+     * @param string $adminToken
+     *
      * @return array
      */
     public function getRefreshTokenWithAdminToken($adminToken)
