@@ -26,6 +26,11 @@ use PrestaShop\AccountsAuth\Presenter\Store\StorePresenter;
 
 class Onboarding
 {
+    /**
+     * PsAccounts module intance
+     *
+     * @var \Module
+     */
     private $psAccountsInstance;
 
     public function __construct()
@@ -33,15 +38,32 @@ class Onboarding
         $this->psAccountsInstance = ModuleCore::getInstanceByName('ps_accounts');
     }
 
+    /**
+     * Present all data for vue
+     *
+     * @return array
+     */
     public function present()
     {
-        if (false == $this->psAccountsInstance) {
+        /**
+         * Hack for phpstan
+         *
+         * @var \Ps_accounts $psAccountsInstance
+         */
+        $psAccountsInstance = $this->psAccountsInstance;
+
+        if (false == $psAccountsInstance) {
             return ['psaccounts' => false];
         }
 
-        return (new StorePresenter($this->psAccountsInstance, $this->psAccountsInstance->getContext()))->present();
+        return (new StorePresenter($psAccountsInstance, $psAccountsInstance->getContext()))->present();
     }
 
+    /**
+     * Check if you are already onboarded
+     *
+     * @return bool
+     */
     public function isOnboarded()
     {
         return Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')

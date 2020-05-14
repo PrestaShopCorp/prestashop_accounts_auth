@@ -21,7 +21,6 @@
 namespace PrestaShop\AccountsAuth\Api;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;
 
 /**
@@ -124,17 +123,14 @@ abstract class GenericClient
      */
     protected function post(array $options = [])
     {
-        try {
-            $response = $this->getClient()->post($this->getRoute(), $options);
-        } catch (GuzzleException $e) {
-            //TODO handle error
-        }
-
+        $response = $this->getClient()->post($this->getRoute(), $options);
         $responseHandler = new ResponseApiHandler();
-
         $response = $responseHandler->handleResponse($response);
         // If response is not successful only
         if (\Configuration::get('PS_CHECKOUT_DEBUG_LOGS_ENABLED') && !$response['status']) {
+            /**
+             * @var \Ps_accounts
+             */
             $module = \Module::getInstanceByName('ps_accounts');
             $logger = $module->getLogger();
             $logger->debug('route ' . $this->getRoute());
