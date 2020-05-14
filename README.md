@@ -23,9 +23,10 @@ Media::addJsDef([
 Run phpstan
 
 ```bash
+git@github.com:PrestaShopCorp/prestashop_accounts_auth.git path/to/clone
 docker run -tid --rm -v ps-volume:/var/www/html --name temp-ps prestashop/prestashop;
 
-docker run --rm --volumes-from temp-ps -v $PWD:/web/module -e _PS_ROOT_DIR_=/var/www/html --workdir=/web/module phpstan/phpstan:0.12 analyse --configuration=/web/module/tests/phpstan/phpstan.neon
+docker run --rm --volumes-from temp-ps -v $PWD:/web/module -v path/to/clone:/web/ps_accounts -e _PS_ROOT_DIR_=/var/www/html --workdir=/web/module phpstan/phpstan:0.12 analyse --configuration=/web/module/tests/phpstan/phpstan.neon
 ```
 
 Run php-cs-fixer
