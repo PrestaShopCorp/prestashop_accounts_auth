@@ -24,7 +24,7 @@ use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Presenter\PresenterInterface;
 
 /**
- * Construct the firebase module
+ * Construct the firebase presenter
  */
 class FirebaseModule implements PresenterInterface
 {

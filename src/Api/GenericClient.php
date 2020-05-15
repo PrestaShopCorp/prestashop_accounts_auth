@@ -29,8 +29,7 @@ use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;
 abstract class GenericClient
 {
     /**
-     * Enable or disable the catch of Maasland 400 error
-     * If set to false, you will not be able to catch the error of maasland
+     * If set to false, you will not be able to catch the error
      * guzzle will show a different error message.
      *
      * @var bool
@@ -127,7 +126,7 @@ abstract class GenericClient
         $responseHandler = new ResponseApiHandler();
         $response = $responseHandler->handleResponse($response);
         // If response is not successful only
-        if (\Configuration::get('PS_CHECKOUT_DEBUG_LOGS_ENABLED') && !$response['status']) {
+        if (\Configuration::get('PS_ACCOUNTS_DEBUG_LOGS_ENABLED') && !$response['status']) {
             /**
              * @var \Ps_accounts
              */

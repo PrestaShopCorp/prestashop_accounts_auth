@@ -25,7 +25,7 @@ use PrestaShop\AccountsAuth\Presenter\Store\Modules\FirebaseModule;
 use PrestaShop\Module\PsAccounts\Presenter\PsAccountsModule;
 
 /**
- * Present the store to the vuejs app (vuex).
+ * Present the store to the vuejs app.
  */
 class StorePresenter implements PresenterInterface
 {
@@ -56,7 +56,7 @@ class StorePresenter implements PresenterInterface
     }
 
     /**
-     * Build the store required by vuex.
+     * Build the store required by vue.
      *
      * @return array
      */

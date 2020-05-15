@@ -18,12 +18,14 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-namespace PrestaShop\AccountsAuth\Processor;
+namespace PrestaShop\AccountsAuth\Wrapper;
 
-use Configuration;
 use ModuleCore;
 use PrestaShop\AccountsAuth\Presenter\Store\StorePresenter;
 
+/**
+ * Wrappe call to presenter
+ */
 class Onboarding
 {
     /**
@@ -57,17 +59,5 @@ class Onboarding
         }
 
         return (new StorePresenter($psAccountsInstance, $psAccountsInstance->getContext()))->present();
-    }
-
-    /**
-     * Check if you are already onboarded
-     *
-     * @return bool
-     */
-    public function isOnboarded()
-    {
-        return Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
-            && Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
-            && Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA');
     }
 }
