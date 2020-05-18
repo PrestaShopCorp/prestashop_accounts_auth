@@ -1,10 +1,12 @@
 # prestashop_accounts_auth
 
-## How install
+## Installation
 
 ```
 composer require prestashop/prestashop-accounts-auth
 ```
+
+## Usage
 
 In your PSX/AOS :
 
@@ -19,7 +21,7 @@ Media::addJsDef([
 ]);
 ```
 
-### Testing
+## Testing
 
 Run phpstan
 

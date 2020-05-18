@@ -1,4 +1,4 @@
-name: PHP tests
+name: Accounts Quality Control PHP
 
 on: [pull_request]
 
@@ -16,7 +16,7 @@ jobs:
       - name: PHP syntax checker 7.3
         uses: prestashop/github-action-php-lint/7.3@master
   php-cs-fixer:
-    name: PHP-CS-Fixer
+    name: PHP-CS-FIXER
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,7 +24,7 @@ jobs:
       - name: Run PHP-CS-Fixer
         uses: prestashopcorp/github-action-php-cs-fixer@master
   phpstan:
-    name: PHPStan
+    name: PHPSTAN
     runs-on: ubuntu-latest
     strategy:
       matrix:
