@@ -36,7 +36,7 @@ class Webhook
 
     public function __construct()
     {
-        $this->psAccountsInstance = ModuleCore::getInstanceByName('ps_accounts');
+        // $this->psAccountsInstance = ModuleCore::getInstanceByName('ps_accounts');
     }
 
     /**
