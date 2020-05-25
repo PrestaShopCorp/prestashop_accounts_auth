@@ -142,8 +142,6 @@ abstract class GenericClient
 
     /**
      * Setter for client.
-     *
-     * @return void
      */
     protected function setClient(Client $client)
     {
@@ -154,8 +152,6 @@ abstract class GenericClient
      * Setter for exceptions mode.
      *
      * @param bool $bool
-     *
-     * @return void
      */
     protected function setExceptionsMode($bool)
     {
@@ -164,8 +160,6 @@ abstract class GenericClient
 
     /**
      * Setter for link.
-     *
-     * @return void
      */
     protected function setLink(\Link $link)
     {
@@ -176,8 +170,6 @@ abstract class GenericClient
      * Setter for route.
      *
      * @param string $route
-     *
-     * @return void
      */
     protected function setRoute($route)
     {
@@ -188,8 +180,6 @@ abstract class GenericClient
      * Setter for timeout.
      *
      * @param int $timeout
-     *
-     * @return void
      */
     protected function setTimeout($timeout)
     {
