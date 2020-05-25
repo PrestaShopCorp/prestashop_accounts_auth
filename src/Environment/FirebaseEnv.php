@@ -55,6 +55,8 @@ class FirebaseEnv
      * setter for firebaseApiKey.
      *
      * @param string $apiKey
+     *
+     * @return void
      */
     private function setFirebaseApiKey($apiKey)
     {
