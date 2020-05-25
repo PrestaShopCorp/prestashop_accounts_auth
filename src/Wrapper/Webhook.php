@@ -47,8 +47,9 @@ class Webhook
     public function ensureWebhookRegistered($module)
     {
         $moduleName = $module->name;
+
         return $module->registerHook([
-            'receiveWebhook_' . $moduleName
+            'receiveWebhook_' . $moduleName,
         ]);
     }
 }

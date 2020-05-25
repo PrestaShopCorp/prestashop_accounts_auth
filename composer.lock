@@ -378,18 +378,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/annotations.git",
-                "reference": "e723cc77e1e05177e4900ead047ab20061e6d66e"
+                "reference": "8fc7b23076e6144d68379f3410bb7dcf15cdc902"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/annotations/zipball/e723cc77e1e05177e4900ead047ab20061e6d66e",
-                "reference": "e723cc77e1e05177e4900ead047ab20061e6d66e",
+                "url": "https://api.github.com/repos/doctrine/annotations/zipball/8fc7b23076e6144d68379f3410bb7dcf15cdc902",
+                "reference": "8fc7b23076e6144d68379f3410bb7dcf15cdc902",
                 "shasum": ""
             },
             "require": {
                 "doctrine/lexer": "1.*",
                 "ext-tokenizer": "*",
-                "php": "^7.1"
+                "php": "^7.1 || ^8.0"
             },
             "require-dev": {
                 "doctrine/cache": "1.*",
@@ -439,7 +439,7 @@
                 "docblock",
                 "parser"
             ],
-            "time": "2020-05-11T10:56:43+00:00"
+            "time": "2020-05-26T20:34:42+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -565,12 +565,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "a27982e1ff3f95ad0cdd580cdf80f96172253db8"
+                "reference": "17d0486b80a2f8900449fccabc7995614f2d7c92"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/a27982e1ff3f95ad0cdd580cdf80f96172253db8",
-                "reference": "a27982e1ff3f95ad0cdd580cdf80f96172253db8",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/17d0486b80a2f8900449fccabc7995614f2d7c92",
+                "reference": "17d0486b80a2f8900449fccabc7995614f2d7c92",
                 "shasum": ""
             },
             "require": {
@@ -653,7 +653,7 @@
                 }
             ],
             "description": "A tool to automatically fix PHP code style",
-            "time": "2020-05-23T12:03:18+00:00"
+            "time": "2020-05-26T05:32:42+00:00"
         },
         {
             "name": "myclabs/deep-copy",
