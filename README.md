@@ -23,17 +23,27 @@ Media::addJsDef([
 
 ## Testing
 
-Run phpstan
+Run php-cs-fixer
+```bash
+php vendor/bin/php-cs-fixer fix
+```
+
+Run phpstan for prestashop 1.6.1.0
 
 ```bash
 git@github.com:PrestaShopCorp/prestashop_accounts_auth.git path/to/clone
 
-docker run -tid --rm -v ps-volume:/var/www/html --name temp-ps prestashop/prestashop;
+docker run -tid --rm -v ps-volume:/var/www/html --name temp-ps prestashop/prestashop:1.6.1.0;
 
-docker run --rm --volumes-from temp-ps -v $PWD:/web/module -v path/to/clone:/web/ps_accounts -e _PS_ROOT_DIR_=/var/www/html --workdir=/web/module phpstan/phpstan:0.12 analyse --configuration=/web/module/tests/phpstan/phpstan.neon
+docker run --rm --volumes-from temp-ps -v $PWD:/web/module -v path/to/clone:/web/ps_accounts -e _PS_ROOT_DIR_=/var/www/html --workdir=/web/module phpstan/phpstan:0.12 analyse --configuration=/web/module/tests/phpstan/phpstan-PS-1.6.neon
 ```
 
-Run php-cs-fixer
+Run phpstan for prestashop 1.7.0.3
+
 ```bash
-php vendor/bin/php-cs-fixer fix
+git@github.com:PrestaShopCorp/prestashop_accounts_auth.git path/to/clone
+
+docker run -tid --rm -v ps-volume:/var/www/html --name temp-ps prestashop/prestashop:1.7.0.3;
+
+docker run --rm --volumes-from temp-ps -v $PWD:/web/module -v path/to/clone:/web/ps_accounts -e _PS_ROOT_DIR_=/var/www/html --workdir=/web/module phpstan/phpstan:0.12 analyse --configuration=/web/module/tests/phpstan/phpstan-PS-1.7.neon
 ```
