@@ -34,6 +34,10 @@ class FirebaseEnv
 
     public function __construct()
     {
+        $this->firebaseApiKey = $_ENV['FIREBASE_API_KEY'];
+        if (false === $this->firebaseApiKey) {
+            throw new \Exception('FIREBASE_API_KEY can\'t be empty');
+        }
         $this->setFirebaseApiKey($_ENV['FIREBASE_API_KEY']);
     }
 
