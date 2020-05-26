@@ -49,7 +49,7 @@ class Token extends FirebaseClient
             ],
         ]);
 
-        if (true === $response['status']) {
+        if ($response && true === $response['status']) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['id_token']);
             \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refresh_token']);
             \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'));
@@ -77,7 +77,7 @@ class Token extends FirebaseClient
                 'returnSecureToken' => true,
             ],
         ]);
-        if (true === $response['status']) {
+        if ($response && true === $response['status']) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['idToken']);
             \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refreshToken']);
             \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'));

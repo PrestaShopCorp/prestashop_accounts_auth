@@ -30,7 +30,7 @@ use PrestaShop\Module\PsAccounts\Presenter\PsAccountsModule;
 class StorePresenter implements PresenterInterface
 {
     /**
-     * @var \ContextCore
+     * @var \Context
      */
     private $context;
 
@@ -44,7 +44,7 @@ class StorePresenter implements PresenterInterface
      */
     private $store;
 
-    public function __construct(\Module $module, \ContextCore $context, array $store = null)
+    public function __construct(\Module $module, \Context $context, array $store = null)
     {
         // Allow to set a custom store for tests purpose
         if (null !== $store) {

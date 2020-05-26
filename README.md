@@ -16,6 +16,7 @@ In your PSX/AOS :
 
 ```php
 $onboarding = new PrestaShop\AccountsAuth\Processor\Onboarding();
+$presenter = $onboarding->present(); //call presenter
 Media::addJsDef([
     'store' => $onboarding->present(),
 ]);
