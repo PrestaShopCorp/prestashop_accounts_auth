@@ -87,16 +87,6 @@ class Token extends FirebaseClient
     }
 
     /**
-     * Check we can request an other token.
-     *
-     * @return bool
-     */
-    public function shouldRefreshToken()
-    {
-        return $this->hasRefreshToken() && $this->isExpired();
-    }
-
-    /**
      * Check if we have a refresh token.
      *
      * @return bool
@@ -131,7 +121,7 @@ class Token extends FirebaseClient
      */
     public function getToken()
     {
-        if ($this->shouldRefreshToken()) {
+        if ($this->hasRefreshToken() && $this->isExpired()) {
             $this->refresh();
         }
 
