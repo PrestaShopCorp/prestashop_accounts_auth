@@ -21,7 +21,7 @@
 namespace PrestaShop\AccountsAuth\Wrapper;
 
 use ModuleCore;
-use PrestaShop\AccountsAuth\Presenter\Store\StorePresenter;
+use PrestaShop\AccountsAuth\Presenter\PsAccountsPresenter;
 
 /**
  * Wrappe call to presenter
@@ -47,17 +47,6 @@ class Onboarding
      */
     public function present()
     {
-        /**
-         * Hack for phpstan
-         *
-         * @var \Ps_accounts $psAccountsInstance
-         */
-        $psAccountsInstance = $this->psAccountsInstance;
-
-        if (false == $psAccountsInstance) {
-            return ['psaccounts' => false];
-        }
-
-        return (new StorePresenter($psAccountsInstance, $psAccountsInstance->getContext()))->present();
+        return (new PsAccountsPresenter())->present();
     }
 }
