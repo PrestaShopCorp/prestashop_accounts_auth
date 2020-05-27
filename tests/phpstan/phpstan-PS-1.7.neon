@@ -1,0 +1,13 @@
+includes:
+	- %currentWorkingDirectory%/vendor/prestashop/php-dev-tools/phpstan/ps-module-extension.neon
+parameters:
+	autoload_files:
+		- /web/ps_accounts/vendor/autoload.php
+	checkMissingIterableValueType: false
+	reportUnmatchedIgnoredErrors: false
+	paths:
+		- ../../src
+	dynamicConstantNames:
+		- _PS_VERSION_
+
+	level: 7
