@@ -29,8 +29,6 @@ use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
  */
 class PsAccountsPresenter
 {
-
-
     /**
      * Present the PsAccounts module for vue.
      *
@@ -38,66 +36,61 @@ class PsAccountsPresenter
      */
     public function present()
     {
-      $presenter = [
+        $presenter = [
               'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
               'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
               'onboardingLink' => $this->getOnboardingLink(),
-              'user' =>   [
-                  email => (Context::getContext())->employee->email,
-                  emailIsValidated => false, //Always false, we will know this information only after
+              'user' => [
+                  'email' => (Context::getContext())->employee->email,
+                  'emailIsValidated' => false, //Always false, we will know this information only after
                 ],
               'currentShop' => $this->getCurrentShop(),
               'shops' => $this->getShopsTree(),
-
         ];
-
-        dump($presenter);
-        die;
-
+        // dump($presenter);die;
         return $presenter;
     }
 
+    /**
+     * @return string
+     */
     public function getCurrentShop()
     {
-      if(false === Module::isEnabled('ps_accounts')){
-        return \Configuration::get('PS_SHOP_NAME');
-      }
+        if (false === Module::isEnabled('ps_accounts')) {
+            return \Configuration::get('PS_SHOP_NAME');
+        }
 
-      //TODO
-      return \Configuration::get('PS_SHOP_NAME');
+        //TODO
+        return \Configuration::get('PS_SHOP_NAME');
     }
 
+    /**
+     * @return string
+     */
     public function getOnboardingLink()
     {
-      if(false === Module::isEnabled('ps_accounts')){
-        return '';
-      }
-      $uiSvcBaseUrl= 'http://localhost:3000';
-      
-      return $uiSvcBaseUrl.'/shop/account/link/'.\Tools::getProtocol().'/';
+        if (false === Module::isEnabled('ps_accounts')) {
+            return '';
+        }
+        $module = Module::getInstanceByName('ps_accounts');
+        $context = $module->getContext();
 
-      // ${svcUiDomainName}/shop/account/link/${protocolDomainToValidate}/${domainNameDomainToValidate}/${protocolBo}/${domainNameBo}/PSXEmoji.Deluxe.Fake.Service?
-      $module = Module::getInstanceByName('ps_accounts');
-      $psAccountscontext = $module->getContext();
-      return [
-        // 'boUrl' => preg_replace(
-        //     '/^https?:\/\/[^\/]+/',
-        //     '',
-        //     $context->link->getAdminLink('AdminModules', true) . '&configure=' . $module->name
-        // ),
-        // 'nextStep' => preg_replace(
-        //     '/^https?:\/\/[^\/]+/',
-        //     '',
-        //     $context->link->getAdminLink('AdminConfigureHmacPsAccounts')
-        // ),
-        'protocolDomainToValidate' => \Tools::getProtocol(),
-        'domainNameDomainToValidate' => str_replace(
-            \Tools::getProtocol((bool) \Configuration::get('PS_SSL_ENABLED')),
-            '',
-            \Tools::getShopDomainSsl(true)
-        ),
-        // 'adminController' => $context->link->getAdminLink('AdminAjaxPsAccounts'),
+        $uiSvcBaseUrl = 'http://localhost:3000';
+        $protocol = \Tools::getProtocol();
+        $domainName = str_replace(
+        \Tools::getProtocol((bool) \Configuration::get('PS_SSL_ENABLED')),
+        '',
+        \Tools::getShopDomainSsl(true)
+      );
+
+        $queryParams = [
       ];
+
+        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '/' . http_build_query($queryParams);
+        $response = 'https://accounts.psessentials-integration.net/shop/account/link/http/shop-accounts.services-integration.prestashop.net/http/shop-accounts.services-integration.prestashop.net/PSXEmoji.Deluxe.Fake.Service?bo=%2Fps-admin%2Findex.php%3Fcontroller%3DAdminModules%26token%3D3fbfa85a028b6b43f48fa51dbae785e5%26configure%3Dps_accounts&pubKey=-----BEGIN%20RSA%20PUBLIC%20KEY-----%0D%0AMIGJAoGBANsxeyXITCOJKhMRm1PGZ%2BxmB%2Bod34fbpTdf1vHsS4044NLzM0Z0jxLi%0D%0AfUwReMA9Um%2Btk1agBkrHiY4AicHOdPkQqpQLe5WUJtd9yiVytUx8pvkMEWg9vYlI%0D%0AVpotQgBHI2z8hK56uMHZq2CnX5JCaN0Xi6cZCc867Xf23YPx%2BFGzAgMBAAE%3D%0D%0A-----END%20RSA%20PUBLIC%20KEY-----&name=PrestaShop&next=%2Fps-admin%2Findex.php%3Fcontroller%3DAdminConfigureHmacPsAccounts%26token%3D9fdb6078d71e10b5809b08bc812146d4&lang=fr-FR';
+        // ${svcUiDomainName}/shop/account/link/${protocolDomainToValidate}/${domainNameDomainToValidate}/${protocolBo}/${domainNameBo}/PSXEmoji.Deluxe.Fake.Service?
+
+        return $response;
     }
 
     /**
@@ -123,7 +116,10 @@ class PsAccountsPresenter
             return $shopList;
         }
 
-        $linkAdapter = new LinkAdapter($this->context->link);
+        $module = Module::getInstanceByName('ps_accounts');
+        $context = $module->getContext();
+
+        $linkAdapter = new LinkAdapter($context->link);
 
         foreach (\Shop::getTree() as $groupId => $groupData) {
             $shops = [];
@@ -138,7 +134,7 @@ class PsAccountsPresenter
                         true,
                         [],
                         [
-                            'configure' => $this->module->name,
+                            'configure' => $module->name,
                             'setShopContext' => 's-' . $shopId,
                         ]
                     ),
