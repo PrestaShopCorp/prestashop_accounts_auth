@@ -48,7 +48,6 @@ class PsAccountsPresenter
           'shops' => $this->getShopsTree(),
         ];
         dump($presenter);
-        exit;
 
         return $presenter;
     }
@@ -71,7 +70,7 @@ class PsAccountsPresenter
      */
     public function getProtocol()
     {
-        return '';
+        return false == \Configuration::get('PS_SSL_ENABLED') ? 'http' : 'https';
     }
 
     /**
@@ -79,11 +78,9 @@ class PsAccountsPresenter
      */
     public function getDomainName()
     {
-        return str_replace(
-        \Tools::getProtocol(\Configuration::get('PS_SSL_ENABLED')),
-        '',
-        \Tools::getShopDomainSsl()
-      );
+        return
+        \Tools::getShopDomain()
+;
     }
 
     /**
@@ -96,23 +93,34 @@ class PsAccountsPresenter
         }
         $module = Module::getInstanceByName('ps_accounts');
         $context = $module->getContext();
-
+        //Use environment variable
         $uiSvcBaseUrl = 'http://localhost:3000';
         $protocol = $this->getProtocol();
         $domainName = $this->getDomainName();
 
         $queryParams = [
-        'bo' => 'qwqwq',
+        'bo' => preg_replace(
+            '/^https?:\/\/[^\/]+/',
+            '',
+            $context->link->getAdminLink('AdminModules', true) . '&configure=' . $module->name
+        ),
         'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY'),
-        'next' => 'dfdfdf',
-        'lang' => $context->language,
+        'next' => preg_replace(
+            '/^https?:\/\/[^\/]+/',
+            '',
+            $context->link->getAdminLink('AdminConfigureHmacPsAccounts')
+        ),
+        'lang' => $context->language->locale,
       ];
 
-        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '?' . http_build_query($queryParams);
-        //$response = 'https://accounts.psessentials-integration.net/shop/account/link/http/shop-accounts.services-integration.prestashop.net/http/shop-accounts.services-integration.prestashop.net/PSXEmoji.Deluxe.Fake.Service?bo=%2Fps-admin%2Findex.php%3Fcontroller%3DAdminModules%26token%3D3fbfa85a028b6b43f48fa51dbae785e5%26configure%3Dps_accounts&pubKey=-----BEGIN%20RSA%20PUBLIC%20KEY-----%0D%0AMIGJAoGBANsxeyXITCOJKhMRm1PGZ%2BxmB%2Bod34fbpTdf1vHsS4044NLzM0Z0jxLi%0D%0AfUwReMA9Um%2Btk1agBkrHiY4AicHOdPkQqpQLe5WUJtd9yiVytUx8pvkMEWg9vYlI%0D%0AVpotQgBHI2z8hK56uMHZq2CnX5JCaN0Xi6cZCc867Xf23YPx%2BFGzAgMBAAE%3D%0D%0A-----END%20RSA%20PUBLIC%20KEY-----&name=PrestaShop&next=%2Fps-admin%2Findex.php%3Fcontroller%3DAdminConfigureHmacPsAccounts%26token%3D9fdb6078d71e10b5809b08bc812146d4&lang=fr-FR';
-        // ${svcUiDomainName}/shop/account/link/${protocolDomainToValidate}/${domainNameDomainToValidate}/${protocolBo}/${domainNameBo}/PSXEmoji.Deluxe.Fake.Service?
+        $queryParamsArray = [];
+        foreach ($queryParams as $key => $value) {
+            $queryParamsArray[] = $key . '=' . $value;
+        }
+        $strQueryParams = implode('&', $queryParamsArray);
+        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '?' . $strQueryParams;
 
-        return http_build_query($queryParams);
+        return $response;
     }
 
     /**
