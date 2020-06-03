@@ -99,8 +99,9 @@ class PsAccountsPresenter
         $context = $module->getContext();
 
         $uiSvcBaseUrl = getenv('ACCOUNTS_API_URL');
+        $uiSvcBaseUrl = 'https://accounts.psessentials-integration.net';
         if(false === $uiSvcBaseUrl){
-            throw new Exception('nvironmenrt variable ACCOUNTS_API_URL should not be empty');
+            throw new \Exception('Environmenrt variable ACCOUNTS_API_URL should not be empty');
         }
         $protocol = $this->getProtocol();
         $domainName = $this->getDomainName();
@@ -125,7 +126,7 @@ class PsAccountsPresenter
             $queryParamsArray[] = $key . '=' . $value;
         }
         $strQueryParams = implode('&', $queryParamsArray);
-        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '?' . $strQueryParams;
+        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '/' . $protocol . '/' . $domainName .'/PSXEmoji.Deluxe.Fake.Service?' . $strQueryParams;
 
         return $response;
     }
