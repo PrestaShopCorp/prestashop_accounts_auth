@@ -23,12 +23,15 @@ namespace PrestaShop\AccountsAuth\Presenter;
 use Context;
 use Module;
 use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
+use PrestaShop\AccountsAuth\Service\SshKey;
 
 /**
  * Construct the psaccounts module.
  */
 class PsAccountsPresenter
 {
+    const STR_TO_SIGN = "data";
+
     /**
      * Present the PsAccounts module for vue.
      *
@@ -96,6 +99,9 @@ class PsAccountsPresenter
         $context = $module->getContext();
 
         $uiSvcBaseUrl = getenv('ACCOUNTS_API_URL');
+        if(false === $uiSvcBaseUrl){
+            throw new Exception('nvironmenrt variable ACCOUNTS_API_URL should not be empty');
+        }
         $protocol = $this->getProtocol();
         $domainName = $this->getDomainName();
 
@@ -130,19 +136,19 @@ class PsAccountsPresenter
     private function generateSshKey()
     {
         if(
-            false === Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
-            || false === Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
-            || false === Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA')
+            false === \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
+            || false === \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
+            || false === \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA')
         ){
             $sshKey = new SshKey();
             $key = $sshKey->generate();
-            Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey']);
-            Configuration::updateValue('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey']);
+            \Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey']);
+            \Configuration::updateValue('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey']);
             $data = 'data';
-            Configuration::updateValue(
+            \Configuration::updateValue(
                 'PS_ACCOUNTS_RSA_SIGN_DATA',
                 $sshKey->signData(
-                    Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY'),
+                    \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY'),
                     self::STR_TO_SIGN
                 )
             );
