@@ -36,6 +36,7 @@ class PsAccountsPresenter
      */
     public function present()
     {
+        $this->generateSshKey();
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
@@ -121,6 +122,32 @@ class PsAccountsPresenter
         $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '?' . $strQueryParams;
 
         return $response;
+    }
+
+    /**
+     * @return void
+     */
+    private function generateSshKey()
+    {
+        if(
+            false === Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
+            || false === Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
+            || false === Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA')
+        ){
+            $sshKey = new SshKey();
+            $key = $sshKey->generate();
+            Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey']);
+            Configuration::updateValue('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey']);
+            $data = 'data';
+            Configuration::updateValue(
+                'PS_ACCOUNTS_RSA_SIGN_DATA',
+                $sshKey->signData(
+                    Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY'),
+                    self::STR_TO_SIGN
+                )
+            );
+        }
+
     }
 
     /**
