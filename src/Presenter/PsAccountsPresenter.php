@@ -41,7 +41,7 @@ class PsAccountsPresenter
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
           'onboardingLink' => $this->getOnboardingLink(),
           'user' => [
-              'email' => Context::getContext()->employee->email,
+              'email' => '',//Context::getContext()->employee->email,
               'emailIsValidated' => false, //Always false, we will know this information only after
             ],
           'currentShop' => $this->getCurrentShop(),
@@ -93,8 +93,8 @@ class PsAccountsPresenter
         }
         $module = Module::getInstanceByName('ps_accounts');
         $context = $module->getContext();
-        //Use environment variable
-        $uiSvcBaseUrl = 'http://localhost:3000';
+
+        $uiSvcBaseUrl = getenv('ACCOUNTS_API_URL');
         $protocol = $this->getProtocol();
         $domainName = $this->getDomainName();
 
