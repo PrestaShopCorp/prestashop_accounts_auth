@@ -99,7 +99,6 @@ class PsAccountsPresenter
         $context = $module->getContext();
 
         $uiSvcBaseUrl = getenv('ACCOUNTS_API_URL');
-        $uiSvcBaseUrl = 'https://accounts.psessentials-integration.net';
         if(false === $uiSvcBaseUrl){
             throw new \Exception('Environmenrt variable ACCOUNTS_API_URL should not be empty');
         }
