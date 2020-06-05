@@ -35,9 +35,15 @@ class Onboarding
      */
     private $psAccountsInstance;
 
-    public function __construct()
+    /**
+     * @var string
+     */
+    public $bo;
+
+    public function __construct($bo)
     {
         $this->psAccountsInstance = ModuleCore::getInstanceByName('ps_accounts');
+        $this->bo = $bo;
     }
 
     /**
@@ -47,6 +53,6 @@ class Onboarding
      */
     public function present()
     {
-        return (new PsAccountsPresenter())->present();
+        return (new PsAccountsPresenter($this->bo))->present();
     }
 }

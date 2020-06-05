@@ -32,6 +32,17 @@ class PsAccountsPresenter
 {
     const STR_TO_SIGN = "data";
 
+
+    /**
+     * @var string
+     */
+    public $bo;
+
+    public function __construct($bo)
+    {
+        $this->bo = $bo;
+    }
+
     /**
      * Present the PsAccounts module for vue.
      *
@@ -45,7 +56,7 @@ class PsAccountsPresenter
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
           'onboardingLink' => $this->getOnboardingLink(),
           'user' => [
-              'email' => '',//Context::getContext()->employee->email,
+              'email' => 'toot',//Context::getContext()->employee->email,
               'emailIsValidated' => false, //Always false, we will know this information only after
             ],
           'currentShop' => $this->getCurrentShop(),
@@ -61,10 +72,6 @@ class PsAccountsPresenter
      */
     public function getCurrentShop()
     {
-        if (false === Module::isEnabled('ps_accounts')) {
-            return \Configuration::get('PS_SHOP_NAME');
-        }
-
         //TODO
         return \Configuration::get('PS_SHOP_NAME');
     }
@@ -106,23 +113,21 @@ class PsAccountsPresenter
         $domainName = $this->getDomainName();
 
         $queryParams = [
-        'bo' => preg_replace(
-            '/^https?:\/\/[^\/]+/',
-            '',
-            $context->link->getAdminLink('AdminModules', true) . '&configure=' . $module->name
-        ),
+        // Maybe
+        'bo' => $this->bo,
         'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY'),
         'next' => preg_replace(
             '/^https?:\/\/[^\/]+/',
             '',
             $context->link->getAdminLink('AdminConfigureHmacPsAccounts')
         ),
+        'name' => \Configuration::get('PS_SHOP_NAME'),
         'lang' => $context->language->locale,
       ];
 
         $queryParamsArray = [];
         foreach ($queryParams as $key => $value) {
-            $queryParamsArray[] = $key . '=' . $value;
+            $queryParamsArray[] = $key . '=' . urlencode($value);
         }
         $strQueryParams = implode('&', $queryParamsArray);
         $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '/' . $protocol . '/' . $domainName .'/PSXEmoji.Deluxe.Fake.Service?' . $strQueryParams;
