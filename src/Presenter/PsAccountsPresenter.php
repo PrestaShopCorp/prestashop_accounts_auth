@@ -56,17 +56,38 @@ class PsAccountsPresenter
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
           'onboardingLink' => $this->getOnboardingLink(),
           'user' => [
-              'email' => 'toot',//Context::getContext()->employee->email,
-              'emailIsValidated' => false, //Always false, we will know this information only after
+              'email' => $this->getEmail(),
+              'emailIsValidated' => $this->isEmailValited(),
             ],
           'currentShop' => $this->getCurrentShop(),
           'shops' => $this->getShopsTree(),
         ];
-        dump($presenter);
 
         return $presenter;
     }
 
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return null !== \Tools::getValue('adminToken')
+            && !empty(\Tools::getValue('adminToken'))
+            && null !== \Tools::getValue('email')
+            && !empty(\Tools::getValue('email')) ? \Tools::getValue('email') : '';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailValited()
+    {
+        return $this->getEmail()
+            && null !== \Tools::getValue('emailVerified')
+            && !empty(\Tools::getValue('emailVerified'))
+            && true == \Tools::getValue('emailVerified');
+    }
     /**
      * @return string
      */
@@ -90,8 +111,7 @@ class PsAccountsPresenter
     public function getDomainName()
     {
         return
-        \Tools::getShopDomain()
-;
+        \Tools::getShopDomain();
     }
 
     /**
