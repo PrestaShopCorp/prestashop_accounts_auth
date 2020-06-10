@@ -20,18 +20,16 @@
 
 namespace PrestaShop\AccountsAuth\Presenter;
 
-use Context;
 use Module;
-use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Service\SshKey;
+use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
 
 /**
  * Construct the psaccounts module.
  */
 class PsAccountsPresenter
 {
-    const STR_TO_SIGN = "data";
-
+    const STR_TO_SIGN = 'data';
 
     /**
      * @var string
@@ -66,7 +64,6 @@ class PsAccountsPresenter
         return $presenter;
     }
 
-
     /**
      * @return string
      */
@@ -88,6 +85,7 @@ class PsAccountsPresenter
             && !empty(\Tools::getValue('emailVerified'))
             && true == \Tools::getValue('emailVerified');
     }
+
     /**
      * @return string
      */
@@ -126,31 +124,30 @@ class PsAccountsPresenter
         $context = $module->getContext();
 
         $uiSvcBaseUrl = getenv('ACCOUNTS_API_URL');
-        if(false === $uiSvcBaseUrl){
+        if (false === $uiSvcBaseUrl) {
             throw new \Exception('Environmenrt variable ACCOUNTS_API_URL should not be empty');
         }
         $protocol = $this->getProtocol();
         $domainName = $this->getDomainName();
 
         $queryParams = [
-        // Maybe
-        'bo' => $this->bo,
-        'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY'),
-        'next' => preg_replace(
-            '/^https?:\/\/[^\/]+/',
-            '',
-            $context->link->getAdminLink('AdminConfigureHmacPsAccounts')
-        ),
-        'name' => \Configuration::get('PS_SHOP_NAME'),
-        'lang' => $context->language->locale,
-      ];
+            'bo' => $this->bo,
+            'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY'),
+            'next' => preg_replace(
+                '/^https?:\/\/[^\/]+/',
+                '',
+                $context->link->getAdminLink('AdminConfigureHmacPsAccounts')
+            ),
+            'name' => \Configuration::get('PS_SHOP_NAME'),
+            'lang' => $context->language->locale,
+        ];
 
         $queryParamsArray = [];
         foreach ($queryParams as $key => $value) {
             $queryParamsArray[] = $key . '=' . urlencode($value);
         }
         $strQueryParams = implode('&', $queryParamsArray);
-        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '/' . $protocol . '/' . $domainName .'/PSXEmoji.Deluxe.Fake.Service?' . $strQueryParams;
+        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '/' . $protocol . '/' . $domainName . '/PSXEmoji.Deluxe.Fake.Service?' . $strQueryParams;
 
         return $response;
     }
@@ -160,11 +157,11 @@ class PsAccountsPresenter
      */
     private function generateSshKey()
     {
-        if(
+        if (
             false === \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
             || false === \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
             || false === \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA')
-        ){
+        ) {
             $sshKey = new SshKey();
             $key = $sshKey->generate();
             \Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey']);
@@ -178,7 +175,6 @@ class PsAccountsPresenter
                 )
             );
         }
-
     }
 
     /**
