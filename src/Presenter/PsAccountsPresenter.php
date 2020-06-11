@@ -46,13 +46,13 @@ class PsAccountsPresenter
      *
      * @return array
      */
-    public function present()
+    public function present($psx)
     {
         $this->generateSshKey();
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
-          'onboardingLink' => $this->getOnboardingLink(),
+          'onboardingLink' => $this->getOnboardingLink($psx ? $psx : 'default'),
           'user' => [
               'email' => $this->getEmail(),
               'emailIsValidated' => $this->isEmailValited(),
@@ -115,7 +115,7 @@ class PsAccountsPresenter
     /**
      * @return string
      */
-    public function getOnboardingLink()
+    public function getOnboardingLink($psx)
     {
         if (false === Module::isEnabled('ps_accounts')) {
             return '';
@@ -147,7 +147,8 @@ class PsAccountsPresenter
             $queryParamsArray[] = $key . '=' . urlencode($value);
         }
         $strQueryParams = implode('&', $queryParamsArray);
-        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName . '/' . $protocol . '/' . $domainName . '/PSXEmoji.Deluxe.Fake.Service?' . $strQueryParams;
+        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName
+            . '/' . $protocol . '/' . $domainName . '/' . $psx . '?' . $strQueryParams;
 
         return $response;
     }

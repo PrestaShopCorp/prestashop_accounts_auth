@@ -51,8 +51,8 @@ class Onboarding
      *
      * @return array
      */
-    public function present()
+    public function present($psx)
     {
-        return (new PsAccountsPresenter($this->bo))->present();
+        return (new PsAccountsPresenter($this->bo))->present($psx);
     }
 }
