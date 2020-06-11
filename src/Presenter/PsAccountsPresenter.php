@@ -123,9 +123,9 @@ class PsAccountsPresenter
         $module = Module::getInstanceByName('ps_accounts');
         $context = $module->getContext();
 
-        $uiSvcBaseUrl = getenv('ACCOUNTS_API_URL');
+        $uiSvcBaseUrl = getenv('ACCOUNTS_SVC_UI_URL');
         if (false === $uiSvcBaseUrl) {
-            throw new \Exception('Environmenrt variable ACCOUNTS_API_URL should not be empty');
+            throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
         }
         $protocol = $this->getProtocol();
         $domainName = $this->getDomainName();
