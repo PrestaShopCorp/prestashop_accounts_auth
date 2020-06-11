@@ -44,6 +44,8 @@ class PsAccountsPresenter
     /**
      * Present the PsAccounts module for vue.
      *
+     * @param string $psx
+     *
      * @return array
      */
     public function present($psx)
