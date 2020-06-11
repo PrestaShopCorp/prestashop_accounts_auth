@@ -36,7 +36,7 @@ class PsAccountsPresenter
      */
     public $bo;
 
-    public function __construct($bo)
+    public function __construct(string $bo)
     {
         $this->bo = $bo;
     }
@@ -115,6 +115,8 @@ class PsAccountsPresenter
     }
 
     /**
+     * @param string $psx
+     *
      * @return string
      */
     public function getOnboardingLink($psx)
