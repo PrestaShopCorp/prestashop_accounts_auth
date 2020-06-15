@@ -1,0 +1,17 @@
+includes:
+	- %currentWorkingDirectory%/vendor/prestashop/php-dev-tools/phpstan/ps-module-extension.neon
+parameters:
+	autoload_files:
+		- /web/ps_accounts/vendor/autoload.php
+	checkMissingIterableValueType: false
+	reportUnmatchedIgnoredErrors: false
+	paths:
+		- ../../src
+	dynamicConstantNames:
+		- _PS_VERSION_
+	ignoreErrors:
+		- '#Call to an undefined method Module::getContext().#'
+		- '#Result of \|\| is always false.#'
+		- '#Strict comparison using === between false and string will always evaluate to false.#'
+
+	level: 7
