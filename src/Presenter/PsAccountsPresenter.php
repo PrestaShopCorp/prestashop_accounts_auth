@@ -21,6 +21,7 @@
 namespace PrestaShop\AccountsAuth\Presenter;
 
 use Module;
+use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Service\SshKey;
 use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
 
@@ -71,10 +72,16 @@ class PsAccountsPresenter
      */
     public function getEmail()
     {
-        return null !== \Tools::getValue('adminToken')
-            && !empty(\Tools::getValue('adminToken'))
-            && null !== \Tools::getValue('email')
-            && !empty(\Tools::getValue('email')) ? \Tools::getValue('email') : '';
+        if (null !== \Tools::getValue('adminToken')
+        && !empty(\Tools::getValue('adminToken'))
+        && null !== \Tools::getValue('email')
+        && !empty(\Tools::getValue('email'))) {
+            $this->getRefreshTokenWithAdminToken();
+
+            return \Tools::getValue('email');
+        } else {
+            return '';
+        }
     }
 
     /**
@@ -238,5 +245,16 @@ class PsAccountsPresenter
         }
 
         return $shopList;
+    }
+
+    /**
+     * @return void
+     */
+    private function getRefreshTokenWithAdminToken()
+    {
+        \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'));
+        $token = new Token();
+        $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'));
+        $token->refresh();
     }
 }
