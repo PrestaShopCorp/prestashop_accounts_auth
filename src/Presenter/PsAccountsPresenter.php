@@ -24,6 +24,7 @@ use Module;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Service\SshKey;
 use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Construct the psaccounts module.
@@ -51,6 +52,8 @@ class PsAccountsPresenter
      */
     public function present($psx)
     {
+        $dotenv = new Dotenv();
+        $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
         $this->generateSshKey();
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),

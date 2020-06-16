@@ -10,7 +10,7 @@
   },
   "require": {
     "php": ">=5.6",
-    "symfony/dotenv": "^3.4",
+    "symfony/dotenv": "^5.2@dev",
     "ext-json": "*",
     "guzzlehttp/guzzle": "~5.0"
   },
