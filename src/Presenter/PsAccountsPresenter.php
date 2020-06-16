@@ -76,12 +76,15 @@ class PsAccountsPresenter
     public function getEmail()
     {
         if (
-            null !== \Tools::getValue('adminToken')
-            && !empty(\Tools::getValue('adminToken'))
-            && null !== \Tools::getValue('email')
+            null !== \Tools::getValue('email')
             && !empty(\Tools::getValue('email'))
         ) {
-            $this->getRefreshTokenWithAdminToken();
+            if (
+                null !== \Tools::getValue('adminToken')
+                && !empty(\Tools::getValue('adminToken'))
+            ) {
+                $this->getRefreshTokenWithAdminToken();
+            }
 
             return \Tools::getValue('email');
         } else {
