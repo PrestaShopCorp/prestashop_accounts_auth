@@ -21,8 +21,10 @@
 namespace PrestaShop\AccountsAuth\Presenter;
 
 use Module;
+use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Service\SshKey;
 use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
+use Symfony\Component\Dotenv\Dotenv;
 
 /**
  * Construct the psaccounts module.
@@ -50,7 +52,11 @@ class PsAccountsPresenter
      */
     public function present($psx)
     {
+        $dotenv = new Dotenv();
+        $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+
         $this->generateSshKey();
+        $this->getRefreshTokenWithAdminToken();
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
@@ -71,10 +77,14 @@ class PsAccountsPresenter
      */
     public function getEmail()
     {
-        return null !== \Tools::getValue('adminToken')
-            && !empty(\Tools::getValue('adminToken'))
-            && null !== \Tools::getValue('email')
-            && !empty(\Tools::getValue('email')) ? \Tools::getValue('email') : '';
+        if (
+            null !== \Tools::getValue('email')
+            && !empty(\Tools::getValue('email'))
+        ) {
+            return '';
+        }
+
+        return \Tools::getValue('email');
     }
 
     /**
@@ -259,5 +269,23 @@ class PsAccountsPresenter
         }
 
         return $shopList;
+    }
+
+    /**
+     * Only callable during onboarding
+     *
+     * @return void
+     */
+    private function getRefreshTokenWithAdminToken()
+    {
+        if (
+            null !== \Tools::getValue('adminToken')
+            && !empty(\Tools::getValue('adminToken'))
+        ) {
+            \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'));
+            $token = new Token();
+            $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'));
+            $token->refresh();
+        }
     }
 }
