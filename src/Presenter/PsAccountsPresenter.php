@@ -54,7 +54,9 @@ class PsAccountsPresenter
     {
         $dotenv = new Dotenv();
         $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+
         $this->generateSshKey();
+        $this->getRefreshTokenWithAdminToken();
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
@@ -79,17 +81,10 @@ class PsAccountsPresenter
             null !== \Tools::getValue('email')
             && !empty(\Tools::getValue('email'))
         ) {
-            if (
-                null !== \Tools::getValue('adminToken')
-                && !empty(\Tools::getValue('adminToken'))
-            ) {
-                $this->getRefreshTokenWithAdminToken();
-            }
-
-            return \Tools::getValue('email');
-        } else {
             return '';
         }
+
+        return \Tools::getValue('email');
     }
 
     /**
@@ -256,13 +251,21 @@ class PsAccountsPresenter
     }
 
     /**
+     * Only callable during onboarding
+     *
      * @return void
      */
     private function getRefreshTokenWithAdminToken()
     {
-        \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'));
-        $token = new Token();
-        $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'));
-        $token->refresh();
+        if (
+            null !== \Tools::getValue('adminToken')
+            && !empty(\Tools::getValue('adminToken'))
+        ) {
+            \Tools::getValue('email');
+            \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'));
+            $token = new Token();
+            $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'));
+            $token->refresh();
+        }
     }
 }
