@@ -98,6 +98,7 @@ class PsAccountsPresenter
 
         $shop = \Shop::getShop($context->shop->id);
         $linkAdapter = new LinkAdapter($context->link);
+
         return [
             'id' => $shop['id_shop'],
             'name' => $shop['name'],
