@@ -137,12 +137,12 @@ class PsAccountsPresenter
     /**
      * @param string $psx
      *
-     * @return string | false
+     * @return string
      */
     public function getOnboardingLink($psx)
     {
         if (false === Module::isEnabled('ps_accounts')) {
-            return false;
+            return '';
         }
 
         $module = Module::getInstanceByName('ps_accounts');
