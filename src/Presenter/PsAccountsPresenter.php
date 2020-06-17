@@ -93,8 +93,25 @@ class PsAccountsPresenter
      */
     public function getCurrentShop()
     {
-        //TODO
-        return \Configuration::get('PS_SHOP_NAME');
+        $module = \Module::getInstanceByName('ps_accounts');
+        $context = $module->getContext();
+
+        $shop = \Shop::getShop($context->shop->id);
+        $linkAdapter = new LinkAdapter($context->link);
+
+        return [
+            'id' => $shop['id_shop'],
+            'name' => $shop['name'],
+            'url' => $linkAdapter->getAdminLink(
+                'AdminModules',
+                true,
+                [],
+                [
+                    'configure' => $module->name,
+                    'setShopContext' => 's-' . $shop['id_shop'],
+                ]
+            ),
+        ];
     }
 
     /**
@@ -110,8 +127,7 @@ class PsAccountsPresenter
      */
     public function getDomainName()
     {
-        return
-        \Tools::getShopDomain();
+        return \Tools::getShopDomain();
     }
 
     /**
@@ -122,8 +138,9 @@ class PsAccountsPresenter
     public function getOnboardingLink($psx)
     {
         if (false === Module::isEnabled('ps_accounts')) {
-            return '';
+            return false;
         }
+
         $module = Module::getInstanceByName('ps_accounts');
         $context = $module->getContext();
 
