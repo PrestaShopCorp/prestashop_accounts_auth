@@ -261,7 +261,6 @@ class PsAccountsPresenter
             null !== \Tools::getValue('adminToken')
             && !empty(\Tools::getValue('adminToken'))
         ) {
-            \Tools::getValue('email');
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'));
             $token = new Token();
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'));
