@@ -89,7 +89,7 @@ class PsAccountsPresenter
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getCurrentShop()
     {
@@ -133,7 +133,7 @@ class PsAccountsPresenter
     /**
      * @param string $psx
      *
-     * @return string
+     * @return string | false
      */
     public function getOnboardingLink($psx)
     {
