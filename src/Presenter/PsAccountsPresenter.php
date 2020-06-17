@@ -98,10 +98,11 @@ class PsAccountsPresenter
 
         $shop = \Shop::getShop($context->shop->id);
         $linkAdapter = new LinkAdapter($context->link);
-
         return [
             'id' => $shop['id_shop'],
             'name' => $shop['name'],
+            'domain' => $shop['domain'],
+            'domain_ssl' => $shop['domain_ssl'],
             'url' => $linkAdapter->getAdminLink(
                 'AdminModules',
                 true,
@@ -127,7 +128,9 @@ class PsAccountsPresenter
      */
     public function getDomainName()
     {
-        return \Tools::getShopDomain();
+        $currentShop = $this->getCurrentShop();
+
+        return false == \Configuration::get('PS_SSL_ENABLED') ? $currentShop['domain'] : $currentShop['domain_ssl'];
     }
 
     /**
