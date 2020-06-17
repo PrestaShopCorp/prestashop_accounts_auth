@@ -89,12 +89,31 @@ class PsAccountsPresenter
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function getCurrentShop()
     {
-        //TODO
-        return \Configuration::get('PS_SHOP_NAME');
+        $module = \Module::getInstanceByName('ps_accounts');
+        $context = $module->getContext();
+
+        $shop = \Shop::getShop($context->shop->id);
+        $linkAdapter = new LinkAdapter($context->link);
+
+        return [
+            'id' => $shop['id_shop'],
+            'name' => $shop['name'],
+            'domain' => $shop['domain'],
+            'domain_ssl' => $shop['domain_ssl'],
+            'url' => $linkAdapter->getAdminLink(
+                'AdminModules',
+                true,
+                [],
+                [
+                    'configure' => $module->name,
+                    'setShopContext' => 's-' . $shop['id_shop'],
+                ]
+            ),
+        ];
     }
 
     /**
@@ -110,8 +129,9 @@ class PsAccountsPresenter
      */
     public function getDomainName()
     {
-        return
-        \Tools::getShopDomain();
+        $currentShop = $this->getCurrentShop();
+
+        return false == \Configuration::get('PS_SSL_ENABLED') ? $currentShop['domain'] : $currentShop['domain_ssl'];
     }
 
     /**
@@ -124,6 +144,7 @@ class PsAccountsPresenter
         if (false === Module::isEnabled('ps_accounts')) {
             return '';
         }
+
         $module = Module::getInstanceByName('ps_accounts');
         $context = $module->getContext();
 
