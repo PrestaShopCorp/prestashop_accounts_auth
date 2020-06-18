@@ -54,12 +54,15 @@ class PsAccountsPresenter
     {
         $dotenv = new Dotenv();
         $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+        $module = \Module::getInstanceByName('ps_accounts');
+        $context = $module->getContext();
 
         $this->generateSshKey();
         $this->getRefreshTokenWithAdminToken();
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
+          'isSuperAdmin' => $context->employee->isSuperAdmin(),
           'onboardingLink' => $this->getOnboardingLink($psx ? $psx : 'default'),
           'user' => [
               'email' => $this->getEmail(),
