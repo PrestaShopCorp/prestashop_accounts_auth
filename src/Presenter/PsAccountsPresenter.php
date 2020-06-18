@@ -68,7 +68,7 @@ class PsAccountsPresenter
           'currentShop' => $this->getCurrentShop(),
           'shops' => $this->getShopsTree(),
         ];
-        dump($presenter);
+
         return $presenter;
     }
 
@@ -76,13 +76,14 @@ class PsAccountsPresenter
      * @return string | null
      */
     public function getEmail()
-    {   dump(!empty(\Tools::getValue('email')));
+    {
         if (
             null !== \Tools::getValue('email')
             && !empty(\Tools::getValue('email'))
         ) {
             return \Tools::getValue('email');
         }
+
         return null;
     }
 
