@@ -22,6 +22,7 @@ namespace PrestaShop\AccountsAuth\Presenter;
 
 use Module;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
+use PrestaShop\AccountsAuth\Manager\ShopUuidManager;
 use PrestaShop\AccountsAuth\Service\SshKey;
 use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
 use Symfony\Component\Dotenv\Dotenv;
@@ -58,7 +59,8 @@ class PsAccountsPresenter
         $context = $module->getContext();
 
         $this->generateSshKey();
-        $this->getRefreshTokenWithAdminToken();
+        $currentShop = $this->getCurrentShop();
+        $this->getRefreshTokenWithAdminToken($currentShop['id']);
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
@@ -68,7 +70,7 @@ class PsAccountsPresenter
               'email' => $this->getEmail(),
               'emailIsValidated' => $this->isEmailValited(),
             ],
-          'currentShop' => $this->getCurrentShop(),
+          'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
 
@@ -277,18 +279,22 @@ class PsAccountsPresenter
     /**
      * Only callable during onboarding
      *
+     * @param int $shopId
+     *
      * @return void
      */
-    private function getRefreshTokenWithAdminToken()
+    private function getRefreshTokenWithAdminToken($shopId)
     {
         if (
             null !== \Tools::getValue('adminToken')
             && !empty(\Tools::getValue('adminToken'))
         ) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'));
+            $ShopUuidManager = new ShopUuidManager();
+            $ShopUuidManager->generateForShop($shopId);
             $token = new Token();
-            $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'));
-            $token->refresh();
+            $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
+            $token->refresh($shopId);
         }
     }
 }
