@@ -69,7 +69,6 @@ class PsAccountsPresenter
     public function present($bo)
     {
         if (false === Module::isInstalled('ps_accounts') || false === Module::isEnabled('ps_accounts')) {
-
             return [
                 'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
                 'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
