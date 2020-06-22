@@ -15,10 +15,16 @@ In your PSX/AOS :
 [viewsjs component](https://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
 
 ```php
-$onboarding = new PrestaShop\AccountsAuth\Processor\Onboarding();
-$presenter = $onboarding->present(); //call presenter
+//return url
+$boUrl = preg_replace(
+    '/^https?:\/\/[^\/]+/',
+    '',
+    $this->context->link->getAdminLink('AdminModules', true) . '&configure=ps_checkout'
+);
+$psAccountPresenter = new PrestaShop\AccountsAuth\Presenter\PsAccountsPresenter('psx_name');
+
 Media::addJsDef([
-    'store' => $onboarding->present(),
+    'contextPsAccounts' => $psAccountPresenter->present($boUrl),
 ]);
 ```
 

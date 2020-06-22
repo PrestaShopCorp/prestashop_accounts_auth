@@ -20,6 +20,7 @@
 
 namespace PrestaShop\AccountsAuth\Presenter;
 
+use Context;
 use Module;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Manager\ShopUuidManager;
@@ -37,40 +38,66 @@ class PsAccountsPresenter
     /**
      * @var string
      */
-    public $bo;
+    public $psx;
 
-    public function __construct(string $bo)
+    /**
+     * @var Module
+     */
+    public $module;
+
+    /**
+     * @var Context
+     */
+    public $context;
+
+    public function __construct(string $psx)
     {
-        $this->bo = $bo;
+        $this->psx = $psx;
+        $dotenv = new Dotenv();
+        $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+        $this->module = Module::getInstanceByName('ps_accounts');
+        $this->context = Context::getContext();
     }
 
     /**
      * Present the PsAccounts module for vue.
      *
-     * @param string $psx
+     * @param string $bo
      *
      * @return array
      */
-    public function present($psx)
+    public function present($bo)
     {
-        $dotenv = new Dotenv();
-        $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
-        $module = \Module::getInstanceByName('ps_accounts');
-        $context = $module->getContext();
+        if (false === Module::isInstalled('ps_accounts') || false === Module::isEnabled('ps_accounts')) {
 
-        $this->generateSshKey();
+            return [
+                'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
+                'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
+                'isSuperAdmin' => $this->context->employee->isSuperAdmin(),
+                'onboardingLink' => '',
+                'user' => [
+                    'email' => null,
+                    'emailIsValidated' => false,
+                  ],
+                'currentShop' => [],
+                'shops' => [],
+              ];
+        }
+
         $currentShop = $this->getCurrentShop();
+        $this->generateSshKey($currentShop['id']);
         $this->getRefreshTokenWithAdminToken($currentShop['id']);
+
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
-          'isSuperAdmin' => $context->employee->isSuperAdmin(),
-          'onboardingLink' => $this->getOnboardingLink($psx ? $psx : 'default'),
+          'isSuperAdmin' => $this->context->employee->isSuperAdmin(),
+          'onboardingLink' => $this->getOnboardingLink($bo, $currentShop['id']),
           'user' => [
               'email' => $this->getEmail(),
               'emailIsValidated' => $this->isEmailValited(),
             ],
-          'currentShop' => $currentShop,
+          'currentShop' => $this->getCurrentShop(),
           'shops' => $this->getShopsTree(),
         ];
 
@@ -108,11 +135,8 @@ class PsAccountsPresenter
      */
     public function getCurrentShop()
     {
-        $module = \Module::getInstanceByName('ps_accounts');
-        $context = $module->getContext();
-
-        $shop = \Shop::getShop($context->shop->id);
-        $linkAdapter = new LinkAdapter($context->link);
+        $shop = \Shop::getShop($this->context->shop->id);
+        $linkAdapter = new LinkAdapter($this->context->link);
 
         return [
             'id' => $shop['id_shop'],
@@ -124,7 +148,7 @@ class PsAccountsPresenter
                 true,
                 [],
                 [
-                    'configure' => $module->name,
+                    'configure' => $this->module->name,
                     'setShopContext' => 's-' . $shop['id_shop'],
                 ]
             ),
@@ -132,54 +156,52 @@ class PsAccountsPresenter
     }
 
     /**
-     * @return string
-     */
-    public function getProtocol()
-    {
-        return false == \Configuration::get('PS_SSL_ENABLED') ? 'http' : 'https';
-    }
-
-    /**
-     * @return string
-     */
-    public function getDomainName()
-    {
-        $currentShop = $this->getCurrentShop();
-
-        return false == \Configuration::get('PS_SSL_ENABLED') ? $currentShop['domain'] : $currentShop['domain_ssl'];
-    }
-
-    /**
-     * @param string $psx
+     * @param int $shopId
      *
      * @return string
      */
-    public function getOnboardingLink($psx)
+    public function getProtocol($shopId)
     {
-        if (false === Module::isEnabled('ps_accounts')) {
-            return '';
-        }
+        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? 'http' : 'https';
+    }
 
-        $module = Module::getInstanceByName('ps_accounts');
-        $context = $module->getContext();
+    /**
+     * @param int $shopId
+     *
+     * @return string
+     */
+    public function getDomainName($shopId)
+    {
+        $currentShop = $this->getCurrentShop();
 
-        $uiSvcBaseUrl = getenv('ACCOUNTS_SVC_UI_URL');
+        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? $currentShop['domain'] : $currentShop['domain_ssl'];
+    }
+
+    /**
+     * @param string $bo
+     * @param int $shopId
+     *
+     * @return string
+     */
+    public function getOnboardingLink($bo, $shopId)
+    {
+        $uiSvcBaseUrl = $_ENV['ACCOUNTS_SVC_UI_URL'];
         if (false === $uiSvcBaseUrl) {
             throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
         }
-        $protocol = $this->getProtocol();
-        $domainName = $this->getDomainName();
-
+        $protocol = $this->getProtocol($shopId);
+        $domainName = $this->getDomainName($shopId);
+        $currentShop = $this->getCurrentShop();
         $queryParams = [
-            'bo' => $this->bo,
-            'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY'),
+            'bo' => $bo,
+            'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId),
             'next' => preg_replace(
                 '/^https?:\/\/[^\/]+/',
                 '',
-                $context->link->getAdminLink('AdminConfigureHmacPsAccounts')
+                $this->context->link->getAdminLink('AdminConfigureHmacPsAccounts')
             ),
-            'name' => \Configuration::get('PS_SHOP_NAME'),
-            'lang' => $context->language->locale,
+            'name' => $currentShop['name'],
+            'lang' => $this->context->language->locale,
         ];
 
         $queryParamsArray = [];
@@ -188,32 +210,34 @@ class PsAccountsPresenter
         }
         $strQueryParams = implode('&', $queryParamsArray);
         $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName
-            . '/' . $protocol . '/' . $domainName . '/' . $psx . '?' . $strQueryParams;
+            . '/' . $protocol . '/' . $domainName . '/' . $this->psx . '?' . $strQueryParams;
 
         return $response;
     }
 
     /**
+     * @param int $shopId
+     *
      * @return void
      */
-    private function generateSshKey()
+    private function generateSshKey($shopId)
     {
         if (
-            false === \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY')
-            || false === \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY')
-            || false === \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA')
+            false === \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
+            || false === \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
+            || false === \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
         ) {
             $sshKey = new SshKey();
             $key = $sshKey->generate();
-            \Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey']);
-            \Configuration::updateValue('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey']);
+            \Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey'], false, null, (int) $shopId);
+            \Configuration::updateValue('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey'], false, null, (int) $shopId);
             $data = 'data';
             \Configuration::updateValue(
                 'PS_ACCOUNTS_RSA_SIGN_DATA',
                 $sshKey->signData(
-                    \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY'),
+                    \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId),
                     self::STR_TO_SIGN
-                )
+                ), false, null, (int) $shopId
             );
         }
     }
@@ -237,14 +261,11 @@ class PsAccountsPresenter
     {
         $shopList = [];
 
-        if (false === Module::isEnabled('ps_accounts') || true === $this->isShopContext()) {
+        if (true === $this->isShopContext()) {
             return $shopList;
         }
 
-        $module = Module::getInstanceByName('ps_accounts');
-        $context = $module->getContext();
-
-        $linkAdapter = new LinkAdapter($context->link);
+        $linkAdapter = new LinkAdapter($this->context->link);
 
         foreach (\Shop::getTree() as $groupId => $groupData) {
             $shops = [];
@@ -259,7 +280,7 @@ class PsAccountsPresenter
                         true,
                         [],
                         [
-                            'configure' => $module->name,
+                            'configure' => $this->module->name,
                             'setShopContext' => 's-' . $shopId,
                         ]
                     ),
@@ -289,7 +310,7 @@ class PsAccountsPresenter
             null !== \Tools::getValue('adminToken')
             && !empty(\Tools::getValue('adminToken'))
         ) {
-            \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'));
+            \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
             $ShopUuidManager = new ShopUuidManager();
             $ShopUuidManager->generateForShop($shopId);
             $token = new Token();
