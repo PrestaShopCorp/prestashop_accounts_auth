@@ -68,35 +68,20 @@ class PsAccountsPresenter
      */
     public function present($bo)
     {
-        if (false === Module::isInstalled('ps_accounts') || false === Module::isEnabled('ps_accounts')) {
-            return [
-                'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
-                'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
-                'isSuperAdmin' => $this->context->employee->isSuperAdmin(),
-                'onboardingLink' => '',
-                'user' => [
-                    'email' => null,
-                    'emailIsValidated' => false,
-                  ],
-                'currentShop' => [],
-                'shops' => [],
-              ];
-        }
-
-        $currentShop = $this->getCurrentShop();
+        $currentShop = $this->getCurrentShop($this->psx);
         $this->generateSshKey($currentShop['id']);
         $this->getRefreshTokenWithAdminToken($currentShop['id']);
 
         $presenter = [
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
-          'isSuperAdmin' => $this->context->employee->isSuperAdmin(),
           'onboardingLink' => $this->getOnboardingLink($bo, $currentShop['id']),
           'user' => [
               'email' => $this->getEmail(),
               'emailIsValidated' => $this->isEmailValited(),
+              'isSuperAdmin' => $this->context->employee->isSuperAdmin(),
             ],
-          'currentShop' => $this->getCurrentShop(),
+          'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
 
@@ -130,9 +115,11 @@ class PsAccountsPresenter
     }
 
     /**
+     * @param string $psx
+     *
      * @return array
      */
-    public function getCurrentShop()
+    public function getCurrentShop($psx)
     {
         $shop = \Shop::getShop($this->context->shop->id);
         $linkAdapter = new LinkAdapter($this->context->link);
@@ -147,7 +134,7 @@ class PsAccountsPresenter
                 true,
                 [],
                 [
-                    'configure' => $this->module->name,
+                    'configure' => $psx,
                     'setShopContext' => 's-' . $shop['id_shop'],
                 ]
             ),
@@ -184,6 +171,10 @@ class PsAccountsPresenter
      */
     public function getOnboardingLink($bo, $shopId)
     {
+        if (false === Module::isInstalled('ps_accounts') || false === Module::isEnabled('ps_accounts')) {
+            return '';
+        }
+
         $uiSvcBaseUrl = $_ENV['ACCOUNTS_SVC_UI_URL'];
         if (false === $uiSvcBaseUrl) {
             throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');

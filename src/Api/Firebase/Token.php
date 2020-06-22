@@ -84,7 +84,7 @@ class Token extends FirebaseClient
 
         if ($response && true === $response['status']) {
             if (
-                false === \Configuration::get('PS_CHECKOUT_SHOP_UUID_V4', null, null, (int) $idShop)
+                false === \Configuration::get('PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $idShop)
             ) {
                 \Configuration::updateValue('PS_CHECKOUT_SHOP_UUID_V4', $jwt->uid, false, null, (int) $idShop);
             }

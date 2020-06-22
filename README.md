@@ -11,7 +11,7 @@ composer require prestashop/prestashop-accounts-auth
 In your PSX/AOS :
 
 
-- In the PSX / AOS module controllers, get onboarding presenter and go to the view for which is used by the
+- In the PSX / AOS module  main controller, get onboarding presenter and go to the view for which is used by the
 [viewsjs component](https://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
 
 ```php
@@ -19,9 +19,9 @@ In your PSX/AOS :
 $boUrl = preg_replace(
     '/^https?:\/\/[^\/]+/',
     '',
-    $this->context->link->getAdminLink('AdminModules', true) . '&configure=ps_checkout'
+    $this->context->link->getAdminLink('AdminModules', true) . '&configure='.$this->name
 );
-$psAccountPresenter = new PrestaShop\AccountsAuth\Presenter\PsAccountsPresenter('psx_name');
+$psAccountPresenter = new PrestaShop\AccountsAuth\Presenter\PsAccountsPresenter($this->name);
 
 Media::addJsDef([
     'contextPsAccounts' => $psAccountPresenter->present($boUrl),
