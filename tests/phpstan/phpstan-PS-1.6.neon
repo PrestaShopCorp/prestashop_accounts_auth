@@ -13,5 +13,7 @@ parameters:
 		- '#Call to an undefined method Module::getContext().#'
 		- '#Result of \|\| is always false.#'
 		- '#Strict comparison using === between false and string will always evaluate to false.#'
+		- '#Access to an undefined property Language::\$locale.#'
+
 
 	level: 7
