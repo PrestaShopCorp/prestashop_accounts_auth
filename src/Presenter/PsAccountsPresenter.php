@@ -62,20 +62,26 @@ class PsAccountsPresenter
     /**
      * Present the PsAccounts module for vue.
      *
-     * @param string $bo
-     *
      * @return array
      */
-    public function present($bo)
+    public function present()
     {
+        $callback = preg_replace(
+            '/^https?:\/\/[^\/]+/',
+            '',
+            $this->context->link->getAdminLink('AdminModules', true) . '&configure=' . $this->psx
+        );
         $currentShop = $this->getCurrentShop();
         $this->generateSshKey($currentShop['id']);
         $this->getRefreshTokenWithAdminToken($currentShop['id']);
 
         $presenter = [
+          'psIs17' => $this->isPs17(),
+          'psAccountsInstallLink' => $this->getPsAccountsInstallLink(),
+          'psAccountsEnableLink' => $this->getPsAccountsEnableLink(),
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
-          'onboardingLink' => $this->getOnboardingLink($bo, $currentShop['id']),
+          'onboardingLink' => $this->getOnboardingLink($callback, $currentShop['id']),
           'user' => [
               'email' => $this->getEmail(),
               'emailIsValidated' => $this->isEmailValited(),
@@ -84,8 +90,47 @@ class PsAccountsPresenter
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
+        // dump($presenter);
 
         return $presenter;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isPs17()
+    {
+        return version_compare(_PS_VERSION_, '1.7.0.0', '>=');
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getPsAccountsInstallLink()
+    {
+        if (true === Module::isInstalled('ps_accounts')) {
+            return null;
+        }
+
+        if ($this->isPs17()) {
+        }
+
+        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psx . '&install=' . $this->psx;
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getPsAccountsEnableLink()
+    {
+        if (true === Module::isEnabled('ps_accounts')) {
+            return null;
+        }
+
+        if ($this->isPs17()) {
+        }
+
+        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psx . '&enable=1 ';
     }
 
     /**
