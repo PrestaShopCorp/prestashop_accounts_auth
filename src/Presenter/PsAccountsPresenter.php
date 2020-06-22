@@ -68,7 +68,7 @@ class PsAccountsPresenter
      */
     public function present($bo)
     {
-        $currentShop = $this->getCurrentShop($this->psx);
+        $currentShop = $this->getCurrentShop();
         $this->generateSshKey($currentShop['id']);
         $this->getRefreshTokenWithAdminToken($currentShop['id']);
 
@@ -115,11 +115,9 @@ class PsAccountsPresenter
     }
 
     /**
-     * @param string $psx
-     *
      * @return array
      */
-    public function getCurrentShop($psx)
+    public function getCurrentShop()
     {
         $shop = \Shop::getShop($this->context->shop->id);
         $linkAdapter = new LinkAdapter($this->context->link);
@@ -134,7 +132,7 @@ class PsAccountsPresenter
                 true,
                 [],
                 [
-                    'configure' => $psx,
+                    'configure' => $this->psx,
                     'setShopContext' => 's-' . $shop['id_shop'],
                 ]
             ),
