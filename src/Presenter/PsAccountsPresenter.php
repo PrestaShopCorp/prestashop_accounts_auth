@@ -50,6 +50,11 @@ class PsAccountsPresenter
      */
     public $context;
 
+    /**
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    protected $container;
+
     public function __construct(string $psx)
     {
         $this->psx = $psx;
@@ -66,11 +71,7 @@ class PsAccountsPresenter
      */
     public function present()
     {
-        $callback = preg_replace(
-            '/^https?:\/\/[^\/]+/',
-            '',
-            $this->context->link->getAdminLink('AdminModules', true) . '&configure=' . $this->psx
-        );
+
         $currentShop = $this->getCurrentShop();
         $this->generateSshKey($currentShop['id']);
         $this->getRefreshTokenWithAdminToken($currentShop['id']);
@@ -81,7 +82,7 @@ class PsAccountsPresenter
           'psAccountsEnableLink' => $this->getPsAccountsEnableLink(),
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
           'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
-          'onboardingLink' => $this->getOnboardingLink($callback, $currentShop['id']),
+          'onboardingLink' => $this->getOnboardingLink($currentShop['id']),
           'user' => [
               'email' => $this->getEmail(),
               'emailIsValidated' => $this->isEmailValited(),
@@ -100,7 +101,7 @@ class PsAccountsPresenter
      */
     private function isPs17()
     {
-        return version_compare(_PS_VERSION_, '1.7.0.0', '>=');
+        return version_compare(_PS_VERSION_, '1.7.3.0', '>=');
     }
 
     /**
@@ -113,6 +114,12 @@ class PsAccountsPresenter
         }
 
         if ($this->isPs17()) {
+            $router = $this->get('router');
+
+            return substr(\Tools::getShopDomainSsl(true) . __PS_BASE_URI__, 0, -1) . $router->generate('admin_module_manage_action', [
+                'action' => 'install',
+                'module_name' => 'ps_accounts',
+            ]);
         }
 
         return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psx . '&install=' . $this->psx;
@@ -128,9 +135,15 @@ class PsAccountsPresenter
         }
 
         if ($this->isPs17()) {
+            $router = $this->get('router');
+
+            return substr(\Tools::getShopDomainSsl(true) . __PS_BASE_URI__, 0, -1) . $router->generate('admin_module_manage_action', [
+                'action' => 'enable',
+                'module_name' => 'ps_accounts',
+            ]);
         }
 
-        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psx . '&enable=1 ';
+        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psx . '&enable=1';
     }
 
     /**
@@ -207,16 +220,21 @@ class PsAccountsPresenter
     }
 
     /**
-     * @param string $bo
      * @param int $shopId
      *
      * @return string
      */
-    public function getOnboardingLink($bo, $shopId)
+    public function getOnboardingLink($shopId)
     {
         if (false === Module::isInstalled('ps_accounts') || false === Module::isEnabled('ps_accounts')) {
             return '';
         }
+
+        $callback = preg_replace(
+            '/^https?:\/\/[^\/]+/',
+            '',
+            $this->context->link->getAdminLink('AdminModules', true) . '&configure=' . $this->psx
+        );
 
         $uiSvcBaseUrl = $_ENV['ACCOUNTS_SVC_UI_URL'];
         if (false === $uiSvcBaseUrl) {
@@ -226,7 +244,7 @@ class PsAccountsPresenter
         $domainName = $this->getDomainName($shopId);
         $currentShop = $this->getCurrentShop();
         $queryParams = [
-            'bo' => $bo,
+            'bo' => $callback,
             'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId),
             'next' => preg_replace(
                 '/^https?:\/\/[^\/]+/',
@@ -307,7 +325,7 @@ class PsAccountsPresenter
                     'id' => $shopId,
                     'name' => $shopData['name'],
                     'domain' => $shopData['domain'],
-                    'domain_ssl' => $shopData['domain_ssl'],
+                    'domainSsl' => $shopData['domain_ssl'],
                     'url' => $linkAdapter->getAdminLink(
                         'AdminModules',
                         true,
@@ -350,5 +368,19 @@ class PsAccountsPresenter
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
             $token->refresh($shopId);
         }
+    }
+
+    /**
+     * Override of native function to always retrieve Symfony container instead of legacy admin container on legacy context.
+     *
+     * @return void
+     */
+    public function get($serviceName)
+    {
+        if (null === $this->container) {
+            $this->container = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance();
+        }
+
+        return $this->container->get($serviceName);
     }
 }
