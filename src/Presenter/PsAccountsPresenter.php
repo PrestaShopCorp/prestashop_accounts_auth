@@ -249,7 +249,7 @@ class PsAccountsPresenter
                 $this->context->link->getAdminLink('AdminConfigureHmacPsAccounts')
             ),
             'name' => $currentShop['name'],
-            'lang' => $this->context->language->locale,
+            'lang' => $this->context->language->iso_code,
         ];
 
         $queryParamsArray = [];
