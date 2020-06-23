@@ -89,7 +89,7 @@ class PsAccountsPresenter
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
-        dump($presenter);
+
         return $presenter;
     }
 
