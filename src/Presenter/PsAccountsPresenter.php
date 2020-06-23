@@ -23,7 +23,6 @@ namespace PrestaShop\AccountsAuth\Presenter;
 use Context;
 use Module;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\Manager\ShopUuidManager;
 use PrestaShop\AccountsAuth\Service\SshKey;
 use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
 use Symfony\Component\Dotenv\Dotenv;
@@ -38,7 +37,7 @@ class PsAccountsPresenter
     /**
      * @var string
      */
-    public $psx;
+    public $psxName;
 
     /**
      * @var Module
@@ -55,9 +54,9 @@ class PsAccountsPresenter
      */
     protected $container;
 
-    public function __construct(string $psx)
+    public function __construct(string $psxName)
     {
-        $this->psx = $psx;
+        $this->psxName = $psxName;
         $dotenv = new Dotenv();
         $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
         $this->module = Module::getInstanceByName('ps_accounts');
@@ -90,7 +89,7 @@ class PsAccountsPresenter
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
-
+        dump($presenter);
         return $presenter;
     }
 
@@ -120,7 +119,7 @@ class PsAccountsPresenter
             ]);
         }
 
-        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psx . '&install=' . $this->psx;
+        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&install=' . $this->psxName;
     }
 
     /**
@@ -141,7 +140,7 @@ class PsAccountsPresenter
             ]);
         }
 
-        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psx . '&enable=1';
+        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&enable=1';
     }
 
     /**
@@ -188,7 +187,7 @@ class PsAccountsPresenter
                 true,
                 [],
                 [
-                    'configure' => $this->psx,
+                    'configure' => $this->psxName,
                     'setShopContext' => 's-' . $shop['id_shop'],
                 ]
             ),
@@ -231,7 +230,7 @@ class PsAccountsPresenter
         $callback = preg_replace(
             '/^https?:\/\/[^\/]+/',
             '',
-            $this->context->link->getAdminLink('AdminModules', true) . '&configure=' . $this->psx
+            $this->context->link->getAdminLink('AdminModules', true) . '&configure=' . $this->psxName
         );
 
         $uiSvcBaseUrl = $_ENV['ACCOUNTS_SVC_UI_URL'];
@@ -259,7 +258,7 @@ class PsAccountsPresenter
         }
         $strQueryParams = implode('&', $queryParamsArray);
         $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName
-            . '/' . $protocol . '/' . $domainName . '/' . $this->psx . '?' . $strQueryParams;
+            . '/' . $protocol . '/' . $domainName . '/' . $this->psxName . '?' . $strQueryParams;
 
         return $response;
     }
@@ -360,8 +359,6 @@ class PsAccountsPresenter
             && !empty(\Tools::getValue('adminToken'))
         ) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
-            $ShopUuidManager = new ShopUuidManager();
-            $ShopUuidManager->generateForShop($shopId);
             $token = new Token();
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
             $token->refresh($shopId);
