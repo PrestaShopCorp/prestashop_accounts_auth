@@ -1,5 +1,22 @@
 # prestashop_accounts_auth
 
+## AOS and comunity module
+
+An AOS module needs three parts:
+
+### [module ps_accounts](http://github.com/PrestaShopCorp/ps_accounts)
+
+* Contains all the controllers
+
+### [librairie npm](http://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
+
+* Contains all the vuejs components to manage onboarding
+
+### [librairie composer](http://github.com/PrestaShopCorp/prestashop_accounts_auth)
+
+* contient tout la lib composer:
+    * Contains all the firebase's logic
+
 ## Installation
 
 ```bash
@@ -20,6 +37,31 @@ $psAccountPresenter = new PrestaShop\AccountsAuth\Presenter\PsAccountsPresenter(
 Media::addJsDef([
     'contextPsAccounts' => $psAccountPresenter->present(),
 ]);
+```
+
+The $psAccountPresenter format is :
+```php
+[
+    'psIs17' => bool,
+    'psAccountsInstallLink' => null|string,
+    'psAccountsEnableLink' => null|string,
+    'psAccountsIsInstalled' => bool,
+    'psAccountsIsEnabled' => bool,
+    'onboardingLink' => string,
+    'user' => [
+        'email' => null|string,
+        'emailIsValidated' => bool,
+        'isSuperAdmin' => bool,
+    ],
+    'currentShop' =>  [
+        'id' => string,
+        'name' => string,
+        'domain' => string,
+        'domainSsl' => string,
+        'url' => string,
+    ],
+    'shops' => $this->getShopsTree(),
+        ];
 ```
 
 ## Testing

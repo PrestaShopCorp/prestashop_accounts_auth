@@ -72,7 +72,7 @@ class PsAccountsPresenter
     {
         $currentShop = $this->getCurrentShop();
         $this->generateSshKey($currentShop['id']);
-        $this->getRefreshTokenWithAdminToken($currentShop['id']);
+        $this->saveQueriesParams($currentShop['id']);
 
         $presenter = [
           'psIs17' => $this->isPs17(),
@@ -82,13 +82,15 @@ class PsAccountsPresenter
           'psAccountsIsEnabled' => Module::isEnabled('ps_accounts'),
           'onboardingLink' => $this->getOnboardingLink($currentShop['id']),
           'user' => [
-              'email' => $this->getEmail(),
-              'emailIsValidated' => $this->isEmailValited(),
+              'email' => $this->getEmail($currentShop['id']),
+              'emailIsValidated' => $this->isEmailValited($currentShop['id']),
               'isSuperAdmin' => $this->context->employee->isSuperAdmin(),
             ],
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
+
+        // dump($presenter);
 
         return $presenter;
     }
@@ -144,29 +146,23 @@ class PsAccountsPresenter
     }
 
     /**
+     * @param int $shopId
+     *
      * @return string | null
      */
-    public function getEmail()
+    public function getEmail($shopId)
     {
-        if (
-            null !== \Tools::getValue('email')
-            && !empty(\Tools::getValue('email'))
-        ) {
-            return \Tools::getValue('email');
-        }
-
-        return null;
+        return \Configuration::get('PS_PSX_EMAIL', null, null, (int) $shopId) ?: null;
     }
 
     /**
-     * @return bool
+     * @param int $shopId
+     *
+     * @return string
      */
-    public function isEmailValited()
+    public function isEmailValited($shopId)
     {
-        return $this->getEmail()
-            && null !== \Tools::getValue('emailVerified')
-            && !empty(\Tools::getValue('emailVerified'))
-            && true == \Tools::getValue('emailVerified');
+        return \Configuration::get('PS_PSX_EMAIL_IS_VERIFIED', null, null, (int) $shopId);
     }
 
     /**
@@ -352,17 +348,32 @@ class PsAccountsPresenter
      *
      * @return void
      */
-    private function getRefreshTokenWithAdminToken($shopId)
+    private function saveQueriesParams($shopId)
     {
+        $token = new Token();
+
+        if (
+            null !== \Tools::getValue('email')
+            && !empty(\Tools::getValue('email'))
+        ) {
+            \Configuration::updateValue('PS_PSX_EMAIL', \Tools::getValue('email'), false, null, (int) $shopId);
+            if (
+                null !== \Tools::getValue('emailVerified')
+                && !empty(\Tools::getValue('emailVerified'))
+                && true == \Tools::getValue('emailVerified')
+            ) {
+                \Configuration::updateValue('PS_PSX_EMAIL_IS_VERIFIED', true, false, null, (int) $shopId);
+            }
+        }
+
         if (
             null !== \Tools::getValue('adminToken')
             && !empty(\Tools::getValue('adminToken'))
         ) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
-            $token = new Token();
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
-            $token->refresh($shopId);
         }
+        $token->refresh($shopId);
     }
 
     /**
