@@ -80,7 +80,7 @@ class PsAccountsPresenter
           'psAccountsInstallLink' => $this->getPsAccountsInstallLink(),
           'psAccountsEnableLink' => $this->getPsAccountsEnableLink(),
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
-          'psAccountIsEnabled' => Module::isEnabled('ps_accounts'),
+          'psAccountsIsEnabled' => Module::isEnabled('ps_accounts'),
           'onboardingLink' => $this->getOnboardingLink($currentShop['id']),
           'user' => [
               'email' => $this->getEmail(),
@@ -90,7 +90,6 @@ class PsAccountsPresenter
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
-        dump($presenter);
 
         return $presenter;
     }
