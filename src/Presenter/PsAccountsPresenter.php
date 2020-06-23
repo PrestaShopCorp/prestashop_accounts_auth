@@ -71,7 +71,6 @@ class PsAccountsPresenter
      */
     public function present()
     {
-
         $currentShop = $this->getCurrentShop();
         $this->generateSshKey($currentShop['id']);
         $this->getRefreshTokenWithAdminToken($currentShop['id']);
@@ -91,7 +90,7 @@ class PsAccountsPresenter
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
         ];
-        // dump($presenter);
+        dump($presenter);
 
         return $presenter;
     }
@@ -373,7 +372,9 @@ class PsAccountsPresenter
     /**
      * Override of native function to always retrieve Symfony container instead of legacy admin container on legacy context.
      *
-     * @return void
+     * @param string $serviceName
+     *
+     * @return mixed
      */
     public function get($serviceName)
     {
