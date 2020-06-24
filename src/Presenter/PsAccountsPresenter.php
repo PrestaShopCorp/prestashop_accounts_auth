@@ -90,7 +90,7 @@ class PsAccountsPresenter
           'shops' => $this->getShopsTree(),
         ];
 
-        // dump($presenter);
+        dump($presenter);
 
         return $presenter;
     }
@@ -268,8 +268,12 @@ class PsAccountsPresenter
     {
         if (
             false === \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
+            || empty(\Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
             || false === \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
+            || empty(\Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
             || false === \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
+            || empty(\Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId))
+
         ) {
             $sshKey = new SshKey();
             $key = $sshKey->generate();
@@ -369,6 +373,12 @@ class PsAccountsPresenter
         if (
             null !== \Tools::getValue('adminToken')
             && !empty(\Tools::getValue('adminToken'))
+            && false !== \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
+            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
+            && false !== \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
+            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
+            && false !== \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
+            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId))
         ) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
