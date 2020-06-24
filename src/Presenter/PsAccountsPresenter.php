@@ -83,7 +83,7 @@ class PsAccountsPresenter
           'onboardingLink' => $this->getOnboardingLink($currentShop['id']),
           'user' => [
               'email' => $this->getEmail($currentShop['id']),
-              'emailIsValidated' => $this->isEmailValited($currentShop['id']),
+              'emailIsValidated' => $this->isEmailValidated($currentShop['id']),
               'isSuperAdmin' => $this->context->employee->isSuperAdmin(),
             ],
           'currentShop' => $currentShop,
@@ -169,9 +169,10 @@ class PsAccountsPresenter
      *
      * @return bool
      */
-    public function isEmailValited($shopId)
+    public function isEmailValidated($shopId)
     {
-        return '1' === \Configuration::get('PS_PSX_EMAIL_IS_VERIFIED', null, null, (int) $shopId) ? true : false;
+        // TODO:
+        return in_array(\Configuration::get('PS_PSX_EMAIL_IS_VERIFIED', null, null, (int) $shopId), ['1', 1, true]);
     }
 
     /**
