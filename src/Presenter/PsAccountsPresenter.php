@@ -162,7 +162,7 @@ class PsAccountsPresenter
      */
     public function isEmailValited($shopId)
     {
-        return \Configuration::get('PS_PSX_EMAIL_IS_VERIFIED', null, null, (int) $shopId);
+        return '1' === \Configuration::get('PS_PSX_EMAIL_IS_VERIFIED', null, null, (int) $shopId) ? true : false;
     }
 
     /**
