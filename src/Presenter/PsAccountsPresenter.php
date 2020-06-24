@@ -88,11 +88,20 @@ class PsAccountsPresenter
             ],
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
+          'firebaseRefreshToken' => $this->getFirebaseRefreshToken($currentShop['id']),
         ];
 
-        dump($presenter);
-
         return $presenter;
+    }
+
+    /**
+     * @param int $shopId
+     *
+     * @return string | null
+     */
+    private function getFirebaseRefreshToken($shopId)
+    {
+        return \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId) ?: null;
     }
 
     /**
@@ -158,7 +167,7 @@ class PsAccountsPresenter
     /**
      * @param int $shopId
      *
-     * @return string
+     * @return bool
      */
     public function isEmailValited($shopId)
     {
@@ -266,15 +275,7 @@ class PsAccountsPresenter
      */
     private function generateSshKey($shopId)
     {
-        if (
-            false === \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
-            || empty(\Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
-            || false === \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
-            || empty(\Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
-            || false === \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
-            || empty(\Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId))
-
-        ) {
+        if (false === $this->hasSshKey($shopId)) {
             $sshKey = new SshKey();
             $key = $sshKey->generate();
             \Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey'], false, null, (int) $shopId);
@@ -288,6 +289,21 @@ class PsAccountsPresenter
                 ), false, null, (int) $shopId
             );
         }
+    }
+
+    /**
+     * @param int $shopId
+     *
+     * @return bool
+     */
+    private function hasSshKey($shopId)
+    {
+        return false !== \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
+            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
+            && false !== \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
+            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
+            && false !== \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
+            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId));
     }
 
     /**
@@ -373,12 +389,7 @@ class PsAccountsPresenter
         if (
             null !== \Tools::getValue('adminToken')
             && !empty(\Tools::getValue('adminToken'))
-            && false !== \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
-            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
-            && false !== \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
-            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
-            && false !== \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
-            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId))
+            && true === $this->hasSshKey($shopId)
         ) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
