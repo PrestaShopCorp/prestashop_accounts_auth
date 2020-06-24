@@ -13,5 +13,6 @@ parameters:
 		- '#Call to an undefined method Module::getContext().#'
 		- '#Result of \|\| is always false.#'
 		- '#Strict comparison using === between false and string will always evaluate to false.#'
+		- '#Call to static method getInstance\(\) on an unknown class PrestaShop\\PrestaShop\\Adapter\\SymfonyContainer.#'
 
 	level: 7

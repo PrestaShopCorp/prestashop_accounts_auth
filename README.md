@@ -1,8 +1,25 @@
 # prestashop_accounts_auth
 
+## AOS and comunity module
+
+An AOS module needs three parts:
+
+### [module ps_accounts](http://github.com/PrestaShopCorp/ps_accounts)
+
+* Contains all the controllers
+
+### [librairie npm](http://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
+
+* Contains all the vuejs components to manage onboarding
+
+### [librairie composer](http://github.com/PrestaShopCorp/prestashop_accounts_auth)
+
+* contient tout la lib composer:
+    * Contains all the firebase's logic
+
 ## Installation
 
-```
+```bash
 composer require prestashop/prestashop-accounts-auth
 ```
 
@@ -10,16 +27,41 @@ composer require prestashop/prestashop-accounts-auth
 
 In your PSX/AOS :
 
-
-- In the PSX / AOS module controllers, get onboarding presenter and go to the view for which is used by the
+- In the PSX / AOS module  main controller, get onboarding presenter and go to the view for which is used by the
 [viewsjs component](https://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
 
 ```php
-$onboarding = new PrestaShop\AccountsAuth\Processor\Onboarding();
-$presenter = $onboarding->present(); //call presenter
+
+$psAccountPresenter = new PrestaShop\AccountsAuth\Presenter\PsAccountsPresenter($this->name);
+
 Media::addJsDef([
-    'store' => $onboarding->present(),
+    'contextPsAccounts' => $psAccountPresenter->present(),
 ]);
+```
+
+The $psAccountPresenter format is :
+```php
+[
+    'psIs17' => bool,
+    'psAccountsInstallLink' => null|string,
+    'psAccountsEnableLink' => null|string,
+    'psAccountsIsInstalled' => bool,
+    'psAccountsIsEnabled' => bool,
+    'onboardingLink' => string,
+    'user' => [
+        'email' => null|string,
+        'emailIsValidated' => bool,
+        'isSuperAdmin' => bool,
+    ],
+    'currentShop' =>  [
+        'id' => string,
+        'name' => string,
+        'domain' => string,
+        'domainSsl' => string,
+        'url' => string,
+    ],
+    'shops' => $this->getShopsTree(),
+        ];
 ```
 
 ## Testing

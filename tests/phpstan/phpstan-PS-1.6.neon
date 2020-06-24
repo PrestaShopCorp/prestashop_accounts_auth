@@ -13,5 +13,9 @@ parameters:
 		- '#Call to an undefined method Module::getContext().#'
 		- '#Result of \|\| is always false.#'
 		- '#Strict comparison using === between false and string will always evaluate to false.#'
+		- '#Access to an undefined property Language::\$locale.#'
+		- '#Call to static method getInstance\(\) on an unknown class PrestaShop\\PrestaShop\\Adapter\\SymfonyContainer.#'
+		- '#Call to method get\(\) on an unknown class Symfony\\Component\\DependencyInjection\\ContainerInterface.#'
+		- '#Property PrestaShop\\AccountsAuth\\Presenter\\PsAccountsPresenter::\$container has unknown class Symfony\\Component\\DependencyInjection\\ContainerInterface as its type.#'
 
 	level: 7
