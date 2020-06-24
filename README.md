@@ -14,8 +14,8 @@ An AOS module needs three parts:
 
 ### [librairie composer](http://github.com/PrestaShopCorp/prestashop_accounts_auth)
 
-* contient tout la lib composer:
-    * Contains all the firebase's logic
+* Wrappe all the call to ps_accounts
+* Contains all the firebase's logic
 
 ## Installation
 
@@ -61,7 +61,7 @@ The $psAccountPresenter format is :
         'url' => string,
     ],
     'shops' => $this->getShopsTree(),
-        ];
+];
 ```
 
 ## Testing
