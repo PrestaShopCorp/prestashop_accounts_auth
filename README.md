@@ -1,8 +1,8 @@
 # prestashop_accounts_auth
 
-## AOS and comunity module
+## Community Service & PrestaShop X modules
 
-An AOS module needs three parts:
+To work as a Community Service or as PrestaShop X, a module needs three parts:
 
 ### [module ps_accounts](http://github.com/PrestaShopCorp/ps_accounts)
 
@@ -14,8 +14,8 @@ An AOS module needs three parts:
 
 ### [librairie composer](http://github.com/PrestaShopCorp/prestashop_accounts_auth)
 
-* Wrappe all the call to ps_accounts
-* Contains all the firebase's logic
+* Wraps all the calls to ps_accounts
+* Contains all the Firebase logic
 
 ## Installation
 
@@ -25,9 +25,9 @@ composer require prestashop/prestashop-accounts-auth
 
 ## Usage
 
-In your PSX/AOS :
+In your PrestaShop X or Community Service module:
 
-- In the PSX / AOS module  main controller, get onboarding presenter and go to the view for which is used by the
+- In the module's controllers and/or main class, get onboarding presenter and go to the view used by the
 [viewsjs component](https://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
 
 ```php
@@ -39,7 +39,7 @@ Media::addJsDef([
 ]);
 ```
 
-The $psAccountPresenter format is :
+The $psAccountPresenter format is:
 ```php
 [
     'psIs17' => bool,
