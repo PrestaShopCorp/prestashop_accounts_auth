@@ -20,7 +20,7 @@ To work as a Community Service or as PrestaShop X, a module needs three parts:
 ## Installation
 
 ```bash
-composer requires prestashop/prestashop-accounts-auth
+composer require prestashop/prestashop-accounts-auth
 ```
 
 ## Usage
