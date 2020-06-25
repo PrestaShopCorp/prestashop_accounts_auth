@@ -54,6 +54,9 @@ class PsAccountsPresenter
      */
     protected $container;
 
+    /**
+     * @param string $psxName
+     */
     public function __construct($psxName)
     {
         $this->psxName = $psxName;
@@ -393,9 +396,8 @@ class PsAccountsPresenter
             if (
                 null !== \Tools::getValue('emailVerified')
                 && !empty(\Tools::getValue('emailVerified'))
-                && true == \Tools::getValue('emailVerified')
             ) {
-                \Configuration::updateValue('PS_PSX_EMAIL_IS_VERIFIED', true, false, null, (int) $shopId);
+                \Configuration::updateValue('PS_PSX_EMAIL_IS_VERIFIED', 'true' === \Tools::getValue('emailVerified'), false, null, (int) $shopId);
             }
         }
 
