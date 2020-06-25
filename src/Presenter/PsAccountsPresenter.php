@@ -89,6 +89,8 @@ class PsAccountsPresenter
           'currentShop' => $currentShop,
           'shops' => $this->getShopsTree(),
           'firebaseRefreshToken' => $this->getFirebaseRefreshToken($currentShop['id']),
+          'superAdminEmail' => $this->getSuperAdminEmail(),
+          'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
         ];
 
         return $presenter;
@@ -102,6 +104,16 @@ class PsAccountsPresenter
     private function getFirebaseRefreshToken($shopId)
     {
         return \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId) ?: null;
+    }
+
+    /**
+     * @return string
+     */
+    private function getSuperAdminEmail()
+    {
+        $employee = new \Employee(1);
+
+        return $employee->email;
     }
 
     /**

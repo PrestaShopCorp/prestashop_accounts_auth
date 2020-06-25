@@ -60,7 +60,10 @@ The $psAccountPresenter format is:
         'domainSsl' => string,
         'url' => string,
     ],
-    'shops' => $this->getShopsTree(),
+    'shops' => [],
+    'firebaseRefreshToken' => null|string,
+    'superAdminEmail' => string,
+    'ssoResendVerificationEmail' => string,
 ];
 ```
 
