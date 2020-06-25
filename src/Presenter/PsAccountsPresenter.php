@@ -54,7 +54,7 @@ class PsAccountsPresenter
      */
     protected $container;
 
-    public function __construct(string $psxName)
+    public function __construct($psxName)
     {
         $this->psxName = $psxName;
         $dotenv = new Dotenv();
