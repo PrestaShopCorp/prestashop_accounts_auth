@@ -244,7 +244,7 @@ class PsAccountsPresenter
      */
     public function getOnboardingLink($shopId)
     {
-        if (false === Module::isInstalled('ps_accounts') || false === Module::isEnabled('ps_accounts')) {
+        if (false === Module::isInstalled('ps_accounts')) {
             return '';
         }
 
