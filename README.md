@@ -27,7 +27,7 @@ composer require prestashop/prestashop-accounts-auth
 
 In your PrestaShop X or Community Service module:
 
-- In the PrestaShop X/Community Service module's main controller, get onboarding presenter and go to the view used by the
+- In the module's controllers and/or main class, get onboarding presenter and go to the view used by the
 [viewsjs component](https://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
 
 ```php
