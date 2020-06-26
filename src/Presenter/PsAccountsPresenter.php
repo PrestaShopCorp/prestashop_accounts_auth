@@ -408,6 +408,8 @@ class PsAccountsPresenter
         ) {
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
+            $token->refresh($shopId);
+            \Tools::redirect((new \Link)->getAdminLink('AdminModules') . '&configure=' . $this->psxName);
         }
         $token->refresh($shopId);
     }
