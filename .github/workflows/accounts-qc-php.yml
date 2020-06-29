@@ -45,7 +45,7 @@ jobs:
       - name: git clone ps_accounts
         run: |
           git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/PrestaShopCorp/ps_accounts.git ~/ps_accounts
-          cd ~/ps_accounts && git checkout -b feature/790-extract-library-from-ps_accounts origin/feature/790-extract-library-from-ps_accounts
+          cd ~/ps_accounts
       - name: composer install
         run: composer install && cd ~/ps_accounts && composer install
       - name: Pull PrestaShop files (Tag ${{ matrix.presta-versions }})
