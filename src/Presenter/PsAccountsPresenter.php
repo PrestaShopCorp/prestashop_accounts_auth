@@ -22,9 +22,9 @@ namespace PrestaShop\AccountsAuth\Presenter;
 
 use Context;
 use Module;
+use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Service\SshKey;
-use PrestaShop\Module\PsAccounts\Adapter\LinkAdapter;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -55,6 +55,11 @@ class PsAccountsPresenter
     protected $container;
 
     /**
+     * @var LinkAdapter
+     */
+    protected $linkAdapter;
+
+    /**
      * @param string $psxName
      */
     public function __construct($psxName)
@@ -64,6 +69,7 @@ class PsAccountsPresenter
         $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
         $this->module = Module::getInstanceByName('ps_accounts');
         $this->context = Context::getContext();
+        $this->linkAdapter = new LinkAdapter($this->context->link);
     }
 
     /**
@@ -95,7 +101,8 @@ class PsAccountsPresenter
           'superAdminEmail' => $this->getSuperAdminEmail(),
           'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
         ];
-
+        // echo '<pre>';
+        // var_dump($presenter);die;
         return $presenter;
     }
 
@@ -145,7 +152,7 @@ class PsAccountsPresenter
             ]);
         }
 
-        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&install=' . $this->psxName;
+        return  $this->linkAdapter->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&install=' . $this->psxName;
     }
 
     /**
@@ -166,7 +173,7 @@ class PsAccountsPresenter
             ]);
         }
 
-        return $this->context->link->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&enable=1';
+        return  $this->linkAdapter->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&enable=1';
     }
 
     /**
@@ -196,14 +203,13 @@ class PsAccountsPresenter
     public function getCurrentShop()
     {
         $shop = \Shop::getShop($this->context->shop->id);
-        $linkAdapter = new LinkAdapter($this->context->link);
 
         return [
             'id' => $shop['id_shop'],
             'name' => $shop['name'],
             'domain' => $shop['domain'],
             'domainSsl' => $shop['domain_ssl'],
-            'url' => $linkAdapter->getAdminLink(
+            'url' => $this->linkAdapter->getAdminLink(
                 'AdminModules',
                 true,
                 [],
@@ -251,7 +257,7 @@ class PsAccountsPresenter
         $callback = preg_replace(
             '/^https?:\/\/[^\/]+/',
             '',
-            $this->context->link->getAdminLink('AdminModules', true) . '&configure=' . $this->psxName
+            $this->linkAdapter->getAdminLink('AdminModules', true) . '&configure=' . $this->psxName
         );
 
         $uiSvcBaseUrl = $_ENV['ACCOUNTS_SVC_UI_URL'];
@@ -267,7 +273,7 @@ class PsAccountsPresenter
             'next' => preg_replace(
                 '/^https?:\/\/[^\/]+/',
                 '',
-                $this->context->link->getAdminLink('AdminConfigureHmacPsAccounts')
+                $this->linkAdapter->getAdminLink('AdminConfigureHmacPsAccounts')
             ),
             'name' => $currentShop['name'],
             'lang' => $this->context->language->iso_code,
@@ -345,8 +351,6 @@ class PsAccountsPresenter
             return $shopList;
         }
 
-        $linkAdapter = new LinkAdapter($this->context->link);
-
         foreach (\Shop::getTree() as $groupId => $groupData) {
             $shops = [];
             foreach ($groupData['shops'] as $shopId => $shopData) {
@@ -355,7 +359,7 @@ class PsAccountsPresenter
                     'name' => $shopData['name'],
                     'domain' => $shopData['domain'],
                     'domainSsl' => $shopData['domain_ssl'],
-                    'url' => $linkAdapter->getAdminLink(
+                    'url' => $this->linkAdapter->getAdminLink(
                         'AdminModules',
                         true,
                         [],
@@ -409,7 +413,7 @@ class PsAccountsPresenter
             \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
             $token->refresh($shopId);
-            \Tools::redirect((new \Link)->getAdminLink('AdminModules') . '&configure=' . $this->psxName);
+            \Tools::redirect($this->linkAdapter->getAdminLink('AdminModules') . '&configure=' . $this->psxName);
         }
         $token->refresh($shopId);
     }
