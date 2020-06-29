@@ -17,5 +17,6 @@ parameters:
 		- '#Call to static method getInstance\(\) on an unknown class PrestaShop\\PrestaShop\\Adapter\\SymfonyContainer.#'
 		- '#Call to method get\(\) on an unknown class Symfony\\Component\\DependencyInjection\\ContainerInterface.#'
 		- '#Property PrestaShop\\AccountsAuth\\Presenter\\PsAccountsPresenter::\$container has unknown class Symfony\\Component\\DependencyInjection\\ContainerInterface as its type.#'
-
+		- '#Method LinkCore::getAdminLink\(\) invoked with 4 parameters, 1-2 required.#'
+	
 	level: 7
