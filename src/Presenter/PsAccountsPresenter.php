@@ -24,6 +24,7 @@ use Context;
 use Module;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
+use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Service\SshKey;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -50,6 +51,11 @@ class PsAccountsPresenter
     public $context;
 
     /**
+     * @var ShopContext
+     */
+    public $shopContext;
+
+    /**
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
     protected $container;
@@ -69,6 +75,7 @@ class PsAccountsPresenter
         $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
         $this->module = Module::getInstanceByName('ps_accounts');
         $this->context = Context::getContext();
+        $this->shopContext = new ShopContext();
         $this->linkAdapter = new LinkAdapter($this->context->link);
     }
 
@@ -84,7 +91,7 @@ class PsAccountsPresenter
         $this->saveQueriesParams($currentShop['id']);
 
         $presenter = [
-          'psIs17' => $this->isPs17(),
+          'psIs17' => $this->shopContext->isShop17(),
           'psAccountsInstallLink' => $this->getPsAccountsInstallLink(),
           'psAccountsEnableLink' => $this->getPsAccountsEnableLink(),
           'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
@@ -127,14 +134,6 @@ class PsAccountsPresenter
     }
 
     /**
-     * @return bool
-     */
-    private function isPs17()
-    {
-        return version_compare(_PS_VERSION_, '1.7.3.0', '>=');
-    }
-
-    /**
      * @return string | null
      */
     public function getPsAccountsInstallLink()
@@ -143,7 +142,7 @@ class PsAccountsPresenter
             return null;
         }
 
-        if ($this->isPs17()) {
+        if ($this->shopContext->isShop17()) {
             $router = $this->get('router');
 
             return substr(\Tools::getShopDomainSsl(true) . __PS_BASE_URI__, 0, -1) . $router->generate('admin_module_manage_action', [
@@ -164,7 +163,7 @@ class PsAccountsPresenter
             return null;
         }
 
-        if ($this->isPs17()) {
+        if ($this->shopContext->isShop17()) {
             $router = $this->get('router');
 
             return substr(\Tools::getShopDomainSsl(true) . __PS_BASE_URI__, 0, -1) . $router->generate('admin_module_manage_action', [
