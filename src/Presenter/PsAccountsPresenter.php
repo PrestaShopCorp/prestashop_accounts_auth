@@ -108,8 +108,7 @@ class PsAccountsPresenter
           'superAdminEmail' => $this->getSuperAdminEmail(),
           'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
         ];
-        // echo '<pre>';
-        // var_dump($presenter);die;
+
         return $presenter;
     }
 
