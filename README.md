@@ -8,7 +8,7 @@ To work as a Community Service or as PrestaShop X, a module needs three parts:
 
 * Contains all the controllers
 
-### [librairie npm](http://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
+### [librairy npm](http://github.com/PrestaShopCorp/prestashop_accounts_vue_components)
 
 * Contains all the vuejs components to manage onboarding
 
@@ -24,6 +24,28 @@ composer require prestashop/prestashop-accounts-auth
 ```
 
 ## Usage
+
+Each PrestaShop X modules require that the module ps_accounts is installed in order to precess to the onboarding.
+PrestaShop X modules need to install ps_accounts in their install() method. In order to simplify that we have created a method that handle it for you: 
+
+```php
+(new PrestaShop\AccountsAuth\Installer\Install())->installPsAccounts()
+```
+
+eg: You need to call the method above in the install() method in the main class of your module:
+
+```php
+/**
+ * Function executed at the install of the module
+ *
+ * @return bool
+ */
+public function install()
+{
+  return (new PrestaShop\AccountsAuth\Installer\Install())->installPsAccounts() &&
+    parent::install();
+}
+```
 
 In your PrestaShop X or Community Service module:
 

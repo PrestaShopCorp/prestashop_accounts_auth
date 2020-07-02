@@ -150,7 +150,10 @@ class PsAccountsPresenter
             ]);
         }
 
-        return  $this->linkAdapter->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&install=' . $this->psxName;
+        return  $this->linkAdapter->getAdminLink('AdminModules', true, [], [
+            'module_name' => $this->psxName,
+            'install' => $this->psxName,
+        ]);
     }
 
     /**
@@ -171,7 +174,10 @@ class PsAccountsPresenter
             ]);
         }
 
-        return  $this->linkAdapter->getAdminLink('AdminModules') . '&module_name=' . $this->psxName . '&enable=1';
+        return  $this->linkAdapter->getAdminLink('AdminModules', true, [], [
+            'module_name' => $this->psxName,
+            'enable' => '1'
+        ]);
     }
 
     /**
