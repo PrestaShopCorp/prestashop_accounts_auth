@@ -176,7 +176,7 @@ class PsAccountsPresenter
 
         return  $this->linkAdapter->getAdminLink('AdminModules', true, [], [
             'module_name' => $this->psxName,
-            'enable' => '1'
+            'enable' => '1',
         ]);
     }
 

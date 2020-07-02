@@ -20,16 +20,16 @@
 
 namespace PrestaShop\AccountsAuth\Installer;
 
-use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 use PrestaShop\AccountsAuth\Context\ShopContext;
+use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 
 /**
-* Install ps_accounts module
-*/
+ * Install ps_accounts module
+ */
 class Install
 {
     /**
-     * @var string $psAccounts
+     * @var string
      */
     private $psAccounts = 'ps_accounts';
 
