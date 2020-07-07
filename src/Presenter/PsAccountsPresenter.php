@@ -50,7 +50,7 @@ class PsAccountsPresenter
      */
     public function present()
     {
-        $presenter = [
+        return [
           'psIs17' => $this->psAccountsService->getShopContext()->isShop17(),
           'psAccountsInstallLink' => $this->psAccountsService->getPsAccountsInstallLink(),
           'psAccountsEnableLink' => $this->psAccountsService->getPsAccountsEnableLink(),
@@ -68,8 +68,5 @@ class PsAccountsPresenter
           'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
           'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
         ];
-        dump($presenter);
-
-        return $presenter;
     }
 }

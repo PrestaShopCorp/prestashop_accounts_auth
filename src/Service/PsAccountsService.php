@@ -28,7 +28,7 @@ use PrestaShop\AccountsAuth\Context\ShopContext;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
- * Construct the psaccounts module.
+ * Construct the psaccounts service.
  */
 class PsAccountsService
 {
@@ -55,9 +55,9 @@ class PsAccountsService
     protected $container;
 
     /**
-     * @var string
+     * @var string | null
      */
-    public $psxName;
+    public $psxName = null;
 
     /**
      * @var LinkAdapter
@@ -68,7 +68,6 @@ class PsAccountsService
     {
         $dotenv = new Dotenv();
         $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
-        $this->psxName = null;
         $this->module = Module::getInstanceByName('ps_accounts');
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();
@@ -92,6 +91,8 @@ class PsAccountsService
     }
 
     /**
+     * @param string $psxName
+     *
      * @return void
      */
     public function setPsxName($psxName)
@@ -202,7 +203,6 @@ class PsAccountsService
      */
     public function isEmailValidated($shopId)
     {
-        // TODO:
         return in_array(\Configuration::get('PS_PSX_EMAIL_IS_VERIFIED', null, null, (int) $shopId), ['1', 1, true]);
     }
 
