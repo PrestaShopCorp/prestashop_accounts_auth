@@ -32,16 +32,16 @@ class Token extends FirebaseClient
      *
      * @see https://firebase.google.com/docs/reference/rest/auth#section-refresh-token Firebase documentation
      *
-     * @param int $idShop
+     * @param int $shopId
      *
      * @return array
      */
-    public function refresh($idShop)
+    public function refresh($shopId)
     {
-        if (true == \Configuration::get('PS_PSX_FIREBASE_LOCK', null, null, (int) $idShop)) {
+        if (true == \Configuration::get('PS_PSX_FIREBASE_LOCK', null, null, (int) $shopId)) {
             return [];
         }
-        \Configuration::updateValue('PS_PSX_FIREBASE_LOCK', true, false, null, (int) $idShop);
+        \Configuration::updateValue('PS_PSX_FIREBASE_LOCK', true, false, null, (int) $shopId);
         $this->setRoute('https://securetoken.googleapis.com/v1/token');
 
         $response = $this->post([
@@ -52,11 +52,11 @@ class Token extends FirebaseClient
         ]);
 
         if ($response && true === $response['status']) {
-            \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['id_token'], false, null, (int) $idShop);
-            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refresh_token'], false, null, (int) $idShop);
-            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'), false, null, (int) $idShop);
+            \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['id_token'], false, null, (int) $shopId);
+            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refresh_token'], false, null, (int) $shopId);
+            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'), false, null, (int) $shopId);
         }
-        \Configuration::updateValue('PS_PSX_FIREBASE_LOCK', false, false, null, (int) $idShop);
+        \Configuration::updateValue('PS_PSX_FIREBASE_LOCK', false, false, null, (int) $shopId);
 
         return $response;
     }
@@ -67,12 +67,16 @@ class Token extends FirebaseClient
      * @see https://firebase.google.com/docs/reference/rest/auth Firebase documentation
      *
      * @param string $adminToken
-     * @param int $idShop
+     * @param int $shopId
      *
-     * @return array
+     * @return void
      */
-    public function getRefreshTokenWithAdminToken($adminToken, $idShop)
+    public function getRefreshTokenWithAdminToken($adminToken, $shopId)
     {
+        if (false == $adminToken) {
+            return;
+        }
+
         $this->setRoute('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=' . $_ENV['FIREBASE_API_KEY']);
         $response = $this->post([
             'json' => [
@@ -80,34 +84,36 @@ class Token extends FirebaseClient
                 'returnSecureToken' => true,
             ],
         ]);
-        $jwt = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $adminToken)[1]))));
 
-        if ($response && true === $response['status']) {
-            if (
-                false === \Configuration::get('PS_CHECKOUT_SHOP_UUID_V4', null, null, (int) $idShop)
-            ) {
-                \Configuration::updateValue('PS_CHECKOUT_SHOP_UUID_V4', $jwt->uid, false, null, (int) $idShop);
-            }
-
-            \Configuration::updateValue('PSX_UUID_V4', $jwt->uid, false, null, (int) $idShop);
-            \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['idToken'], false, null, (int) $idShop);
-            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refreshToken'], false, null, (int) $idShop);
-            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'), false, null, (int) $idShop);
+        if (!$response || false === $response['status']) {
+            return;
         }
 
-        return $response;
+        $jwt = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $adminToken)[1]))));
+        if (
+            false === \Configuration::get('PS_CHECKOUT_SHOP_UUID_V4', null, null, (int) $shopId)
+        ) {
+            \Configuration::updateValue('PS_CHECKOUT_SHOP_UUID_V4', $jwt->uid, false, null, (int) $shopId);
+        }
+        \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', $adminToken, false, null, (int) $shopId);
+        \Configuration::updateValue('PSX_UUID_V4', $jwt->uid, false, null, (int) $shopId);
+        \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['idToken'], false, null, (int) $shopId);
+        \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refreshToken'], false, null, (int) $shopId);
+        \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'), false, null, (int) $shopId);
+
+        $this->refresh($shopId);
     }
 
     /**
      * Check if we have a refresh token.
      *
-     * @param int $idShop
+     * @param int $shopId
      *
      * @return bool
      */
-    public function hasRefreshToken($idShop)
+    public function hasRefreshToken($shopId)
     {
-        $refresh_token = \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $idShop);
+        $refresh_token = \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId);
 
         return !empty($refresh_token);
     }
@@ -115,13 +121,13 @@ class Token extends FirebaseClient
     /**
      * Check the token validity. The token expire time is set to 3600 seconds.
      *
-     * @param int $idShop
+     * @param int $shopId
      *
      * @return bool
      */
-    public function isExpired($idShop)
+    public function isExpired($shopId)
     {
-        $refresh_date = \Configuration::get('PS_PSX_FIREBASE_REFRESH_DATE', null, null, (int) $idShop);
+        $refresh_date = \Configuration::get('PS_PSX_FIREBASE_REFRESH_DATE', null, null, (int) $shopId);
 
         if (empty($refresh_date)) {
             return true;
@@ -133,16 +139,16 @@ class Token extends FirebaseClient
     /**
      * Get the user firebase token.
      *
-     * @param int $idShop
+     * @param int $shopId
      *
      * @return string
      */
-    public function getToken($idShop)
+    public function getToken($shopId)
     {
-        if ($this->hasRefreshToken($idShop) && $this->isExpired($idShop)) {
-            $this->refresh($idShop);
+        if ($this->hasRefreshToken($shopId) && $this->isExpired($shopId)) {
+            $this->refresh($shopId);
         }
 
-        return \Configuration::get('PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $idShop);
+        return \Configuration::get('PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $shopId);
     }
 }
