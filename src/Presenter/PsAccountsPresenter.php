@@ -64,7 +64,6 @@ class PsAccountsPresenter
             ],
           'currentShop' => $this->psAccountsService->getCurrentShop(),
           'shops' => $this->psAccountsService->getShopsTree(),
-          'firebaseRefreshToken' => $this->psAccountsService->getFirebaseRefreshToken($this->psAccountsService->getCurrentShop()['id']),
           'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
           'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
         ];

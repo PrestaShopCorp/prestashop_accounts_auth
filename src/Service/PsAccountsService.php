@@ -119,13 +119,11 @@ class PsAccountsService
     }
 
     /**
-     * @param int $shopId
-     *
      * @return string | null
      */
-    public function getFirebaseRefreshToken($shopId)
+    public function getFirebaseRefreshToken()
     {
-        return \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId) ?: null;
+        return \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $this->getCurrentShop()['id']) ?: null;
     }
 
     /**
