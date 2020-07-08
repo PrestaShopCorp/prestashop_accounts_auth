@@ -66,6 +66,7 @@ class PsAccountsPresenter
           'shops' => $this->psAccountsService->getShopsTree(),
           'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
           'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
+          'language' => $this->psAccountsService->getContext()->language->iso_code,
         ];
     }
 }
