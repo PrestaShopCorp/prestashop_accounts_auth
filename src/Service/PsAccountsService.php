@@ -119,13 +119,11 @@ class PsAccountsService
     }
 
     /**
-     * @param int $shopId
-     *
      * @return string | null
      */
-    public function getFirebaseRefreshToken($shopId)
+    public function getFirebaseRefreshToken()
     {
-        return \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId) ?: null;
+        return \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $this->getCurrentShop()['id']) ?: null;
     }
 
     /**
@@ -400,6 +398,16 @@ class PsAccountsService
     public function saveQueriesParams($shopId)
     {
         $token = new Token();
+        if (false === $this->hasSshKey($shopId)) {
+            return;
+        }
+        if (null !== \Tools::getValue('adminToken') && !empty(\Tools::getValue('adminToken'))) {
+            $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
+        }
+
+        if (false == \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId)) {
+            return;
+        }
 
         if (
             null !== \Tools::getValue('email')
@@ -419,11 +427,9 @@ class PsAccountsService
             && !empty(\Tools::getValue('adminToken'))
             && true === $this->hasSshKey($shopId)
         ) {
-            \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', \Tools::getValue('adminToken'), false, null, (int) $shopId);
-            $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
-            $token->refresh($shopId);
             \Tools::redirect($this->linkAdapter->getAdminLink('AdminModules') . '&configure=' . $this->psxName);
         }
+
         $token->refresh($shopId);
     }
 
