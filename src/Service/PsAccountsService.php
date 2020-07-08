@@ -127,6 +127,14 @@ class PsAccountsService
     }
 
     /**
+     * @return string | null
+     */
+    public function getFirebaseIdToken()
+    {
+        return \Configuration::get('PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $this->getCurrentShop()['id']) ?: null;
+    }
+
+    /**
      * @return string
      */
     public function getSuperAdminEmail()
