@@ -442,6 +442,14 @@ class PsAccountsService
     }
 
     /**
+     * @return string | false
+     */
+    public function getShopUuidV4()
+    {
+        return \Configuration::get('PSX_UUID_V4', null, null, (int) $this->getCurrentShop()['id']);
+    }
+
+    /**
      * Override of native function to always retrieve Symfony container instead of legacy admin container on legacy context.
      *
      * @param string $serviceName
