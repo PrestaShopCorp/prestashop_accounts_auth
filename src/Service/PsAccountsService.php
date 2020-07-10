@@ -255,7 +255,7 @@ class PsAccountsService
     {
         $currentShop = $this->getCurrentShop();
 
-        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? $currentShop['domain'] : $currentShop['domain_ssl'];
+        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? $currentShop['domain'] : $currentShop['domainSsl'];
     }
 
     /**
