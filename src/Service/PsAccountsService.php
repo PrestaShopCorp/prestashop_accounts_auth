@@ -199,7 +199,7 @@ class PsAccountsService
      */
     public function getEmail($shopId)
     {
-        return \Configuration::get('PS_PSX_EMAIL', null, null, (int) $shopId) ?: null;
+        return \Configuration::get('PS_PSX_FIREBASE_EMAIL', null, null, (int) $shopId) ?: null;
     }
 
     /**
@@ -209,7 +209,7 @@ class PsAccountsService
      */
     public function isEmailValidated($shopId)
     {
-        return in_array(\Configuration::get('PS_PSX_EMAIL_IS_VERIFIED', null, null, (int) $shopId), ['1', 1, true]);
+        return in_array(\Configuration::get('PS_PSX_FIREBASE_EMAIL_IS_VERIFIED', null, null, (int) $shopId), ['1', 1, true]);
     }
 
     /**
@@ -421,12 +421,12 @@ class PsAccountsService
             null !== \Tools::getValue('email')
             && !empty(\Tools::getValue('email'))
         ) {
-            \Configuration::updateValue('PS_PSX_EMAIL', \Tools::getValue('email'), false, null, (int) $shopId);
+            \Configuration::updateValue('PS_PSX_FIREBASE_EMAIL', \Tools::getValue('email'), false, null, (int) $shopId);
             if (
                 null !== \Tools::getValue('emailVerified')
                 && !empty(\Tools::getValue('emailVerified'))
             ) {
-                \Configuration::updateValue('PS_PSX_EMAIL_IS_VERIFIED', 'true' === \Tools::getValue('emailVerified'), false, null, (int) $shopId);
+                \Configuration::updateValue('PS_PSX_FIREBASE_EMAIL_IS_VERIFIED', 'true' === \Tools::getValue('emailVerified'), false, null, (int) $shopId);
             }
         }
 
