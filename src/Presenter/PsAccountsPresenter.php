@@ -50,10 +50,6 @@ class PsAccountsPresenter
      */
     public function present()
     {
-        if (false == Module::isInstalled('ps_accounts')) {
-            return [];
-        }
-
         return [
           'psIs17' => $this->psAccountsService->getShopContext()->isShop17(),
           'psAccountsInstallLink' => $this->psAccountsService->getPsAccountsInstallLink(),

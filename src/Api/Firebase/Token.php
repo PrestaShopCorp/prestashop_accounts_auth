@@ -20,7 +20,6 @@
 
 namespace PrestaShop\AccountsAuth\Api\Firebase;
 
-use Module;
 use PrestaShop\AccountsAuth\Api\Firebase\Client\FirebaseClient;
 
 /**
@@ -39,7 +38,7 @@ class Token extends FirebaseClient
      */
     public function refresh($shopId)
     {
-        if (false == Module::isInstalled('ps_accounts') || true == \Configuration::get('PS_PSX_FIREBASE_LOCK', null, null, (int) $shopId)) {
+        if (true == \Configuration::get('PS_PSX_FIREBASE_LOCK', null, null, (int) $shopId)) {
             return [];
         }
         \Configuration::updateValue('PS_PSX_FIREBASE_LOCK', true, false, null, (int) $shopId);

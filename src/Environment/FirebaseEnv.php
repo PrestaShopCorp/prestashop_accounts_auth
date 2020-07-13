@@ -37,10 +37,10 @@ class FirebaseEnv
     public function __construct()
     {
         $dotenv = new Dotenv();
-        $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
-        $this->firebaseApiKey = $_ENV['FIREBASE_API_KEY'];
-        if (false === $this->firebaseApiKey) {
-            throw new \Exception('FIREBASE_API_KEY can\'t be empty');
+        if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {
+            $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+        } else {
+            $dotenv->load(dirname(__FILE__) . '/env');
         }
         $this->setFirebaseApiKey($_ENV['FIREBASE_API_KEY']);
     }
