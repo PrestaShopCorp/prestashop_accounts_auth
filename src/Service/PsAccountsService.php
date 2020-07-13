@@ -25,7 +25,7 @@ use Module;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Context\ShopContext;
-use Symfony\Component\Dotenv\Dotenv;
+use PrestaShop\AccountsAuth\Environment\Env;
 
 /**
  * Construct the psaccounts service.
@@ -66,8 +66,7 @@ class PsAccountsService
 
     public function __construct()
     {
-        $dotenv = new Dotenv();
-        $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+        new Env();
         $this->module = Module::getInstanceByName('ps_accounts');
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();

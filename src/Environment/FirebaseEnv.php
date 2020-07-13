@@ -25,7 +25,7 @@ use Symfony\Component\Dotenv\Dotenv;
 /**
  * Allow to set the differents api key / api link depending on.
  */
-class FirebaseEnv
+class Env
 {
     /**
      * Firebase public api key.
