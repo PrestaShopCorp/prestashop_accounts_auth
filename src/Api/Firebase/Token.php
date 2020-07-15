@@ -31,6 +31,7 @@ class Token extends FirebaseClient
     public function __construct()
     {
         new Env();
+        parent::__construct();
     }
 
     /**
