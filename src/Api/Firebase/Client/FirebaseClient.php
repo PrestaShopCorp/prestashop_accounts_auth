@@ -22,7 +22,7 @@ namespace PrestaShop\AccountsAuth\Api\Firebase\Client;
 
 use GuzzleHttp\Client;
 use PrestaShop\AccountsAuth\Api\GenericClient;
-use PrestaShop\AccountsAuth\Environment\FirebaseEnv;
+use PrestaShop\AccountsAuth\Environment\Env;
 
 /**
  * Handle firebase signIn/signUp.
@@ -38,7 +38,7 @@ class FirebaseClient extends GenericClient
 
     public function __construct()
     {
-        $this->apiKey = (new FirebaseEnv())->getFirebaseApiKey();
+        $this->apiKey = (new Env())->getFirebaseApiKey();
 
         $client = new Client([
             'defaults' => [
