@@ -443,9 +443,9 @@ class PsAccountsService
     /**
      * @return string | false
      */
-    public function getShopUuidV4()
+    public function getShopUuidV4($shopId = null)
     {
-        return \Configuration::get('PSX_UUID_V4', null, null, (int) $this->getCurrentShop()['id']);
+        return \Configuration::get('PSX_UUID_V4', null, null, (int) ($shopId ? $shopId : $this->getCurrentShop()['id']));
     }
 
     /**
@@ -462,5 +462,29 @@ class PsAccountsService
         }
 
         return $this->container->get($serviceName);
+    }
+
+    public function changeUrl($c, $trigger)
+    {
+        $shopId = $c['shop_id'] ? $c['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
+        $sslEnabled = true == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId);
+
+        $shopUuidFirebase = $this->getShopUuidV4($shopId);
+        $protocol = $sslEnabled ? 'https' : 'http';
+        $domainToUpdate = $sslEnabled ? $c['domain_ssl'] : $c['domain'];
+        $boUrlToUpdate = preg_replace(
+            '/^https?:\/\/[^\/]+/',
+            '',
+            $this->linkAdapter->getAdminLink('AdminModules', true)
+        );
+
+        echo '<pre>';
+        var_dump($shopUuidFirebase);
+        var_dump($protocol);
+        var_dump($domainToUpdate);
+        var_dump($boUrlToUpdate);
+        var_dump($_ENV['ACCOUNTS_SVC_API_URL']);
+
+        die();
     }
 }
