@@ -5,7 +5,8 @@
   "minimum-stability": "dev",
   "autoload": {
     "psr-4": {
-      "PrestaShop\\AccountsAuth\\": "src/"
+      "PrestaShop\\AccountsAuth\\": "src/",
+      "Tests\\": "tests/"
     }
   },
   "require": {

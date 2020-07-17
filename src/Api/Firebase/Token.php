@@ -97,7 +97,7 @@ class Token extends FirebaseClient
             return;
         }
 
-        $uid = (new Parser())->parse((string) $adminToken)->getClaim('uid');
+        $uid = $this->parseJwt($adminToken)->getClaim('uid');;
 
         if (
             false === \Configuration::get('PS_CHECKOUT_SHOP_UUID_V4', null, null, (int) $shopId)
@@ -159,5 +159,15 @@ class Token extends FirebaseClient
         }
 
         return \Configuration::get('PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $shopId);
+    }
+
+    /**
+     * @param string $adminToken
+     *
+     * @return \Lcobucci\JWT\Token
+     */
+    public function parseJwt($adminToken)
+    {
+        return (new Parser())->parse((string)$adminToken);
     }
 }
