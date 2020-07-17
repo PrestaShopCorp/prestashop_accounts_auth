@@ -24,6 +24,7 @@ use Context;
 use Module;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
+use PrestaShop\AccountsAuth\Api\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
 
@@ -236,25 +237,31 @@ class PsAccountsService
     }
 
     /**
-     * @param int $shopId
-     *
-     * @return string
+     * @return bool
      */
-    public function getProtocol($shopId)
+    public function sslEnabled()
     {
-        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? 'http' : 'https';
+        $shopId = $this->getCurrentShop()['id'];
+
+        return true == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId);
     }
 
     /**
-     * @param int $shopId
-     *
      * @return string
      */
-    public function getDomainName($shopId)
+    public function getProtocol()
+    {
+        return false == $this->sslEnabled() ? 'http' : 'https';
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomainName()
     {
         $currentShop = $this->getCurrentShop();
 
-        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? $currentShop['domain'] : $currentShop['domainSsl'];
+        return false == $this->sslEnabled() ? $currentShop['domain'] : $currentShop['domainSsl'];
     }
 
     /**
@@ -278,8 +285,8 @@ class PsAccountsService
         if (false === $uiSvcBaseUrl) {
             throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
         }
-        $protocol = $this->getProtocol($shopId);
-        $domainName = $this->getDomainName($shopId);
+        $protocol = $this->getProtocol();
+        $domainName = $this->getDomainName();
         $currentShop = $this->getCurrentShop();
         $queryParams = [
             'bo' => $callback,
@@ -464,27 +471,28 @@ class PsAccountsService
         return $this->container->get($serviceName);
     }
 
-    public function changeUrl($c, $trigger)
+    /**
+     * @param array $bodyHttp
+     * @param string $trigger
+     *
+     * @return mixed
+     */
+    public function changeUrl($bodyHttp, $trigger)
     {
-        $shopId = $c['shop_id'] ? $c['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
-        $sslEnabled = true == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId);
-
+        $shopId = $bodyHttp['shop_id'] ? $bodyHttp['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
+        $sslEnabled = $this->sslEnabled();
         $shopUuidFirebase = $this->getShopUuidV4($shopId);
-        $protocol = $sslEnabled ? 'https' : 'http';
-        $domainToUpdate = $sslEnabled ? $c['domain_ssl'] : $c['domain'];
-        $boUrlToUpdate = preg_replace(
-            '/^https?:\/\/[^\/]+/',
-            '',
-            $this->linkAdapter->getAdminLink('AdminModules', true)
+
+        $response = (new ServicesAccountsClient($this->getContext()->link))->fetch(
+            $this->getShopUuidV4($shopId),
+            [
+                'protocol' => $sslEnabled ? 'https' : 'http',
+                'domain' => $sslEnabled ? $bodyHttp['domain_ssl'] : $bodyHttp['domain'],
+                'boUrl' => $this->linkAdapter->getAdminLink('AdminModules', true),
+                'trigger' => $trigger,
+            ]
         );
 
-        echo '<pre>';
-        var_dump($shopUuidFirebase);
-        var_dump($protocol);
-        var_dump($domainToUpdate);
-        var_dump($boUrlToUpdate);
-        var_dump($_ENV['ACCOUNTS_SVC_API_URL']);
-
-        die();
+        return $reponse;
     }
 }
