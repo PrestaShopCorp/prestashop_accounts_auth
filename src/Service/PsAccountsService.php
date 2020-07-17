@@ -259,13 +259,19 @@ class PsAccountsService
     }
 
     /**
+     * @param mixed $shopId
+     *
      * @return string
      */
-    public function getDomainName()
+    public function getDomainName($shopId = false)
     {
-        $currentShop = $this->getCurrentShop();
+        if ($shopId === false) {
+            $currentShop = $this->getCurrentShop();
+            return false == $this->sslEnabled() ? $currentShop['domain'] : $currentShop['domainSsl'];
+        }
 
-        return false == $this->sslEnabled() ? $currentShop['domain'] : $currentShop['domainSsl'];
+        $shop = \Shop::getShop($shopId)
+        return false == $this->sslEnabled($shopId) ? $currentShop['domain'] : $currentShop['domain_ssl'];
     }
 
     /**
