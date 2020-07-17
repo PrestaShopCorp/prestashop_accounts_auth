@@ -23,6 +23,7 @@ namespace PrestaShop\AccountsAuth\Api;
 use GuzzleHttp\Client;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
+use PrestaShop\AccountsAuth\Api\Firebase\Token;
 
 /**
  * Handle  call api Services
@@ -32,9 +33,10 @@ class ServicesAccountsClient extends GenericClient
     public function __construct(\Link $link, Client $client = null)
     {
         new Env();
-        $this->setLink($link);
         $psAccountsService = new PsAccountsService();
-        $token = $psAccountsService->getFirebaseIdToken();
+        $shopId = $psAccountsService->getCurrentShop()['id'];
+        $token = (new Token())->getToken($shopId);
+        $this->setLink($link);
 
         // Client can be provided for tests
         if (null === $client) {
@@ -48,7 +50,7 @@ class ServicesAccountsClient extends GenericClient
                         //'Content-Type' => 'application/vnd.accounts.v1+json', // api version to use
                         'Accept' => 'application/json',
                         'Authorization' => 'Bearer ' . $token,
-                        'Shop-Id' => $psAccountsService->getCurrentShop()['id'],
+                        'Shop-Id' => $shopId,
                         'Module-Version' => \Ps_accounts::VERSION, // version of the module
                         'Prestashop-Version' => _PS_VERSION_, // prestashop version
                     ],

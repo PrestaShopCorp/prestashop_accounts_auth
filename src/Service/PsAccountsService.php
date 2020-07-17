@@ -239,9 +239,9 @@ class PsAccountsService
     /**
      * @return bool
      */
-    public function sslEnabled()
+    public function sslEnabled($shopId = false)
     {
-        $shopId = $this->getCurrentShop()['id'];
+        $shopId = $shopId ? $shopId : $this->getCurrentShop()['id'];
 
         return true == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId);
     }
@@ -249,9 +249,9 @@ class PsAccountsService
     /**
      * @return string
      */
-    public function getProtocol()
+    public function getProtocol($shopId = false)
     {
-        return false == $this->sslEnabled() ? 'http' : 'https';
+        return false == $this->sslEnabled($shopId) ? 'http' : 'https';
     }
 
     /**
@@ -482,8 +482,8 @@ class PsAccountsService
     public function changeUrl($bodyHttp, $trigger)
     {
         $shopId = array_key_exists('shop_id', $bodyHttp) ? $bodyHttp['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
-        $sslEnabled = $this->sslEnabled();
-        $protocol = $sslEnabled ? 'https' : 'http';
+        $sslEnabled = $this->sslEnabled($shopId);
+        $protocol = $this->getProtocol($shopId);
         $domain = $sslEnabled ? $bodyHttp['domain_ssl'] : $bodyHttp['domain'];
         $uuid = $this->getShopUuidV4($shopId);
         $response = false;
