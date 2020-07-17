@@ -97,7 +97,7 @@ class Token extends FirebaseClient
             return;
         }
 
-        $uid = $this->parseJwt($adminToken)->getClaim('uid');;
+        $uid = $this->parseJwt($adminToken)->getClaim('uid');
 
         if (
             false === \Configuration::get('PS_CHECKOUT_SHOP_UUID_V4', null, null, (int) $shopId)
@@ -168,6 +168,6 @@ class Token extends FirebaseClient
      */
     public function parseJwt($adminToken)
     {
-        return (new Parser())->parse((string)$adminToken);
+        return (new Parser())->parse((string) $adminToken);
     }
 }
