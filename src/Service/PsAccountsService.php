@@ -273,7 +273,7 @@ class PsAccountsService
 
         $shop = \Shop::getShop($shopId);
 
-        return false == $this->sslEnabled($shopId) ? $currentShop['domain'] : $currentShop['domain_ssl'];
+        return false == $this->sslEnabled($shopId) ? $shop['domain'] : $shop['domain_ssl'];
     }
 
     /**
