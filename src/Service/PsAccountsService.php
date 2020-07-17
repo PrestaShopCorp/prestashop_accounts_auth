@@ -297,9 +297,9 @@ class PsAccountsService
         if (false === $uiSvcBaseUrl) {
             throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
         }
-        $protocol = $this->getProtocol();
-        $domainName = $this->getDomainName();
-        $currentShop = $this->getCurrentShop();
+        $protocol = $this->getProtocol($shopId);
+        $domainName = $this->getDomainName($shopId);
+        $currentShop = \Shop::getShop($shopId);
         $queryParams = [
             'bo' => $callback,
             'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId),
