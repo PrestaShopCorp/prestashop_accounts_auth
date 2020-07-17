@@ -237,6 +237,8 @@ class PsAccountsService
     }
 
     /**
+     * @param mixed $shopId
+     *
      * @return bool
      */
     public function sslEnabled($shopId = false)
@@ -247,6 +249,8 @@ class PsAccountsService
     }
 
     /**
+     * @param mixed $shopId
+     *
      * @return string
      */
     public function getProtocol($shopId = false)
