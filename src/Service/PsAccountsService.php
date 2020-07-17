@@ -448,9 +448,11 @@ class PsAccountsService
     }
 
     /**
+     * @param mixed $shopId
+     *
      * @return string | false
      */
-    public function getShopUuidV4($shopId = null)
+    public function getShopUuidV4($shopId = false)
     {
         return \Configuration::get('PSX_UUID_V4', null, null, (int) ($shopId ? $shopId : $this->getCurrentShop()['id']));
     }
@@ -481,10 +483,9 @@ class PsAccountsService
     {
         $shopId = $bodyHttp['shop_id'] ? $bodyHttp['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
         $sslEnabled = $this->sslEnabled();
-        $shopUuidFirebase = $this->getShopUuidV4($shopId);
 
         $response = (new ServicesAccountsClient($this->getContext()->link))->fetch(
-            $this->getShopUuidV4($shopId),
+            $this->getShopUuidV4($bodyHttp['shop_id']),
             [
                 'protocol' => $sslEnabled ? 'https' : 'http',
                 'domain' => $sslEnabled ? $bodyHttp['domain_ssl'] : $bodyHttp['domain'],
@@ -493,6 +494,6 @@ class PsAccountsService
             ]
         );
 
-        return $reponse;
+        return $response;
     }
 }

@@ -60,7 +60,7 @@ class ServicesAccountsClient extends GenericClient
     }
 
     /**
-     * @param string $shopUuidV4
+     * @param mixed $shopUuidV4
      * @param array $bodyHttp
      *
      * @return array | false
