@@ -20,6 +20,7 @@
 
 namespace PrestaShop\AccountsAuth\Api\Firebase;
 
+use Lcobucci\JWT\Parser;
 use PrestaShop\AccountsAuth\Api\Firebase\Client\FirebaseClient;
 use PrestaShop\AccountsAuth\Environment\Env;
 
@@ -96,14 +97,15 @@ class Token extends FirebaseClient
             return;
         }
 
-        $jwt = json_decode(base64_decode(str_replace('_', '/', str_replace('-', '+', explode('.', $adminToken)[1]))));
+        $uid = (new Parser())->parse((string) $adminToken)->getClaim('uid');
+
         if (
             false === \Configuration::get('PS_CHECKOUT_SHOP_UUID_V4', null, null, (int) $shopId)
         ) {
-            \Configuration::updateValue('PS_CHECKOUT_SHOP_UUID_V4', $jwt->uid, false, null, (int) $shopId);
+            \Configuration::updateValue('PS_CHECKOUT_SHOP_UUID_V4', $uid, false, null, (int) $shopId);
         }
         \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', $adminToken, false, null, (int) $shopId);
-        \Configuration::updateValue('PSX_UUID_V4', $jwt->uid, false, null, (int) $shopId);
+        \Configuration::updateValue('PSX_UUID_V4', $uid, false, null, (int) $shopId);
         \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['idToken'], false, null, (int) $shopId);
         \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refreshToken'], false, null, (int) $shopId);
         \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'), false, null, (int) $shopId);
