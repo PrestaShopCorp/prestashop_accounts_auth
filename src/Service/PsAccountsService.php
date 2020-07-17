@@ -24,6 +24,7 @@ use Context;
 use Module;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
+use PrestaShop\AccountsAuth\Api\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
 
@@ -236,25 +237,43 @@ class PsAccountsService
     }
 
     /**
-     * @param int $shopId
+     * @param mixed $shopId
      *
-     * @return string
+     * @return bool
      */
-    public function getProtocol($shopId)
+    public function sslEnabled($shopId = false)
     {
-        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? 'http' : 'https';
+        $shopId = $shopId ? $shopId : $this->getCurrentShop()['id'];
+
+        return true == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId);
     }
 
     /**
-     * @param int $shopId
+     * @param mixed $shopId
      *
      * @return string
      */
-    public function getDomainName($shopId)
+    public function getProtocol($shopId = false)
     {
-        $currentShop = $this->getCurrentShop();
+        return false == $this->sslEnabled($shopId) ? 'http' : 'https';
+    }
 
-        return false == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId) ? $currentShop['domain'] : $currentShop['domainSsl'];
+    /**
+     * @param mixed $shopId
+     *
+     * @return string
+     */
+    public function getDomainName($shopId = false)
+    {
+        if ($shopId === false) {
+            $currentShop = $this->getCurrentShop();
+
+            return false == $this->sslEnabled() ? $currentShop['domain'] : $currentShop['domainSsl'];
+        }
+
+        $shop = \Shop::getShop($shopId);
+
+        return false == $this->sslEnabled($shopId) ? $shop['domain'] : $shop['domain_ssl'];
     }
 
     /**
@@ -280,7 +299,7 @@ class PsAccountsService
         }
         $protocol = $this->getProtocol($shopId);
         $domainName = $this->getDomainName($shopId);
-        $currentShop = $this->getCurrentShop();
+        $currentShop = \Shop::getShop($shopId);
         $queryParams = [
             'bo' => $callback,
             'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId),
@@ -441,11 +460,13 @@ class PsAccountsService
     }
 
     /**
+     * @param mixed $shopId
+     *
      * @return string | false
      */
-    public function getShopUuidV4()
+    public function getShopUuidV4($shopId = false)
     {
-        return \Configuration::get('PSX_UUID_V4', null, null, (int) $this->getCurrentShop()['id']);
+        return \Configuration::get('PSX_UUID_V4', null, null, (int) ($shopId ? $shopId : $this->getCurrentShop()['id']));
     }
 
     /**
@@ -462,5 +483,40 @@ class PsAccountsService
         }
 
         return $this->container->get($serviceName);
+    }
+
+    /**
+     * @param array $bodyHttp
+     * @param string $trigger
+     *
+     * @return mixed
+     */
+    public function changeUrl($bodyHttp, $trigger)
+    {
+        $shopId = array_key_exists('shop_id', $bodyHttp) ? $bodyHttp['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
+        $sslEnabled = $this->sslEnabled($shopId);
+        $protocol = $this->getProtocol($shopId);
+        $domain = $sslEnabled ? $bodyHttp['domain_ssl'] : $bodyHttp['domain'];
+        $uuid = $this->getShopUuidV4($shopId);
+        $response = false;
+        $boUrl = preg_replace(
+             '/^https?:\/\/[^\/]+/',
+             $protocol . '://' . $domain,
+             $this->linkAdapter->getAdminLink('AdminModules', true)
+         );
+
+        if ($uuid && strlen($uuid) > 0) {
+            $response = (new ServicesAccountsClient($this->getContext()->link))->fetch(
+                $uuid,
+                [
+                    'protocol' => $protocol,
+                    'domain' => $domain,
+                    'boUrl' => $boUrl,
+                    'trigger' => $trigger,
+                ]
+            );
+        }
+
+        return $response;
     }
 }

@@ -20,7 +20,7 @@
 
 namespace PrestaShop\AccountsAuth\Api\Firebase;
 
-use PrestaShop\AccountsAuth\Api\Firebase\Client\FirebaseClient;
+use PrestaShop\AccountsAuth\Api\FirebaseClient;
 use PrestaShop\AccountsAuth\Environment\Env;
 
 /**
