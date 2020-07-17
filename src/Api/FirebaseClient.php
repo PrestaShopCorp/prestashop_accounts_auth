@@ -18,10 +18,9 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-namespace PrestaShop\AccountsAuth\Api\Firebase\Client;
+namespace PrestaShop\AccountsAuth\Api;
 
 use GuzzleHttp\Client;
-use PrestaShop\AccountsAuth\Api\GenericClient;
 use PrestaShop\AccountsAuth\Environment\Env;
 
 /**

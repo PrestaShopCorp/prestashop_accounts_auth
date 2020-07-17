@@ -141,6 +141,33 @@ abstract class GenericClient
     }
 
     /**
+     * Wrapper of method patch from guzzle client.
+     *
+     * @param array $options payload
+     *
+     * @return array return response or false if no response
+     */
+    protected function patch(array $options = [])
+    {
+        $response = $this->getClient()->patch($this->getRoute(), $options);
+        $responseHandler = new ResponseApiHandler();
+        $response = $responseHandler->handleResponse($response);
+        // If response is not successful only
+        if (\Configuration::get('PS_ACCOUNTS_DEBUG_LOGS_ENABLED') && !$response['status']) {
+            /**
+             * @var \Ps_accounts
+             */
+            $module = \Module::getInstanceByName('ps_accounts');
+            $logger = $module->getLogger();
+            $logger->debug('route ' . $this->getRoute());
+            $logger->debug('options ' . var_export($options, true));
+            $logger->debug('response ' . var_export($response, true));
+        }
+
+        return $response;
+    }
+
+    /**
      * Setter for client.
      *
      * @return void
