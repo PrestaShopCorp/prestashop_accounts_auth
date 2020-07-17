@@ -481,18 +481,29 @@ class PsAccountsService
      */
     public function changeUrl($bodyHttp, $trigger)
     {
-        $shopId = $bodyHttp['shop_id'] ? $bodyHttp['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
+        $shopId = array_key_exists('shop_id', $bodyHttp) ? $bodyHttp['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
         $sslEnabled = $this->sslEnabled();
+        $protocol = $sslEnabled ? 'https' : 'http';
+        $domain = $sslEnabled ? $bodyHttp['domain_ssl'] : $bodyHttp['domain'];
+        $uuid = $this->getShopUuidV4($shopId);
+        $response = false;
+        $boUrl = preg_replace(
+             '/^https?:\/\/[^\/]+/',
+             $protocol . '://' . $domain,
+             $this->linkAdapter->getAdminLink('AdminModules', true)
+         );
 
-        $response = (new ServicesAccountsClient($this->getContext()->link))->fetch(
-            $this->getShopUuidV4($bodyHttp['shop_id']),
-            [
-                'protocol' => $sslEnabled ? 'https' : 'http',
-                'domain' => $sslEnabled ? $bodyHttp['domain_ssl'] : $bodyHttp['domain'],
-                'boUrl' => $this->linkAdapter->getAdminLink('AdminModules', true),
-                'trigger' => $trigger,
-            ]
-        );
+        if ($uuid && strlen($uuid) > 0) {
+            $response = (new ServicesAccountsClient($this->getContext()->link))->fetch(
+                $uuid,
+                [
+                    'protocol' => $protocol,
+                    'domain' => $domain,
+                    'boUrl' => $boUrl,
+                    'trigger' => $trigger,
+                ]
+            );
+        }
 
         return $response;
     }
