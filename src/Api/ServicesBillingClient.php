@@ -26,9 +26,9 @@ use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
- * Handle  call api Services
+ * Handle call api Services
  */
-class ServicesAccountsClient extends GenericClient
+class ServicesBillingClient extends GenericClient
 {
     public function __construct(\Link $link, Client $client = null)
     {
@@ -41,7 +41,7 @@ class ServicesAccountsClient extends GenericClient
         // Client can be provided for tests
         if (null === $client) {
             $client = new Client([
-                'base_url' => $_ENV['ACCOUNTS_SVC_API_URL'],
+                'base_url' => $_ENV['BILLING_SVC_API_URL'],
                 'defaults' => [
                     'timeout' => $this->timeout,
                     'exceptions' => $this->catchExceptions,
@@ -63,15 +63,27 @@ class ServicesAccountsClient extends GenericClient
 
     /**
      * @param mixed $shopUuidV4
+     *
+     * @return array | false
+     */
+    public function getBillingCustomer($shopUuidV4)
+    {
+        $this->setRoute('/shops/' . $shopUuidV4);
+
+        return $this->get([]);
+    }
+
+    /**
+     * @param mixed $shopUuidV4
      * @param array $bodyHttp
      *
      * @return array | false
      */
-    public function changeUrl($shopUuidV4, $bodyHttp)
+    public function createBillingCustomer($shopUuidV4, $bodyHttp)
     {
-        $this->setRoute('/shops/' . $shopUuidV4 . '/url');
+        $this->setRoute('/shops/' . $shopUuidV4);
 
-        return $this->patch([
+        return $this->post([
             'body' => $bodyHttp,
         ]);
     }
