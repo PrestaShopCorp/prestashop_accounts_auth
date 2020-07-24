@@ -94,8 +94,13 @@ class PsBillingService
         return $this->container->get($serviceName);
     }
 
-    // TODO !0: method implement : $planName can be 'ps-analytics-free' for example
-    public function subscribeToFreePlan($planName, $shopId = false) {
+    /**
+     * @param string $planName
+     * @param mixed $shopId
+     *
+     * @return mixed
+     */
+    public function subscribeToFreePlan($module, $planName, $shopId = false) {
         $psAccountsService = new PsAccountsService();
         if ($shopId === false) {
             $shopId = $psAccountsService->getCurrentShop()['id'];
@@ -104,13 +109,47 @@ class PsBillingService
         $uuid = $psAccountsService->getShopUuidV4($shopId);
         $response = false;
 
+dump('shopId:');
+dump($uuid);
         if ($uuid && strlen($uuid) > 0) {
             $billingClient = new ServicesBillingClient($this->getContext()->link);
+
             $response = $billingClient->getBillingCustomer($uuid);
-            return $response;
-            // TODO !0: vérifier si le customer existe. Si non, le créer (autre appel).
-            // appel pour vérifier si le plan $planName est souscrit chez le customer, et souscrire sinon.
-            // renvoyer en sortie un true si tout bon ?
+            if (!$response || !array_key_exists('httpCode', $response)) {
+                throw new \Exception('Billing customer request failed.');
+            }
+            if ($response['httpCode'] === 404) {
+dump('There is NO customer. getBillingCustomer');
+                $response = $billingClient->createBillingCustomer($uuid, []); // TODO !0: payload
+                if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 200) {
+                    throw new \Exception('Billing customer creation failed.');
+                }
+            }
+
+dump('now, customer:');
+dump($response['body']);
+
+            $response = $billingClient->getBillingSubscriptions($uuid, $module);
+            if (!$response || !array_key_exists('httpCode', $response)) {
+                throw new \Exception('Billing subscriptions request failed.');
+            }
+
+            if ($response['httpCode'] === 404) {
+dump('There is NO subscriptions. getBillingSubscriptions');
+
+                $response = $billingClient->createBillingSubscriptions($uuid, ['plan_id' => $planName]);
+                if (!$response || !array_key_exists('httpCode', $response)) {
+                    throw new \Exception('Billing subscription creation failed.');
+                }
+
+                return $response['httpCode'] === 200;
+            } else {
+dump('There is existing subscriptions. getBillingSubscriptions:');
+dump($response['body']);
+                // TODO !0 look into subs to see $planName, and return true if found
+            }
+
+            return false;
         }
 
         return $response !== false;
