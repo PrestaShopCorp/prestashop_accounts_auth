@@ -176,7 +176,7 @@ abstract class GenericClient
      */
     protected function get(array $options = [])
     {
-        $response = $this->getClient()->fetch($this->getRoute(), $options);
+        $response = $this->getClient()->get($this->getRoute(), $options);
         $responseHandler = new ResponseApiHandler();
         $response = $responseHandler->handleResponse($response);
         // If response is not successful only

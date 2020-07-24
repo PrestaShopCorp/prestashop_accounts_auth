@@ -1,8 +1,9 @@
-FIREBASE_API_KEY=AIzaSyCMUjiEGuWv92t_wegsc-YJ8nc1pS_SJYc
-FIREBASE_AUTH_DOMAIN=prestashop-sso-prod.firebaseapp.com
-FIREBASE_PROJECT_ID=prestashop-sso-prod
+FIREBASE_API_KEY=AIzaSyASHFE2F08ncoOH9NhoCF8_6z7qnoLVKSA
+FIREBASE_AUTH_DOMAIN=prestashop-ready-integration.firebaseapp.com
+FIREBASE_PROJECT_ID=prestashop-ready-integration
 
 ACCOUNTS_SVC_UI_URL=http://localhost:8080
 ACCOUNTS_SVC_API_URL=http://accounts-webhook-api:3001
+BILLING_SVC_API_URL=http://billing-api:3000
 
 SSO_RESEND_VERIFICATION_EMAIL=https://auth.prestashop.com/account/send-verification-email

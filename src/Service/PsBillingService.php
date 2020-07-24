@@ -94,7 +94,7 @@ class PsBillingService
         return $this->container->get($serviceName);
     }
 
-    // TODO !0: method implement :
+    // TODO !0: method implement : $planName can be 'ps-analytics-free' for example
     public function subscribeToFreePlan($planName, $shopId = false) {
         $psAccountsService = new PsAccountsService();
         if ($shopId === false) {
@@ -105,7 +105,9 @@ class PsBillingService
         $response = false;
 
         if ($uuid && strlen($uuid) > 0) {
-            $response = (new ServicesBillingClient($this->getContext()->link))->getBillingCustomer($uuid);
+            $billingClient = new ServicesBillingClient($this->getContext()->link);
+            $response = $billingClient->getBillingCustomer($uuid);
+            return $response;
             // TODO !0: vérifier si le customer existe. Si non, le créer (autre appel).
             // appel pour vérifier si le plan $planName est souscrit chez le customer, et souscrire sinon.
             // renvoyer en sortie un true si tout bon ?

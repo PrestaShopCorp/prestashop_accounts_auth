@@ -24,6 +24,7 @@ use GuzzleHttp\Client;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
+//use PrestaShop\AccountsAuth\Api\GenericClient;
 
 /**
  * Handle call api Services
@@ -82,6 +83,33 @@ class ServicesBillingClient extends GenericClient
     public function createBillingCustomer($shopUuidV4, $bodyHttp)
     {
         $this->setRoute('/shops/' . $shopUuidV4);
+
+        return $this->post([
+            'body' => $bodyHttp,
+        ]);
+    }
+
+    /**
+     * @param mixed $shopUuidV4
+     *
+     * @return array | false
+     */
+    public function getBillingSubscriptions($shopUuidV4)
+    {
+        $this->setRoute('/shops/' . $shopUuidV4 . '/subscriptions');
+
+        return $this->fetch([]);
+    }
+
+    /**
+     * @param mixed $shopUuidV4
+     * @param array $bodyHttp
+     *
+     * @return array | false
+     */
+    public function createBillingSubscriptions($shopUuidV4, $bodyHttp)
+    {
+        $this->setRoute('/shops/' . $shopUuidV4 . '/subscriptions');
 
         return $this->post([
             'body' => $bodyHttp,
