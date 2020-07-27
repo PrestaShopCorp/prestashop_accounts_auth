@@ -109,8 +109,9 @@ class PsBillingService
         $uuid = $psAccountsService->getShopUuidV4($shopId);
         $response = false;
 
-dump('shopId:');
-dump($uuid);
+        dump('shopId:');
+        dump($uuid);
+
         if ($uuid && strlen($uuid) > 0) {
             $billingClient = new ServicesBillingClient($this->getContext()->link);
 
@@ -119,15 +120,17 @@ dump($uuid);
                 throw new \Exception('Billing customer request failed.');
             }
             if ($response['httpCode'] === 404) {
-dump('There is NO customer. getBillingCustomer');
+
+                dump('There is NO customer. getBillingCustomer');
+
                 $response = $billingClient->createBillingCustomer($uuid, []); // TODO !0: check payload
                 if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 200) {
                     throw new \Exception('Billing customer creation failed.');
                 }
             }
 
-dump('now, customer:');
-dump($response['body']); // TODO !0: check customer is the right (once API bug fixed)
+            dump('now, customer:');
+            dump($response['body']); // TODO !0: check customer is the right (once API bug fixed)
 
             $response = $billingClient->getBillingSubscriptions($uuid, $module);
             if (!$response || !array_key_exists('httpCode', $response)) {
