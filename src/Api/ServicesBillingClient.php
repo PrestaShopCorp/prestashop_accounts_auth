@@ -24,7 +24,6 @@ use GuzzleHttp\Client;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
-//use PrestaShop\AccountsAuth\Api\GenericClient;
 
 /**
  * Handle call api Services

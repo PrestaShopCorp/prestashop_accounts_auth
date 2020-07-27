@@ -21,14 +21,10 @@
 namespace PrestaShop\AccountsAuth\Service;
 
 use Context;
-use Module;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
-use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\Api\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Api\ServicesBillingClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
-use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
  * Construct the psbilling service.
@@ -100,7 +96,8 @@ class PsBillingService
      *
      * @return mixed
      */
-    public function subscribeToFreePlan($module, $planName, $shopId = false) {
+    public function subscribeToFreePlan($module, $planName, $shopId = false)
+    {
         $psAccountsService = new PsAccountsService();
         if ($shopId === false) {
             $shopId = $psAccountsService->getCurrentShop()['id'];
@@ -120,7 +117,6 @@ class PsBillingService
                 throw new \Exception('Billing customer request failed.');
             }
             if ($response['httpCode'] === 404) {
-
                 dump('There is NO customer. getBillingCustomer');
 
                 $response = $billingClient->createBillingCustomer($uuid, []); // TODO !0: check payload
