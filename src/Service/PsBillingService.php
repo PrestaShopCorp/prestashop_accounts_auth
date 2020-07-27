@@ -120,14 +120,14 @@ dump($uuid);
             }
             if ($response['httpCode'] === 404) {
 dump('There is NO customer. getBillingCustomer');
-                $response = $billingClient->createBillingCustomer($uuid, []); // TODO !0: payload
+                $response = $billingClient->createBillingCustomer($uuid, []); // TODO !0: check payload
                 if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 200) {
                     throw new \Exception('Billing customer creation failed.');
                 }
             }
 
 dump('now, customer:');
-dump($response['body']);
+dump($response['body']); // TODO !0: check customer is the right (once API bug fixed)
 
             $response = $billingClient->getBillingSubscriptions($uuid, $module);
             if (!$response || !array_key_exists('httpCode', $response)) {
@@ -135,18 +135,18 @@ dump($response['body']);
             }
 
             if ($response['httpCode'] === 404) {
-dump('There is NO subscriptions. getBillingSubscriptions');
-
-                $response = $billingClient->createBillingSubscriptions($uuid, ['plan_id' => $planName]);
+                $response = $billingClient->createBillingSubscriptions($uuid, ['plan_id' => $planName, 'module' => $module]);
                 if (!$response || !array_key_exists('httpCode', $response)) {
                     throw new \Exception('Billing subscription creation failed.');
                 }
 
                 return $response['httpCode'] === 200;
             } else {
-dump('There is existing subscriptions. getBillingSubscriptions:');
-dump($response['body']);
-                // TODO !0 look into subs to see $planName, and return true if found
+                // There is existing subscription. Testing if planName matches the right one.
+                return array_key_exists('body', $response)
+                    && array_key_exists('subscription', $response['body'])
+                    && array_key_exists('plan_id', $response['body']['subscription'])
+                    && $response['body']['subscription']['plan_id'] === $planName;
             }
 
             return false;
