@@ -94,7 +94,8 @@ class PsBillingService
      * @param string $planName
      * @param mixed $shopId
      *
-     * @return mixed
+     * @return mixed An array with subscription identifiers if succeed.
+     * @throws Exception in case of error.
      */
     public function subscribeToFreePlan($module, $planName, $shopId = false)
     {
@@ -104,10 +105,7 @@ class PsBillingService
         }
 
         $uuid = $psAccountsService->getShopUuidV4($shopId);
-        $response = false;
-
-        dump('shopId:');
-        dump($uuid);
+        $toReturn = ['shopAccountId' => $uuid];
 
         if ($uuid && strlen($uuid) > 0) {
             $billingClient = new ServicesBillingClient($this->getContext()->link);
@@ -124,6 +122,7 @@ class PsBillingService
                     throw new \Exception('Billing customer creation failed.');
                 }
             }
+            $toReturn['customerId'] = $response['body']['customer']['id'];
 
             dump('now, customer:');
             dump($response['body']); // TODO !0: check customer is the right (once API bug fixed)
@@ -138,19 +137,22 @@ class PsBillingService
                 if (!$response || !array_key_exists('httpCode', $response)) {
                     throw new \Exception('Billing subscription creation failed.');
                 }
-
-                return $response['httpCode'] === 200;
+                $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
+                return $toReturn;
             } else {
                 // There is existing subscription. Testing if planName matches the right one.
-                return array_key_exists('body', $response)
+                if(array_key_exists('body', $response)
                     && array_key_exists('subscription', $response['body'])
                     && array_key_exists('plan_id', $response['body']['subscription'])
-                    && $response['body']['subscription']['plan_id'] === $planName;
+                    && $response['body']['subscription']['plan_id'] === $planName) {
+                    $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
+                    return $toReturn;
+                } else {
+                    throw new \Exception('Subscription plan name mismatch.');
+                }
             }
-
-            return false;
         }
 
-        return $response !== false;
+        throw new \Exception('Shop account unknown.');
     }
 }
