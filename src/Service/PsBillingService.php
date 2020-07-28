@@ -94,8 +94,9 @@ class PsBillingService
      * @param string $planName
      * @param mixed $shopId
      *
-     * @return mixed An array with subscription identifiers if succeed.
-     * @throws Exception in case of error.
+     * @return mixed An array with subscription identifiers if succeed
+     *
+     * @throws Exception in case of error
      */
     public function subscribeToFreePlan($module, $planName, $shopId = false)
     {
@@ -138,14 +139,16 @@ class PsBillingService
                     throw new \Exception('Billing subscription creation failed.');
                 }
                 $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
+
                 return $toReturn;
             } else {
                 // There is existing subscription. Testing if planName matches the right one.
-                if(array_key_exists('body', $response)
+                if (array_key_exists('body', $response)
                     && array_key_exists('subscription', $response['body'])
                     && array_key_exists('plan_id', $response['body']['subscription'])
                     && $response['body']['subscription']['plan_id'] === $planName) {
                     $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
+
                     return $toReturn;
                 } else {
                     throw new \Exception('Subscription plan name mismatch.');
