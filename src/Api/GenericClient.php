@@ -21,6 +21,7 @@
 namespace PrestaShop\AccountsAuth\Api;
 
 use GuzzleHttp\Client;
+use PrestaShop\AccountsAuth\Environment\EnvSingleton;
 use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;
 
 /**
@@ -62,6 +63,11 @@ abstract class GenericClient
      * @var int
      */
     protected $timeout = 10;
+
+    public function __construct()
+    {
+        EnvSingleton::getInstance();
+    }
 
     /**
      * Getter for client.

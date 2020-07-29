@@ -37,6 +37,8 @@ class FirebaseClient extends GenericClient
 
     public function __construct()
     {
+        parent::__construct();
+
         $this->apiKey = (new Env())->getFirebaseApiKey();
 
         $client = new Client([

@@ -22,7 +22,6 @@ namespace PrestaShop\AccountsAuth\Api;
 
 use GuzzleHttp\Client;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\Environment\EnvSingleton;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
@@ -32,7 +31,7 @@ class ServicesAccountsClient extends GenericClient
 {
     public function __construct(\Link $link, Client $client = null)
     {
-        EnvSingleton::getInstance();
+        parent::__construct();
         $psAccountsService = new PsAccountsService();
         $shopId = $psAccountsService->getCurrentShop()['id'];
         $token = (new Token())->getToken($shopId);
