@@ -38,7 +38,7 @@ abstract class SentryHandler
 {
     public function __construct()
     {
-        $PsAccountsService = new PsAccountsService();
+        $psAccountsService = new PsAccountsService();
         $this->client = new Raven_Client(
             $_ENV['SENTRY_CREDENTIALS'],
             [
@@ -47,13 +47,13 @@ abstract class SentryHandler
                     'php_version' => \Ps_accounts::VERSION,
                     'ps_accounts_vesion' => _PS_VERSION_,
                 ],
-                'ps_accounts_is_enabled' => Module::isEnabled('ps_accounts'),
-                'ps_accounts_is_installed' => Module::isInstalled('ps_accounts'),
-                'currentShop' => $this->psAccountsService->getCurrentShop(),
-                'shops' => $this->psAccountsService->getShopsTree(),
+                'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
+                'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
+                'currentShop' => $psAccountsService->getCurrentShop(),
+                'shops' => $psAccountsService->getShopsTree(),
             ]
         );
-        $this->clien->user_context(
+        $this->client->user_context(
             [
                 'email' => $psAccountsService->getEmail($psAccountsService->getCurrentShop()['id']),
                 'emailIsValidated' => $psAccountsService->isEmailValidated($psAccountsService->getCurrentShop()['id']),

@@ -20,6 +20,7 @@
 
 namespace PrestaShop\AccountsAuth\Presenter;
 
+use Module;
 use PrestaShop\AccountsAuth\Environment\EnvSingleton;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
@@ -51,10 +52,13 @@ class PsAccountsPresenter
      */
     public function present()
     {
-        return [
+        try {
+            return [
           'psIs17' => $this->psAccountsService->getShopContext()->isShop17(),
           'psAccountsInstallLink' => $this->psAccountsService->getPsAccountsInstallLink(),
           'psAccountsEnableLink' => $this->psAccountsService->getPsAccountsEnableLink(),
+          'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
+          'psAccountsIsEnabled' => Module::isEnabled('ps_accounts'),
           'onboardingLink' => $this->psAccountsService->getOnboardingLink($this->psAccountsService->getCurrentShop()['id']),
           'user' => [
               'email' => $this->psAccountsService->getEmail($this->psAccountsService->getCurrentShop()['id']),
@@ -66,5 +70,9 @@ class PsAccountsPresenter
           'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
           'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
         ];
+        } catch (Exception $e) {
+            EnvSingleton::ErrorHandlerSingleton();
+            $errorHandler->handle('An error occurred while loading the presenter : ' . $e->getMessage(), $e->getCode());
+        }
     }
 }
