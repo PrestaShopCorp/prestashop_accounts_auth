@@ -34,15 +34,22 @@ class Env
      */
     private $firebaseApiKey;
 
+    /**
+     * Env constructor.
+     *
+     * @throws \Exception
+     */
     public function __construct()
     {
         $dotenv = new Dotenv();
         if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {
             $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
-        } else {
+        } elseif (file_exists(dirname(__FILE__) . '/env')) {
             $dotenv->load(dirname(__FILE__) . '/env');
+        } else {
+            throw new \Exception('Couldn\'t find env file');
         }
-        $this->setFirebaseApiKey($_ENV['FIREBASE_API_KEY']);
+        $this->setFirebaseApiKey(getenv('FIREBASE_API_KEY'));
     }
 
     /**

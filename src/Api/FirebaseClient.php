@@ -35,11 +35,17 @@ class FirebaseClient extends GenericClient
      */
     protected $apiKey;
 
-    public function __construct()
+    public function __construct(array $params = [])
     {
-        $this->apiKey = (new Env())->getFirebaseApiKey();
+        if (isset($params['api_key'])) {
+            $this->apiKey = $params['api_key'];
+        } else {
+            //$this->apiKey = (new Env())->getFirebaseApiKey();
+            $this->apiKey = getenv('FIREBASE_API_KEY');
+        }
 
         $client = new Client([
+//            'base_url' => [$this->baseUri . '/api/{version}/', ['version' => 'v1']],
             'defaults' => [
                 'timeout' => $this->timeout,
                 'exceptions' => $this->catchExceptions,
@@ -48,11 +54,46 @@ class FirebaseClient extends GenericClient
                     'key' => $this->apiKey,
                 ],
                 'headers' => [
+                    'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ],
             ],
         ]);
 
         $this->setClient($client);
+    }
+
+    /**
+     * @param string $customToken
+     *
+     * @return array response
+     */
+    public function signInWithCustomToken($customToken)
+    {
+        $this->setRoute('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken');
+
+        return $this->post([
+            'json' => [
+                'token' => $customToken,
+                'returnSecureToken' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * @param string $refreshToken
+     *
+     * @return array response
+     */
+    public function getTokenForRefreshToken($refreshToken)
+    {
+        $this->setRoute('https://securetoken.googleapis.com/v1/token');
+
+        return $this->post([
+            'json' => [
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $refreshToken,
+            ],
+        ]);
     }
 }

@@ -21,18 +21,40 @@
 namespace PrestaShop\AccountsAuth\Api\Firebase;
 
 use Lcobucci\JWT\Parser;
+use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Api\FirebaseClient;
 use PrestaShop\AccountsAuth\Environment\Env;
 
 /**
  * Handle authentication firebase requests.
  */
-class Token extends FirebaseClient
+class Token
 {
-    public function __construct()
+    /**
+     * @var Configuration
+     */
+    private $configuration;
+
+    /**
+     * @var FirebaseClient
+     */
+    private $firebaseClient;
+
+    /**
+     * Token constructor.
+     *
+     * @param Configuration|null $configuration
+     * @param FirebaseClient|null $firebaseClient
+     *
+     * @throws \Exception
+     */
+    public function __construct($configuration=null, $firebaseClient=null)
     {
         new Env();
-        parent::__construct();
+
+        //parent::__construct();
+
+        $this->injectDependencies($configuration, $firebaseClient);
     }
 
     /**
@@ -46,25 +68,20 @@ class Token extends FirebaseClient
      */
     public function refresh($shopId)
     {
-        if (true == \Configuration::get('PS_PSX_FIREBASE_LOCK', null, null, (int) $shopId)) {
+        // FIXME : do we really need to do that ?
+        if (! $this->configuration->getLock($shopId)) {
             return [];
         }
-        \Configuration::updateValue('PS_PSX_FIREBASE_LOCK', true, false, null, (int) $shopId);
-        $this->setRoute('https://securetoken.googleapis.com/v1/token');
 
-        $response = $this->post([
-            'json' => [
-                'grant_type' => 'refresh_token',
-                'refresh_token' => \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN'),
-            ],
-        ]);
+        $response = $this->firebaseClient->getTokenForRefreshToken(
+            $this->configuration->get('PS_PSX_FIREBASE_REFRESH_TOKEN')
+        );
 
         if ($response && true === $response['status']) {
-            \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['id_token'], false, null, (int) $shopId);
-            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refresh_token'], false, null, (int) $shopId);
-            \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'), false, null, (int) $shopId);
+            $this->updateShopToken($response['body']['id_token'], $response['body']['refresh_token'], $shopId);
         }
-        \Configuration::updateValue('PS_PSX_FIREBASE_LOCK', false, false, null, (int) $shopId);
+
+        $this->configuration->freeLock($shopId);
 
         return $response;
     }
@@ -74,43 +91,71 @@ class Token extends FirebaseClient
      *
      * @see https://firebase.google.com/docs/reference/rest/auth Firebase documentation
      *
-     * @param string $adminToken
+     * @param string $customToken
      * @param int $shopId
      *
      * @return void
      */
-    public function getRefreshTokenWithAdminToken($adminToken, $shopId)
+    public function getRefreshTokenWithAdminToken($customToken, $shopId)
     {
-        if (false == $adminToken) {
+        if (false == $customToken) {
             return;
         }
 
-        $this->setRoute('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=' . $_ENV['FIREBASE_API_KEY']);
-        $response = $this->post([
-            'json' => [
-                'token' => $adminToken,
-                'returnSecureToken' => true,
-            ],
-        ]);
+        $response = $this->firebaseClient->signInWithCustomToken($customToken);
 
         if (!$response || false === $response['status']) {
             return;
         }
 
-        $uid = $this->parseJwt($adminToken)->getClaim('uid');
+        $this->updateShopUuid($customToken, $shopId);
 
-        if (
-            false === \Configuration::get('PS_CHECKOUT_SHOP_UUID_V4', null, null, (int) $shopId)
-        ) {
-            \Configuration::updateValue('PS_CHECKOUT_SHOP_UUID_V4', $uid, false, null, (int) $shopId);
-        }
-        \Configuration::updateValue('PS_PSX_FIREBASE_ADMIN_TOKEN', $adminToken, false, null, (int) $shopId);
-        \Configuration::updateValue('PSX_UUID_V4', $uid, false, null, (int) $shopId);
-        \Configuration::updateValue('PS_PSX_FIREBASE_ID_TOKEN', $response['body']['idToken'], false, null, (int) $shopId);
-        \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_TOKEN', $response['body']['refreshToken'], false, null, (int) $shopId);
-        \Configuration::updateValue('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'), false, null, (int) $shopId);
+        $this->updateShopToken($response['body']['idToken'], $response['body']['refreshToken'], $shopId);
 
         $this->refresh($shopId);
+    }
+
+    /**
+     * @param string $idToken
+     * @param string $refreshToken
+     * @param int $shopId
+     */
+    public function updateShopToken($idToken, $refreshToken, $shopId)
+    {
+        $this->configuration->setIdShop($shopId);
+
+        $this->configuration->set('PS_PSX_FIREBASE_ID_TOKEN', $idToken);
+
+        $this->configuration->set('PS_PSX_FIREBASE_REFRESH_TOKEN', $refreshToken);
+
+        $this->configuration->set('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @param string $customToken
+     * @param int $shopId
+     */
+    public function updateShopUuid($customToken, $shopId)
+    {
+        $uid = $this->parseJwt($customToken)->getClaim('uid');
+
+        $this->configuration->setIdShop($shopId);
+
+        // compat
+        if (
+            false === $this->configuration->getRaw(
+            'PS_CHECKOUT_SHOP_UUID_V4',
+            null,
+            null,
+            null
+            )
+        ) {
+            $this->configuration->set('PS_CHECKOUT_SHOP_UUID_V4', $uid);
+        }
+
+        $this->configuration->set('PS_PSX_FIREBASE_ADMIN_TOKEN', $customToken);
+
+        $this->configuration->set('PSX_UUID_V4', $uid);
     }
 
     /**
@@ -122,7 +167,12 @@ class Token extends FirebaseClient
      */
     public function hasRefreshToken($shopId)
     {
-        $refresh_token = \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId);
+        $refresh_token = $this->configuration->get(
+            'PS_PSX_FIREBASE_REFRESH_TOKEN',
+            null,
+            null,
+            (int) $shopId
+        );
 
         return !empty($refresh_token);
     }
@@ -136,7 +186,12 @@ class Token extends FirebaseClient
      */
     public function isExpired($shopId)
     {
-        $refresh_date = \Configuration::get('PS_PSX_FIREBASE_REFRESH_DATE', null, null, (int) $shopId);
+        $refresh_date = $this->configuration->get(
+            'PS_PSX_FIREBASE_REFRESH_DATE',
+            null,
+            null,
+            (int) $shopId
+        );
 
         if (empty($refresh_date)) {
             return true;
@@ -158,7 +213,12 @@ class Token extends FirebaseClient
             $this->refresh($shopId);
         }
 
-        return \Configuration::get('PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $shopId);
+        return $this->configuration->get(
+            'PS_PSX_FIREBASE_ID_TOKEN',
+            null,
+            null,
+            (int) $shopId
+        );
     }
 
     /**
@@ -169,5 +229,24 @@ class Token extends FirebaseClient
     public function parseJwt($adminToken)
     {
         return (new Parser())->parse((string) $adminToken);
+    }
+
+    /**
+     * @param Configuration|null $configuration
+     * @param FirebaseClient|null $firebaseApiClient
+     */
+    private function injectDependencies($configuration, $firebaseApiClient)
+    {
+        if ($configuration) {
+            $this->configuration = $configuration;
+        } else {
+            $this->configuration = new Configuration();
+        }
+
+        if ($firebaseApiClient) {
+            $this->firebaseClient = $firebaseApiClient;
+        } else {
+            $this->firebaseClient = new FirebaseClient();
+        }
     }
 }
