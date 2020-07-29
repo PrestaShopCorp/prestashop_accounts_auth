@@ -20,7 +20,7 @@
 
 namespace PrestaShop\AccountsAuth\Presenter;
 
-use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Environment\EnvSingleton;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
@@ -38,7 +38,7 @@ class PsAccountsPresenter
      */
     public function __construct($psxName)
     {
-        new Env();
+        EnvSingleton::getInstance();
         $this->psAccountsService = new PsAccountsService();
         $this->psAccountsService->setPsxName($psxName);
         $this->psAccountsService->manageOnboarding();
