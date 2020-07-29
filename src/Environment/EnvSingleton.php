@@ -31,10 +31,13 @@ namespace PrestaShop\AccountsAuth\Environment;
  */
 class EnvSingleton
 {
+    /**
+     * @var Env
+     */
     private static $instance;
 
     /**
-     * @return ErrorHandle
+     * @return Env
      */
     public static function getInstance()
     {

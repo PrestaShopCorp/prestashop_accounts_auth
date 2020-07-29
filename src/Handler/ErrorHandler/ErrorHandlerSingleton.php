@@ -31,10 +31,13 @@ namespace PrestaShop\AccountsAuth\Handler\Error;
  */
 class ErrorHandlerSingleton
 {
+    /**
+     * @var ErrorHandler
+     */
     private static $instance;
 
     /**
-     * @return ErrorHandle
+     * @return ErrorHandler
      */
     public static function getInstance()
     {

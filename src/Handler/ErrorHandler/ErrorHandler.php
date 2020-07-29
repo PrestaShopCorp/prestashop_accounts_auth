@@ -27,7 +27,6 @@
 namespace PrestaShop\AccountsAuth\Handler\Error;
 
 use PrestaShop\AccountsAuth\Handler\Sentry\SentryHandler;
-use Raven_Client;
 
 /**
  * Handle Error.
@@ -35,11 +34,9 @@ use Raven_Client;
 class ErrorHandler extends SentryHandler
 {
     /**
-     * Firebase api key.
-     *
-     * @var Raven_Client
+     * @var SentryHandler
      */
-    protected $sentryClient;
+    protected $sentryHandler;
 
     public function __construct()
     {
@@ -50,7 +47,7 @@ class ErrorHandler extends SentryHandler
      * @param string $message
      * @param mixed $code
      *
-     * @return \Exception
+     * @return void
      */
     public function handle($message, $code = null)
     {

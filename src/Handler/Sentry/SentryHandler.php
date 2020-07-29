@@ -36,6 +36,11 @@ use Raven_Client;
  */
 abstract class SentryHandler
 {
+    /**
+     * @var Raven_Client
+     */
+    protected $client;
+
     public function __construct()
     {
         $psAccountsService = new PsAccountsService();
@@ -44,8 +49,8 @@ abstract class SentryHandler
             [
                 'tags' => [
                     'php_version' => phpversion(),
-                    'php_version' => \Ps_accounts::VERSION,
-                    'ps_accounts_vesion' => _PS_VERSION_,
+                    'ps_accounts_version' => \Ps_accounts::VERSION,
+                    'prestashop_vesion' => _PS_VERSION_,
                 ],
                 'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
                 'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
@@ -62,6 +67,11 @@ abstract class SentryHandler
         $this->client->install();
     }
 
+    /**
+     * @param string $message
+     *
+     * @return void
+     */
     protected function setMessage($message)
     {
         $this->client->captureMessage($message);
