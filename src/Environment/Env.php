@@ -23,7 +23,7 @@ namespace PrestaShop\AccountsAuth\Environment;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
- * Allow to set the differents api key / api link depending on.
+ * Load environment variables.
  */
 class Env
 {

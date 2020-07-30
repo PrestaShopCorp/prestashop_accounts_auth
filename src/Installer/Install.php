@@ -53,7 +53,7 @@ class Install
         $moduleManagerBuilder = ModuleManagerBuilder::getInstance();
         $moduleManager = $moduleManagerBuilder->build();
         $moduleIsInstalled = $moduleManager->install($this->psAccounts);
-        if ($moduleIsInstalled) {
+        if (false === $moduleIsInstalled) {
             $errorHandler = \PrestaShop\AccountsAuth\Handler\Error\ErrorHandlerSingleton::getInstance();
             $errorHandler->handle('Module ps_accounts has not been installed.');
         }

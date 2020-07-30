@@ -27,7 +27,7 @@
 namespace PrestaShop\AccountsAuth\Handler\Error;
 
 /**
- * Handle api response.
+ * ErroHandler Singleton.
  */
 class ErrorHandlerSingleton
 {

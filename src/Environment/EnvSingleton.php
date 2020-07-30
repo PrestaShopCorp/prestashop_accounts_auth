@@ -27,7 +27,7 @@
 namespace PrestaShop\AccountsAuth\Environment;
 
 /**
- * Handle api response.
+ * Environment Singleton.
  */
 class EnvSingleton
 {
