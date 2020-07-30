@@ -42,8 +42,8 @@ class ServicesAccountsClient extends GenericClient
             $client = new Client([
                 'base_url' => $_ENV['ACCOUNTS_SVC_API_URL'],
                 'defaults' => [
-                    'timeout' => $this->timeout,
-                    'exceptions' => $this->catchExceptions,
+                    'timeout' => 10,
+                    'exceptions' => false,
                     'headers' => [
                         // Commented, else does not work anymore with API.
                         //'Content-Type' => 'application/vnd.accounts.v1+json', // api version to use

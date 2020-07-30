@@ -427,6 +427,7 @@ class PsAccountsService
         if (false === $this->hasSshKey($shopId)) {
             return;
         }
+            
         if (null !== \Tools::getValue('adminToken') && !empty(\Tools::getValue('adminToken'))) {
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
         }
@@ -456,7 +457,7 @@ class PsAccountsService
             \Tools::redirect($this->linkAdapter->getAdminLink('AdminModules') . '&configure=' . $this->psxName);
         }
 
-        $token->refresh($shopId);
+        $token->getToken($shopId);
     }
 
     /**

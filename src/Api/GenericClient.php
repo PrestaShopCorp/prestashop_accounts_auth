@@ -30,13 +30,6 @@ use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;
 abstract class GenericClient
 {
     /**
-     * If set to false, you will not be able to catch the error
-     * guzzle will show a different error message.
-     *
-     * @var bool
-     */
-    protected $catchExceptions = false;
-    /**
      * Guzzle Client.
      *
      * @var Client
@@ -57,13 +50,6 @@ abstract class GenericClient
      */
     protected $route;
 
-    /**
-     * Set how long guzzle will wait a response before end it up.
-     *
-     * @var int
-     */
-    protected $timeout = 10;
-
     public function __construct()
     {
         EnvSingleton::getInstance();
@@ -77,16 +63,6 @@ abstract class GenericClient
     protected function getClient()
     {
         return $this->client;
-    }
-
-    /**
-     * Getter for exceptions mode.
-     *
-     * @return bool
-     */
-    protected function getExceptionsMode()
-    {
-        return $this->catchExceptions;
     }
 
     /**
@@ -107,16 +83,6 @@ abstract class GenericClient
     protected function getRoute()
     {
         return $this->route;
-    }
-
-    /**
-     * Getter for timeout.
-     *
-     * @return int
-     */
-    protected function getTimeout()
-    {
-        return $this->timeout;
     }
 
     /**
@@ -211,18 +177,6 @@ abstract class GenericClient
     }
 
     /**
-     * Setter for exceptions mode.
-     *
-     * @param bool $bool
-     *
-     * @return void
-     */
-    protected function setExceptionsMode($bool)
-    {
-        $this->catchExceptions = $bool;
-    }
-
-    /**
      * Setter for link.
      *
      * @return void
@@ -242,17 +196,5 @@ abstract class GenericClient
     protected function setRoute($route)
     {
         $this->route = $route;
-    }
-
-    /**
-     * Setter for timeout.
-     *
-     * @param int $timeout
-     *
-     * @return void
-     */
-    protected function setTimeout($timeout)
-    {
-        $this->timeout = $timeout;
     }
 }
