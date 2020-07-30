@@ -69,7 +69,7 @@ abstract class SentryHandler
     }
 
     /**
-     * @param string $message
+     * @param mixed $error
      * @param mixed $code
      *
      * @return void
