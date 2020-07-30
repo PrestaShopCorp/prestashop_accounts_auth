@@ -33,6 +33,7 @@ use Raven_Client;
  * Handle Sentry.
  *
  * @doc https://github.com/getsentry/raven-php
+ * @doc https://docs.sentry.io/clients/php/
  */
 abstract class SentryHandler
 {
@@ -69,11 +70,12 @@ abstract class SentryHandler
 
     /**
      * @param string $message
+     * @param mixed $code
      *
      * @return void
      */
-    protected function setMessage($message)
+    protected function setError($error, $code = null)
     {
-        $this->client->captureMessage($message);
+        $code ? $this->client->captureException($error) : $this->client->captureMessage($error);
     }
 }

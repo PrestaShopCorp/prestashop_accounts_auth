@@ -51,9 +51,10 @@ class ErrorHandler extends SentryHandler
      */
     public function handle($message, $code = null)
     {
-        $this->sentryHandler->setMessage($message);
+        $this->sentryHandler->setError($message, $code);
         if ($code) {
-            throw new \Exception($message, $code);
+            http_response_code($code);
+            throw new \Exception($message);
         }
     }
 }

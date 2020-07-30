@@ -427,7 +427,7 @@ class PsAccountsService
         if (false === $this->hasSshKey($shopId)) {
             return;
         }
-            
+
         if (null !== \Tools::getValue('adminToken') && !empty(\Tools::getValue('adminToken'))) {
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
         }
