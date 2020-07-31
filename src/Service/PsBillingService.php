@@ -116,7 +116,6 @@ class PsBillingService
                 throw new \Exception('Billing customer request failed.', 50);
             }
             if ($response['httpCode'] === 404) {
-
                 $response = $billingClient->createBillingCustomer(
                     $uuid,
                     $customerIp ? ['created_from_ip' => $customerIp] : []
