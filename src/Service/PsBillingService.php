@@ -96,10 +96,10 @@ class PsBillingService
      * The $ip parameter will help PS Billing to preselect a tax rate and a currency
      * from the geolocalized IP. This IP should be the browser IP displaying the backoffice.
      *
-     * @param string $module The name of the module.
-     * @param string $planName The label of the existing plan for this module.
-     * @param mixed $shopId An optional shop ID in multishop context. If left false, the current shop will be selected.
-     * @param mixed $customerIp An optional element to help Billing choosing the currency and tax rate (depending on the IP's country) for later paying plan.
+     * @param string $module the name of the module
+     * @param string $planName The label of the existing plan for this module
+     * @param mixed $shopId an optional shop ID in multishop context. If left false, the current shop will be selected.
+     * @param mixed $customerIp an optional element to help Billing choosing the currency and tax rate (depending on the IP's country) for later paying plan
      *
      * @return mixed An array with subscription identifiers if succeed
      *
