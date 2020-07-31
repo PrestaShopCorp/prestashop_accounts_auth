@@ -134,7 +134,7 @@ class PsBillingService
 
             if ($response['httpCode'] === 404) {
                 $response = $billingClient->createBillingSubscriptions($uuid, ['plan_id' => $planName, 'module' => $module]);
-                if (!$response || !array_key_exists('httpCode', $response)  || $response['httpCode'] >= 400) {
+                if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] >= 400) {
                     if (array_key_exists('body', $response)
                         && array_key_exists('message', $response['body'])
                         && array_key_exists(0, $response['body']['message'])) {
