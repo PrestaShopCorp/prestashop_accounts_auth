@@ -113,24 +113,23 @@ class PsBillingService
 
             $response = $billingClient->getBillingCustomer($uuid);
             if (!$response || !array_key_exists('httpCode', $response)) {
-                throw new \Exception('Billing customer request failed.');
+                throw new \Exception('Billing customer request failed.', 50);
             }
             if ($response['httpCode'] === 404) {
-                dump('There is NO customer. getBillingCustomer');
 
                 $response = $billingClient->createBillingCustomer(
                     $uuid,
                     $customerIp ? ['created_from_ip' => $customerIp] : []
                 );
                 if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 200) {
-                    throw new \Exception('Billing customer creation failed.');
+                    throw new \Exception('Billing customer creation failed.', 60);
                 }
             }
             $toReturn['customerId'] = $response['body']['customer']['id'];
 
             $response = $billingClient->getBillingSubscriptions($uuid, $module);
             if (!$response || !array_key_exists('httpCode', $response)) {
-                throw new \Exception('Billing subscriptions request failed.');
+                throw new \Exception('Billing subscriptions request failed.', 51);
             }
 
             if ($response['httpCode'] === 404) {
@@ -141,7 +140,7 @@ class PsBillingService
                         && array_key_exists(0, $response['body']['message'])) {
                         throw new \Exception($response['body']['message'][0]);
                     }
-                    throw new \Exception('Billing subscription creation failed.');
+                    throw new \Exception('Billing subscription creation failed.', 65);
                 }
 
                 $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
@@ -157,11 +156,11 @@ class PsBillingService
 
                     return $toReturn;
                 } else {
-                    throw new \Exception('Subscription plan name mismatch.');
+                    throw new \Exception('Subscription plan name mismatch.', 20);
                 }
             }
         }
 
-        throw new \Exception('Shop account unknown.');
+        throw new \Exception('Shop account unknown.', 10);
     }
 }
