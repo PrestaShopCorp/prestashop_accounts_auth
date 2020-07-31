@@ -98,7 +98,7 @@ class PsBillingService
      *
      * @throws Exception in case of error
      */
-    public function subscribeToFreePlan($module, $planName, $shopId = false)
+    public function subscribeToFreePlan($module, $planName, $shopId = false, $customerIp = null)
     {
         $psAccountsService = new PsAccountsService();
         if ($shopId === false) {
@@ -118,15 +118,15 @@ class PsBillingService
             if ($response['httpCode'] === 404) {
                 dump('There is NO customer. getBillingCustomer');
 
-                $response = $billingClient->createBillingCustomer($uuid, []); // TODO !0: check payload
+                $response = $billingClient->createBillingCustomer(
+                    $uuid,
+                    $customerIp ? ['created_from_ip' => $customerIp] : []
+                );
                 if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 200) {
                     throw new \Exception('Billing customer creation failed.');
                 }
             }
             $toReturn['customerId'] = $response['body']['customer']['id'];
-
-            dump('now, customer:');
-            dump($response['body']); // TODO !0: check customer is the right (once API bug fixed)
 
             $response = $billingClient->getBillingSubscriptions($uuid, $module);
             if (!$response || !array_key_exists('httpCode', $response)) {
@@ -135,15 +135,21 @@ class PsBillingService
 
             if ($response['httpCode'] === 404) {
                 $response = $billingClient->createBillingSubscriptions($uuid, ['plan_id' => $planName, 'module' => $module]);
-                if (!$response || !array_key_exists('httpCode', $response)) {
+                if (!$response || !array_key_exists('httpCode', $response)  || $response['httpCode'] >= 400) {
+                    if (array_key_exists('body', $response)
+                        && array_key_exists('message', $response['body'])
+                        && array_key_exists(0, $response['body']['message'])) {
+                        throw new \Exception($response['body']['message'][0]);
+                    }
                     throw new \Exception('Billing subscription creation failed.');
                 }
+
                 $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
 
                 return $toReturn;
             } else {
                 // There is existing subscription. Testing if planName matches the right one.
-                if (array_key_exists('body', $response)
+                if (array_key_exists('body', $response) && $response['body']
                     && array_key_exists('subscription', $response['body'])
                     && array_key_exists('plan_id', $response['body']['subscription'])
                     && $response['body']['subscription']['plan_id'] === $planName) {
