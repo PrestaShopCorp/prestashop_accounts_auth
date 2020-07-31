@@ -20,6 +20,7 @@
 
 namespace PrestaShop\AccountsAuth\Tests\Unit\Api\Firebase\Token;
 
+use Lcobucci\JWT\Builder;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Api\FirebaseClient;
@@ -35,8 +36,8 @@ class RefreshTest extends TestCase
     public function it_should_handle_response_success()
     {
         $shopId = 5;
-        $idToken = 'foo';
-        $refreshToken = 'bar';
+        $idToken = (new Builder())->withClaim('uid', $this->faker->uuid)->getToken();
+        $refreshToken = (new Builder())->getToken();
 
         $configuration = $this->createMock(Configuration::class);
 

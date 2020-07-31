@@ -2,6 +2,7 @@
 
 namespace PrestaShop\AccountsAuth\Tests\Unit\Api\Firebase\Token;
 
+use Lcobucci\JWT\Builder;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Tests\TestCase;
@@ -16,10 +17,8 @@ class UpdateShopTokenTest extends TestCase
     public function it_should_update_shop_configuration()
     {
         $shopId = 5;
-        $idToken = 'foo';
-        $refreshToken = 'bar';
-
-        //$configuration = $this->createMock(Configuration::class);
+        $idToken = (new Builder())->withClaim('uid', $this->faker->uuid)->getToken();
+        $refreshToken = (new Builder())->getToken();
 
         $configuration = $this->getMockBuilder(Configuration::class)
             ->setMethods(['getRaw', 'setRaw'])

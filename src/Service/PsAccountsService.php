@@ -560,7 +560,6 @@ class PsAccountsService
      */
     protected function storeIdAndRefreshToken($customToken, $shopId)
     {
-        error_log('########################## storeIdAndRefreshToken ' . $customToken . ' ' . $shopId);
         return (new Token())->exchangeCustomTokenForIdAndRefreshToken($customToken, $shopId);
     }
 
@@ -571,7 +570,6 @@ class PsAccountsService
      */
     protected function storeEmailVerifiedStatus($email, $status, $shopId)
     {
-        error_log('########################## storeEmailVerifiedStatus ' . $email . ' ' . $status);
         $this->configuration->setIdShop((int) $shopId);
 
         if (null !== $email && !empty($email)) {

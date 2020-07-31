@@ -7,9 +7,6 @@ use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Tests\TestCase;
 
-// FIXME : use faker->uuid
-// FIXME : use Lcobucci\JWT\Token
-
 class UpdateShopUuidTest extends TestCase
 {
     /**
@@ -21,11 +18,9 @@ class UpdateShopUuidTest extends TestCase
     {
         $shopId = 5;
 
-        $uid = '8f4IQIOlE4UpIgch5nLax9SPeA43';
+        $uid = $this->faker->uuid;
 
         $customToken = (new Builder())->withClaim('uid', $uid)->getToken();
-
-        //$configuration = $this->createMock(Configuration::class);
 
         $configuration = $this->getMockBuilder(Configuration::class)
             ->setMethods(['getRaw', 'setRaw'])
@@ -56,11 +51,9 @@ class UpdateShopUuidTest extends TestCase
     {
         $shopId = 5;
 
-        $uid = '8f4IQIOlE4UpIgch5nLax9SPeA43';
+        $uid = $this->faker->uuid;
 
         $customToken = (new Builder())->withClaim('uid', $uid)->getToken();
-
-        //$configuration = $this->createMock(Configuration::class);
 
         $configuration = $this->getMockBuilder(Configuration::class)
             ->setMethods(['getRaw', 'setRaw'])
