@@ -36,6 +36,8 @@ class PsAccountsPresenter
 
     /**
      * @param string $psxName
+     *
+     * @throws \Exception
      */
     public function __construct($psxName)
     {
@@ -49,6 +51,8 @@ class PsAccountsPresenter
      * Present the PsAccounts module for vue.
      *
      * @return array
+     *
+     * @throws \Exception
      */
     public function present()
     {

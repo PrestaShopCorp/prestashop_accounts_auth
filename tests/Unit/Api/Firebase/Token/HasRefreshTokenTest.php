@@ -37,7 +37,7 @@ class HasRefreshTokenTest extends TestCase
 
         $configuration = $this->createMock(Configuration::class);
 
-        $configuration->method('get')
+        $configuration->method('getRaw')
             ->with('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId)
             ->willReturn(null);
 
@@ -55,7 +55,7 @@ class HasRefreshTokenTest extends TestCase
 
         $configuration = $this->createMock(Configuration::class);
 
-        $configuration->method('get')
+        $configuration->method('getRaw')
             ->with('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId)
             ->willReturn('sqjfjkjsfhksklfjlsjflsj');
 

@@ -35,32 +35,32 @@ class RefreshTest extends TestCase
     public function it_should_handle_response_success()
     {
         $shopId = 5;
+        $idToken = 'foo';
+        $refreshToken = 'bar';
 
         $configuration = $this->createMock(Configuration::class);
 
-        $configuration->method('getLock')
-            ->willReturn(true);
-
         $firebaseClient = $this->createMock(FirebaseClient::class);
 
-        $firebaseClient->method('getTokenForRefreshToken')
+        $firebaseClient->method('exchangeRefreshTokenForIdToken')
             ->willReturn([
                 'status' => true,
                 'body' => [
-                    'id_token' => 'foo',
-                    'refresh_token' => 'bar',
+                    'id_token' => $idToken,
+                    'refresh_token' => $refreshToken,
                 ],
             ]);
 
-        $token = new Token($configuration, $firebaseClient);
+        $token = $this->getMockBuilder(Token::class)
+            ->setConstructorArgs([$configuration, $firebaseClient])
+            ->setMethods(['updateShopToken'])
+            ->getMock();
 
-        $response = $token->refresh($shopId);
+        $token->expects($this->once())
+            ->method('updateShopToken')
+            ->with($idToken, $refreshToken, $shopId);
 
-        $this->assertArrayHasKey('body', $response);
-
-        $this->assertEquals('foo', $response['body']['id_token']);
-
-        $this->assertEquals('bar', $response['body']['refresh_token']);
+        $this->assertTrue($token->refresh($shopId));
     }
 
     /**
@@ -74,20 +74,23 @@ class RefreshTest extends TestCase
 
         $configuration = $this->createMock(Configuration::class);
 
-        $configuration->method('getLock')
-            ->willReturn(true);
-
         $firebaseClient = $this->createMock(FirebaseClient::class);
 
-        $firebaseClient->method('getTokenForRefreshToken')
+        $firebaseClient->method('exchangeRefreshTokenForIdToken')
             ->willReturn([
                 'status' => false,
             ]);
 
+        $token = $this->getMockBuilder(Token::class)
+            ->setConstructorArgs([$configuration, $firebaseClient])
+            ->setMethods(['updateShopToken'])
+            ->getMock();
+
+        $token->expects($this->never())
+            ->method('updateShopToken');
+
         $token = new Token($configuration, $firebaseClient);
 
-        $response = $token->refresh($shopId);
-
-        $this->assertFalse($response['status']);
+        $this->assertFalse($token->refresh($shopId));
     }
 }

@@ -85,7 +85,7 @@ class FirebaseClient extends GenericClient
      *
      * @return array response
      */
-    public function getTokenForRefreshToken($refreshToken)
+    public function exchangeRefreshTokenForIdToken($refreshToken)
     {
         $this->setRoute('https://securetoken.googleapis.com/v1/token');
 

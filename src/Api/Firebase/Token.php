@@ -52,8 +52,6 @@ class Token
     {
         new Env();
 
-        //parent::__construct();
-
         $this->injectDependencies($configuration, $firebaseClient);
     }
 
@@ -64,26 +62,28 @@ class Token
      *
      * @param int $shopId
      *
-     * @return array
+     * @return bool
      */
     public function refresh($shopId)
     {
         // FIXME : do we really need to do that ?
-        if (! $this->configuration->getLock($shopId)) {
-            return [];
-        }
+        /*if (! $this->configuration->getLock($shopId)) {
+            return false;
+        }*/
 
-        $response = $this->firebaseClient->getTokenForRefreshToken(
+        $response = $this->firebaseClient->exchangeRefreshTokenForIdToken(
             $this->configuration->get('PS_PSX_FIREBASE_REFRESH_TOKEN')
         );
 
         if ($response && true === $response['status']) {
             $this->updateShopToken($response['body']['id_token'], $response['body']['refresh_token'], $shopId);
+
+            return true;
         }
 
-        $this->configuration->freeLock($shopId);
+        //$this->configuration->freeLock($shopId);
 
-        return $response;
+        return false;
     }
 
     /**
@@ -94,25 +94,28 @@ class Token
      * @param string $customToken
      * @param int $shopId
      *
-     * @return void
+     * @return bool
      */
-    public function getRefreshTokenWithAdminToken($customToken, $shopId)
+    public function exchangeCustomTokenForIdAndRefreshToken($customToken, $shopId)
     {
         if (false == $customToken) {
-            return;
+            return false;
         }
 
         $response = $this->firebaseClient->signInWithCustomToken($customToken);
 
         if (!$response || false === $response['status']) {
-            return;
+            return false;
         }
 
         $this->updateShopUuid($customToken, $shopId);
 
         $this->updateShopToken($response['body']['idToken'], $response['body']['refreshToken'], $shopId);
 
-        $this->refresh($shopId);
+        // FIXME : useless
+        //$this->refresh($shopId);
+
+        return true;
     }
 
     /**
@@ -167,7 +170,7 @@ class Token
      */
     public function hasRefreshToken($shopId)
     {
-        $refresh_token = $this->configuration->get(
+        $refresh_token = $this->configuration->getRaw(
             'PS_PSX_FIREBASE_REFRESH_TOKEN',
             null,
             null,
@@ -186,7 +189,7 @@ class Token
      */
     public function isExpired($shopId)
     {
-        $refresh_date = $this->configuration->get(
+        $refresh_date = $this->configuration->getRaw(
             'PS_PSX_FIREBASE_REFRESH_DATE',
             null,
             null,
@@ -213,7 +216,7 @@ class Token
             $this->refresh($shopId);
         }
 
-        return $this->configuration->get(
+        return $this->configuration->getRaw(
             'PS_PSX_FIREBASE_ID_TOKEN',
             null,
             null,

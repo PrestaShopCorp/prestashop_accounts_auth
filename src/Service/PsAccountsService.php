@@ -22,6 +22,7 @@ namespace PrestaShop\AccountsAuth\Service;
 
 use Context;
 use Module;
+use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Api\ServicesAccountsClient;
@@ -61,6 +62,11 @@ class PsAccountsService
     public $psxName = null;
 
     /**
+     * @var Configuration
+     */
+    public $configuration;
+
+    /**
      * @var LinkAdapter
      */
     protected $linkAdapter;
@@ -72,6 +78,10 @@ class PsAccountsService
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();
         $this->linkAdapter = new LinkAdapter($this->context->link);
+
+        $this->configuration = new Configuration();
+        //$this->configuration->setIdShop((int) $this->getCurrentShop()['id']);
+        $this->configuration->setIdShop($this->context->shop->id);
     }
 
     /**
@@ -110,6 +120,8 @@ class PsAccountsService
 
     /**
      * @return void
+     *
+     * @throws \Exception
      */
     public function manageOnboarding()
     {
@@ -119,19 +131,21 @@ class PsAccountsService
     }
 
     /**
+     * FIXME : redundant with Token ?
      * @return string | null
      */
     public function getFirebaseRefreshToken()
     {
-        return \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $this->getCurrentShop()['id']) ?: null;
+        return $this->configuration->get('PS_PSX_FIREBASE_REFRESH_TOKEN') ?: null;
     }
 
     /**
+     * FIXME : redundant with Token ?
      * @return string | null
      */
     public function getFirebaseIdToken()
     {
-        return \Configuration::get('PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $this->getCurrentShop()['id']) ?: null;
+        return $this->configuration->getRaw('PS_PSX_FIREBASE_ID_TOKEN') ?: null;
     }
 
     /**
@@ -199,7 +213,12 @@ class PsAccountsService
      */
     public function getEmail($shopId)
     {
-        return \Configuration::get('PS_PSX_FIREBASE_EMAIL', null, null, (int) $shopId) ?: null;
+        return $this->configuration->getRaw(
+            'PS_PSX_FIREBASE_EMAIL',
+            null,
+            null,
+            (int) $shopId
+        ) ?: null;
     }
 
     /**
@@ -209,7 +228,13 @@ class PsAccountsService
      */
     public function isEmailValidated($shopId)
     {
-        return in_array(\Configuration::get('PS_PSX_FIREBASE_EMAIL_IS_VERIFIED', null, null, (int) $shopId), ['1', 1, true]);
+        return in_array($this->configuration->getRaw(
+            'PS_PSX_FIREBASE_EMAIL_IS_VERIFIED',
+            null,
+            null,
+            (int) $shopId),
+            ['1', 1, true]
+        );
     }
 
     /**
@@ -245,7 +270,12 @@ class PsAccountsService
     {
         $shopId = $shopId ? $shopId : $this->getCurrentShop()['id'];
 
-        return true == \Configuration::get('PS_SSL_ENABLED', null, null, (int) $shopId);
+        return true == $this->configuration->getRaw(
+                'PS_SSL_ENABLED',
+                null,
+                null,
+                (int) $shopId
+            );
     }
 
     /**
@@ -280,6 +310,8 @@ class PsAccountsService
      * @param int $shopId
      *
      * @return string
+     *
+     * @throws \Exception
      */
     public function getOnboardingLink($shopId)
     {
@@ -302,7 +334,12 @@ class PsAccountsService
         $currentShop = \Shop::getShop($shopId);
         $queryParams = [
             'bo' => $callback,
-            'pubKey' => \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId),
+            'pubKey' => $this->configuration->getRaw(
+                'PS_ACCOUNTS_RSA_PUBLIC_KEY',
+                null,
+                null,
+                (int) $shopId
+            ),
             'next' => preg_replace(
                 '/^https?:\/\/[^\/]+/',
                 '',
@@ -331,17 +368,21 @@ class PsAccountsService
     public function generateSshKey($shopId)
     {
         if (false === $this->hasSshKey($shopId)) {
+
             $sshKey = new SshKey();
+
             $key = $sshKey->generate();
-            \Configuration::updateValue('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey'], false, null, (int) $shopId);
-            \Configuration::updateValue('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey'], false, null, (int) $shopId);
-            $data = 'data';
-            \Configuration::updateValue(
+
+            $this->configuration->setRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey'], false, null, (int) $shopId);
+            $this->configuration->setRaw('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey'], false, null, (int) $shopId);
+
+            $this->configuration->setRaw(
                 'PS_ACCOUNTS_RSA_SIGN_DATA',
                 $sshKey->signData(
-                    \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId),
+                    $this->configuration->getRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId),
                     self::STR_TO_SIGN
-                ), false, null, (int) $shopId
+                ),
+                false, null, (int) $shopId
             );
         }
     }
@@ -353,12 +394,12 @@ class PsAccountsService
      */
     public function hasSshKey($shopId)
     {
-        return false !== \Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
-            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
-            && false !== \Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
-            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
-            && false !== \Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
-            && !empty(\Configuration::get('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId));
+        return false !== $this->configuration->getRaw('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
+            && !empty($this->configuration->getRaw('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
+            && false !== $this->configuration->getRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
+            && !empty($this->configuration->getRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
+            && false !== $this->configuration->getRaw('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
+            && !empty($this->configuration->getRaw('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId));
     }
 
     /**
@@ -417,46 +458,35 @@ class PsAccountsService
     /**
      * Only callable during onboarding
      *
+     * Prepare onboarding data
+     *
      * @param int $shopId
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function saveQueriesParams($shopId)
     {
-        $token = new Token();
         if (false === $this->hasSshKey($shopId)) {
             return;
         }
-        if (null !== \Tools::getValue('adminToken') && !empty(\Tools::getValue('adminToken'))) {
-            $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
-        }
 
-        if (false == \Configuration::get('PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId)) {
+        if (! $this->storeIdAndRefreshToken(
+            \Tools::getValue('adminToken'),
+            $shopId)
+        ) {
             return;
         }
 
-        if (
-            null !== \Tools::getValue('email')
-            && !empty(\Tools::getValue('email'))
-        ) {
-            \Configuration::updateValue('PS_PSX_FIREBASE_EMAIL', \Tools::getValue('email'), false, null, (int) $shopId);
-            if (
-                null !== \Tools::getValue('emailVerified')
-                && !empty(\Tools::getValue('emailVerified'))
-            ) {
-                \Configuration::updateValue('PS_PSX_FIREBASE_EMAIL_IS_VERIFIED', 'true' === \Tools::getValue('emailVerified'), false, null, (int) $shopId);
-            }
-        }
+        $this->storeEmailVerifiedStatus(
+            \Tools::getValue('email'),
+            \Tools::getValue('emailVerified'),
+            $shopId
+        );
 
-        if (
-            null !== \Tools::getValue('adminToken')
-            && !empty(\Tools::getValue('adminToken'))
-            && true === $this->hasSshKey($shopId)
-        ) {
-            \Tools::redirect($this->linkAdapter->getAdminLink('AdminModules') . '&configure=' . $this->psxName);
-        }
-
-        $token->refresh($shopId);
+        // refresh token : WHY ?
+        //(new Token())->refresh($shopId);
     }
 
     /**
@@ -466,7 +496,7 @@ class PsAccountsService
      */
     public function getShopUuidV4($shopId = false)
     {
-        return \Configuration::get('PSX_UUID_V4', null, null, (int) ($shopId ? $shopId : $this->getCurrentShop()['id']));
+        return $this->configuration->getRaw('PSX_UUID_V4', null, null, (int) ($shopId ? $shopId : $this->getCurrentShop()['id']));
     }
 
     /**
@@ -518,5 +548,40 @@ class PsAccountsService
         }
 
         return $response;
+    }
+
+    /**
+     * @param string $customToken
+     * @param int $shopId
+     *
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    protected function storeIdAndRefreshToken($customToken, $shopId)
+    {
+        error_log('########################## storeIdAndRefreshToken ' . $customToken . ' ' . $shopId);
+        return (new Token())->exchangeCustomTokenForIdAndRefreshToken($customToken, $shopId);
+    }
+
+    /**
+     * @param string $email
+     * @param bool $status
+     * @param $shopId
+     */
+    protected function storeEmailVerifiedStatus($email, $status, $shopId)
+    {
+        error_log('########################## storeEmailVerifiedStatus ' . $email . ' ' . $status);
+        $this->configuration->setIdShop((int) $shopId);
+
+        if (null !== $email && !empty($email)) {
+
+            $this->configuration->set('PS_PSX_FIREBASE_EMAIL', $email);
+
+            if (null !== $status && !empty($status)) {
+
+                $this->configuration->set('PS_PSX_FIREBASE_EMAIL_IS_VERIFIED', 'true' === $status);
+            }
+        }
     }
 }
