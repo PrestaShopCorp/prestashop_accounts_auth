@@ -91,6 +91,7 @@ class ServicesBillingClient extends GenericClient
 
     /**
      * @param mixed $shopUuidV4
+     * @param string $module
      *
      * @return array | false
      */

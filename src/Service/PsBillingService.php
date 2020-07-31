@@ -103,7 +103,7 @@ class PsBillingService
      *
      * @return mixed An array with subscription identifiers if succeed
      *
-     * @throws Exception in case of error
+     * @throws \Exception in case of error
      */
     public function subscribeToFreePlan($module, $planName, $shopId = false, $customerIp = null)
     {
@@ -141,7 +141,7 @@ class PsBillingService
             if ($response['httpCode'] === 404) {
                 $response = $billingClient->createBillingSubscriptions($uuid, ['plan_id' => $planName, 'module' => $module]);
                 if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] >= 400) {
-                    if (array_key_exists('body', $response)
+                    if ($response && array_key_exists('body', $response)
                         && array_key_exists('message', $response['body'])
                         && array_key_exists(0, $response['body']['message'])) {
                         throw new \Exception($response['body']['message'][0]);
