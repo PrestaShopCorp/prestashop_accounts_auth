@@ -26,7 +26,7 @@ composer require prestashop/prestashop-accounts-auth
 ## Usage
 
 Each PrestaShop X modules require that the module ps_accounts is installed in order to precess to the onboarding.
-PrestaShop X modules need to install ps_accounts in their install() method. In order to simplify that we have created a method that handle it for you: 
+PrestaShop X modules need to install ps_accounts in their install() method. In order to simplify that, we have created a method that handle it for you: 
 
 ```php
 (new PrestaShop\AccountsAuth\Installer\Install())->installPsAccounts()
@@ -67,8 +67,6 @@ The $psAccountPresenter format is:
     'psIs17' => bool,
     'psAccountsInstallLink' => null|string,
     'psAccountsEnableLink' => null|string,
-    'psAccountsIsInstalled' => bool,
-    'psAccountsIsEnabled' => bool,
     'onboardingLink' => string,
     'user' => [
         'email' => null|string,
@@ -88,6 +86,44 @@ The $psAccountPresenter format is:
     'ssoResendVerificationEmail' => string,
 ];
 ```
+
+## Billing
+
+This library also provides PrestaShop Billing features and helpers to let
+your module call PrestaShop Billing API.
+
+*N.B.: To be able to call Billing API, you need to onboard the shop first*
+
+### Subscribe to a free plan after onboarding
+
+After a successful onboarding, you should probably register your merchant to
+a base Billing plan (if you have multiple levels of services, the base one is
+probably free). Let it go:
+
+```php
+$billingService = new \PrestaShop\AccountsAuth\Service\PsBillingService();
+$shopId = false; // Set this ID to the current shop in multishop context. False otherwise.
+$ip = null; // Set this to the browser IP (the call is made from the backoffice by the merchant).
+$result = $billingService->subscribeToFreePlan('<your_module>', '<your_basic_plan>', $shopId, $ip);
+```
+
+The `result` will present these IDs:
+```php
+[
+    'shopAccountId' => '<The PS Accounts shop ID, set after onboarding>',
+    'customerId' => '<The PS Billing customer ID, linked to shop account>',
+    'subscriptionId' => '<The subscription ID of the given plan>'
+]
+```
+
+Or an `\Exception` will be thrown in case of error:
+* Code `10`: 'Shop account unknown.'. The shop is not fully onboarded into PS Account process. 
+* Code `20`: 'Subscription plan name mismatch.'. The given plan does not match an available one.
+* Code `50`: 'Billing customer request failed.'. The API call cannot be done.
+* Code `51`: 'Billing subscriptions request failed.'. The API call cannot be done.
+* Code `60`: 'Billing customer creation failed.'. The Billing customer cannot be created.
+* Code `65`: 'Billing subscription creation failed.'. The Billing subscription cannot be created.
+
 
 ## Testing
 

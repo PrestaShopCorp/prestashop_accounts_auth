@@ -506,7 +506,7 @@ class PsAccountsService
          );
 
         if ($uuid && strlen($uuid) > 0) {
-            $response = (new ServicesAccountsClient($this->getContext()->link))->fetch(
+            $response = (new ServicesAccountsClient($this->getContext()->link))->changeUrl(
                 $uuid,
                 [
                     'protocol' => $protocol,
