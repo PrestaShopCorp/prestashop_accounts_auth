@@ -70,7 +70,7 @@ class ServicesBillingClient extends GenericClient
     {
         $this->setRoute('/shops/' . $shopUuidV4);
 
-        return $this->get([]);
+        return $this->get();
     }
 
     /**
@@ -99,7 +99,7 @@ class ServicesBillingClient extends GenericClient
     {
         $this->setRoute('/shops/' . $shopUuidV4 . '/subscriptions?module=' . $module);
 
-        return $this->get([]);
+        return $this->get();
     }
 
     /**
