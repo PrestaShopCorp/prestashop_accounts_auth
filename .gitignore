@@ -1,3 +1,6 @@
 .idea/
 .php_cs.cache
 vendor
+composer-dev.json
+composer-dev.lock
+
