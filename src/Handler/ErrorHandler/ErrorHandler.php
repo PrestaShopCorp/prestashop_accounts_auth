@@ -44,17 +44,18 @@ class ErrorHandler extends SentryHandler
     }
 
     /**
-     * @param string $message
+     * @param \Exception $error
      * @param mixed $code
+     * @param bool|null $throw
      *
      * @return void
      */
-    public function handle($message, $code = null)
+    public function handle($error, $code = null, $throw = true)
     {
-        $this->sentryHandler->setError($message, $code);
-        if ($code) {
+        $this->setError($error, $code);
+        if ($code && true === $throw) {
             http_response_code($code);
-            throw new \Exception($message);
+            throw new \Exception($error->getMessage());
         }
     }
 }

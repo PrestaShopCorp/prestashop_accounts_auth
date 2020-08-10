@@ -48,28 +48,27 @@ abstract class SentryHandler
         $this->client = new Raven_Client(
             $_ENV['SENTRY_CREDENTIALS'],
             [
+                'level' => 'warning',
                 'tags' => [
                     'php_version' => phpversion(),
                     'ps_accounts_version' => \Ps_accounts::VERSION,
                     'prestashop_vesion' => _PS_VERSION_,
+                    'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
+                    'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
                 ],
-                'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
-                'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
-                'currentShop' => $psAccountsService->getCurrentShop(),
-                'shops' => $psAccountsService->getShopsTree(),
+                'user' => [
+                    'email' => $psAccountsService->getEmail($psAccountsService->getCurrentShop()['id']),
+                    'emailIsValidated' => $psAccountsService->isEmailValidated($psAccountsService->getCurrentShop()['id']),
+                    'isSuperAdmin' => $psAccountsService->getContext()->employee->isSuperAdmin(),
+                ],
             ]
         );
-        $this->client->user_context(
-            [
-                'email' => $psAccountsService->getEmail($psAccountsService->getCurrentShop()['id']),
-                'emailIsValidated' => $psAccountsService->isEmailValidated($psAccountsService->getCurrentShop()['id']),
-                'isSuperAdmin' => $psAccountsService->getContext()->employee->isSuperAdmin(),
-            ]);
+
         $this->client->install();
     }
 
     /**
-     * @param mixed $error
+     * @param \Exception $error
      * @param mixed $code
      *
      * @return void
