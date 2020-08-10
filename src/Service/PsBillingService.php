@@ -24,7 +24,7 @@ use Context;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\ServicesBillingClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
-use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Environment\EnvSingleton;
 
 /**
  * Construct the psbilling service.
@@ -53,7 +53,7 @@ class PsBillingService
 
     public function __construct()
     {
-        new Env();
+        EnvSingleton::getInstance();
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();
     }
