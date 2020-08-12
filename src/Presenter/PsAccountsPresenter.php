@@ -21,8 +21,8 @@
 namespace PrestaShop\AccountsAuth\Presenter;
 
 use Module;
-use PrestaShop\AccountsAuth\Environment\EnvSingleton;
-use PrestaShop\AccountsAuth\Handler\Error\ErrorHandlerSingleton;
+use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Handler\Error\ErrorHandler;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
@@ -40,7 +40,7 @@ class PsAccountsPresenter
      */
     public function __construct($psxName)
     {
-        EnvSingleton::getInstance();
+        Env::getInstance();
         $this->psAccountsService = new PsAccountsService();
         $this->psAccountsService->setPsxName($psxName);
         $this->psAccountsService->manageOnboarding();
@@ -72,7 +72,7 @@ class PsAccountsPresenter
                 'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
             ];
         } catch (\Exception $e) {
-            $errorHandler = ErrorHandlerSingleton::getInstance();
+            $errorHandler = ErrorHandler::getInstance();
             $errorHandler->handle($e, $e->getCode());
         }
     }

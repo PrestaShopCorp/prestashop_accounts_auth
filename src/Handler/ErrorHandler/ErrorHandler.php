@@ -39,6 +39,16 @@ class ErrorHandler
      */
     protected $client;
 
+    /**
+     * @var ErrorHandler
+     */
+    private static $instance;
+
+    /**
+     * @var ErrorHandler
+     */
+    private static $instance;
+
     public function __construct()
     {
         $psAccountsService = new PsAccountsService();
@@ -74,5 +84,24 @@ class ErrorHandler
             http_response_code($code);
             throw $error;
         }
+    }
+
+    /**
+     * @return ErrorHandler
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new ErrorHandler();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * @return void
+     */
+    private function __clone()
+    {
     }
 }

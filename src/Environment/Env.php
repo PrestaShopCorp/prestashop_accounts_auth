@@ -34,6 +34,11 @@ class Env
      */
     private $firebaseApiKey;
 
+    /**
+     * @var Env
+     */
+    private static $instance;
+
     public function __construct()
     {
         $dotenv = new Dotenv();
@@ -65,5 +70,24 @@ class Env
     private function setFirebaseApiKey($apiKey)
     {
         $this->firebaseApiKey = $apiKey;
+    }
+
+    /**
+     * @return Env
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new Env();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * @return void
+     */
+    private function __clone()
+    {
     }
 }
