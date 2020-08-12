@@ -26,21 +26,38 @@
 
 namespace PrestaShop\AccountsAuth\Handler\Error;
 
-use PrestaShop\AccountsAuth\Handler\Sentry\SentryHandler;
+use PrestaShop\AccountsAuth\Service\PsAccountsService;
+use Raven_Client;
 
 /**
  * Handle Error.
  */
-class ErrorHandler extends SentryHandler
+class ErrorHandler
 {
     /**
-     * @var SentryHandler
+     * @var Raven_Client
      */
-    protected $sentryHandler;
+    protected $client;
 
     public function __construct()
     {
-        parent::__construct();
+        $psAccountsService = new PsAccountsService();
+        $this->client = new Raven_Client(
+            $_ENV['SENTRY_CREDENTIALS'],
+            [
+                'level' => 'warning',
+                'tags' => [
+                    'php_version' => phpversion(),
+                    'ps_accounts_version' => \Ps_accounts::VERSION,
+                    'prestashop_vesion' => _PS_VERSION_,
+                    'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
+                    'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
+                    'email' => $psAccountsService->getEmail($psAccountsService->getCurrentShop()['id']),
+                ],
+            ]
+        );
+
+        $this->client->install();
     }
 
     /**
@@ -52,10 +69,10 @@ class ErrorHandler extends SentryHandler
      */
     public function handle($error, $code = null, $throw = true)
     {
-        $this->setError($error, $code);
+        $code ? $this->client->captureException($error) : $this->client->captureMessage($error);
         if ($code && true === $throw) {
             http_response_code($code);
-            throw new \Exception($error->getMessage());
+            throw $error;
         }
     }
 }
