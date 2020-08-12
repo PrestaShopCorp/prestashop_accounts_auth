@@ -39,7 +39,7 @@ class Env
      */
     private static $instance;
 
-    public function __construct()
+    private function __construct()
     {
         $dotenv = new Dotenv();
         if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {

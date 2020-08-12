@@ -44,12 +44,7 @@ class ErrorHandler
      */
     private static $instance;
 
-    /**
-     * @var ErrorHandler
-     */
-    private static $instance;
-
-    public function __construct()
+    private function __construct()
     {
         $psAccountsService = new PsAccountsService();
         $this->client = new Raven_Client(
