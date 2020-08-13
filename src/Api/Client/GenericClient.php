@@ -18,7 +18,7 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-namespace PrestaShop\AccountsAuth\Api;
+namespace PrestaShop\AccountsAuth\Api\Client;
 
 use GuzzleHttp\Client;
 use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;

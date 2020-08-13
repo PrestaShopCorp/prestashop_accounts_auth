@@ -23,7 +23,7 @@ namespace PrestaShop\AccountsAuth\Tests\Unit\Api\Firebase\Token;
 use Lcobucci\JWT\Builder;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\Api\FirebaseClient;
+use PrestaShop\AccountsAuth\Api\Client\FirebaseClient;
 use PrestaShop\AccountsAuth\Tests\TestCase;
 
 class RefreshTest extends TestCase

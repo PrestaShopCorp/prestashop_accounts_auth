@@ -1,8 +1,6 @@
 <?php
 
-
 namespace PrestaShop\AccountsAuth\Tests\Unit\Api\Firebase\Token;
-
 
 use Lcobucci\JWT\Builder;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
@@ -20,15 +18,21 @@ class GetTokenTest extends TestCase
     {
         $shopId = $this->faker->randomNumber();
 
-        $configuration = $this->createMock(Configuration::class);
+        $date = (new \DateTime('tomorrow'));
 
         $idToken = (new Builder())
-            ->expiresAt((new \DateTime('tomorrow'))->getTimestamp())
+            ->expiresAt($date->getTimestamp())
             ->withClaim('uid', $this->faker->uuid)->getToken();
 
+        $refreshToken = (new Builder())->getToken();
+
+        $configuration = $this->createMock(Configuration::class);
         $configuration->method('getRaw')
-            ->with('PS_PSX_FIREBASE_ID_TOKEN', null, null, $shopId)
-            ->willReturn($idToken);
+            ->will($this->returnValueMap([
+                ['PS_PSX_FIREBASE_REFRESH_DATE', null, null, (int) $shopId, false, $date->format('Y-m-d h:m:s')],
+                ['PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId, false, (string) $refreshToken],
+                ['PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $shopId, false, (string) $idToken]
+            ]));
 
         $token = $this->getMockBuilder(Token::class)
             ->setConstructorArgs([$configuration])
@@ -38,7 +42,7 @@ class GetTokenTest extends TestCase
         $token->expects($this->never())
             ->method('refresh');
 
-        $this->assertEquals($idToken, $token->getToken($shopId));
+        $this->assertEquals((string) $idToken, $token->getToken($shopId));
     }
 
     /**
@@ -50,15 +54,21 @@ class GetTokenTest extends TestCase
     {
         $shopId = $this->faker->randomNumber();
 
-        $configuration = $this->createMock(Configuration::class);
+        $date = (new \DateTime('yesterday'));
 
         $idToken = (new Builder())
-            ->expiresAt((new \DateTime('yesterday'))->getTimestamp())
+            ->expiresAt($date->getTimestamp())
             ->withClaim('uid', $this->faker->uuid)->getToken();
 
+        $refreshToken = (new Builder())->getToken();
+
+        $configuration = $this->createMock(Configuration::class);
         $configuration->method('getRaw')
-            ->with('PS_PSX_FIREBASE_ID_TOKEN', null, null, $shopId)
-            ->willReturn($idToken);
+            ->will($this->returnValueMap([
+                ['PS_PSX_FIREBASE_REFRESH_DATE', null, null, (int) $shopId, false, $date->format('Y-m-d h:m:s')],
+                ['PS_PSX_FIREBASE_REFRESH_TOKEN', null, null, (int) $shopId, false, (string) $refreshToken],
+                ['PS_PSX_FIREBASE_ID_TOKEN', null, null, (int) $shopId, false, (string) $idToken]
+            ]));
 
         $token = $this->getMockBuilder(Token::class)
             ->setConstructorArgs([$configuration])
@@ -67,8 +77,8 @@ class GetTokenTest extends TestCase
 
         $token->expects($this->once())
             ->method('refresh')
-            ->with($idToken);
+            ->with($shopId);
 
-        $this->assertEquals($idToken, $token->getToken($shopId));
+        $this->assertEquals((string) $idToken, $token->getToken($shopId));
     }
 }

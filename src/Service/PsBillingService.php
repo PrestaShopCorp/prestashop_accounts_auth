@@ -22,7 +22,7 @@ namespace PrestaShop\AccountsAuth\Service;
 
 use Context;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
-use PrestaShop\AccountsAuth\Api\ServicesBillingClient;
+use PrestaShop\AccountsAuth\Api\Client\ServicesBillingClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
 

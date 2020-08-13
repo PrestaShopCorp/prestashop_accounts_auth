@@ -18,9 +18,10 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-namespace PrestaShop\AccountsAuth\Api;
+namespace PrestaShop\AccountsAuth\Api\Client;
 
 use GuzzleHttp\Client;
+use PrestaShop\AccountsAuth\Api\Client\GenericClient;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
@@ -35,7 +36,7 @@ class ServicesAccountsClient extends GenericClient
         new Env();
         $psAccountsService = new PsAccountsService();
         $shopId = $psAccountsService->getCurrentShop()['id'];
-        $token = (new Token())->getToken($shopId);
+        $token = (new Token())->getIdToken($shopId);
         $this->setLink($link);
 
         // Client can be provided for tests

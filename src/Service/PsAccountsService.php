@@ -25,7 +25,7 @@ use Module;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\Api\ServicesAccountsClient;
+use PrestaShop\AccountsAuth\Api\Client\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
 
@@ -80,8 +80,7 @@ class PsAccountsService
         $this->linkAdapter = new LinkAdapter($this->context->link);
 
         $this->configuration = new Configuration();
-        //$this->configuration->setIdShop((int) $this->getCurrentShop()['id']);
-        $this->configuration->setIdShop($this->context->shop->id);
+        $this->configuration->setIdShop((int) $this->getCurrentShop()['id']);
     }
 
     /**
@@ -145,7 +144,7 @@ class PsAccountsService
      */
     public function getFirebaseIdToken()
     {
-        return $this->configuration->getRaw('PS_PSX_FIREBASE_ID_TOKEN') ?: null;
+        return $this->configuration->get('PS_PSX_FIREBASE_ID_TOKEN') ?: null;
     }
 
     /**

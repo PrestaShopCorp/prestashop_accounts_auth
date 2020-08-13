@@ -25,23 +25,21 @@ use PrestaShop\AccountsAuth\Api\Client\FirebaseClient;
 /**
  * Handle authentication firebase requests.
  */
-class Token extends FirebaseClient
+class Auth extends FirebaseClient
 {
     /**
-     * @see https://firebase.google.com/docs/reference/rest/auth#section-refresh-token Firebase documentation
-     *
-     * @param string $refreshToken
+     * @param string $customToken
      *
      * @return array response
      */
-    public function exchangeRefreshTokenForIdToken($refreshToken)
+    public function signInWithCustomToken($customToken)
     {
-        $this->setRoute('https://securetoken.googleapis.com/v1/token');
+        $this->setRoute('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken');
 
         return $this->post([
             'json' => [
-                'grant_type' => 'refresh_token',
-                'refresh_token' => $refreshToken,
+                'token' => $customToken,
+                'returnSecureToken' => true,
             ],
         ]);
     }
