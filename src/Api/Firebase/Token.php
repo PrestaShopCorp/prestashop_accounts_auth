@@ -22,7 +22,6 @@ namespace PrestaShop\AccountsAuth\Api\Firebase;
 
 use Lcobucci\JWT\Parser;
 use PrestaShop\AccountsAuth\Api\FirebaseClient;
-use PrestaShop\AccountsAuth\Environment\Env;
 
 /**
  * Handle authentication firebase requests.
@@ -31,7 +30,6 @@ class Token extends FirebaseClient
 {
     public function __construct()
     {
-        new Env();
         parent::__construct();
     }
 

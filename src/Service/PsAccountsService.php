@@ -27,6 +27,7 @@ use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Api\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Exception\EnvVarException;
 
 /**
  * Construct the psaccounts service.
@@ -67,7 +68,7 @@ class PsAccountsService
 
     public function __construct()
     {
-        new Env();
+        Env::getInstance();
         $this->module = Module::getInstanceByName('ps_accounts');
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();
@@ -295,7 +296,7 @@ class PsAccountsService
 
         $uiSvcBaseUrl = $_ENV['ACCOUNTS_SVC_UI_URL'];
         if (false === $uiSvcBaseUrl) {
-            throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
+            throw new EnvVarException('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
         }
         $protocol = $this->getProtocol($shopId);
         $domainName = $this->getDomainName($shopId);
@@ -427,6 +428,7 @@ class PsAccountsService
         if (false === $this->hasSshKey($shopId)) {
             return;
         }
+
         if (null !== \Tools::getValue('adminToken') && !empty(\Tools::getValue('adminToken'))) {
             $token->getRefreshTokenWithAdminToken(\Tools::getValue('adminToken'), $shopId);
         }
@@ -456,7 +458,7 @@ class PsAccountsService
             \Tools::redirect($this->linkAdapter->getAdminLink('AdminModules') . '&configure=' . $this->psxName);
         }
 
-        $token->refresh($shopId);
+        $token->getToken($shopId);
     }
 
     /**

@@ -23,7 +23,7 @@ namespace PrestaShop\AccountsAuth\Environment;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
- * Allow to set the differents api key / api link depending on.
+ * Load environment variables.
  */
 class Env
 {
@@ -34,7 +34,12 @@ class Env
      */
     private $firebaseApiKey;
 
-    public function __construct()
+    /**
+     * @var Env
+     */
+    private static $instance;
+
+    private function __construct()
     {
         $dotenv = new Dotenv();
         if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {
@@ -65,5 +70,24 @@ class Env
     private function setFirebaseApiKey($apiKey)
     {
         $this->firebaseApiKey = $apiKey;
+    }
+
+    /**
+     * @return Env
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new Env();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * @return void
+     */
+    private function __clone()
+    {
     }
 }
