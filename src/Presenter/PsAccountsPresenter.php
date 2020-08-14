@@ -59,10 +59,10 @@ class PsAccountsPresenter
           'psIs17' => $this->psAccountsService->getShopContext()->isShop17(),
           'psAccountsInstallLink' => $this->psAccountsService->getPsAccountsInstallLink(),
           'psAccountsEnableLink' => $this->psAccountsService->getPsAccountsEnableLink(),
-          'onboardingLink' => $this->psAccountsService->getOnboardingLink($this->psAccountsService->getCurrentShop()['id']),
+          'onboardingLink' => $this->psAccountsService->getOnboardingLink(),
           'user' => [
-              'email' => $this->psAccountsService->getEmail($this->psAccountsService->getCurrentShop()['id']),
-              'emailIsValidated' => $this->psAccountsService->isEmailValidated($this->psAccountsService->getCurrentShop()['id']),
+              'email' => $this->psAccountsService->getEmail(),
+              'emailIsValidated' => $this->psAccountsService->isEmailValidated(),
               'isSuperAdmin' => $this->psAccountsService->getContext()->employee->isSuperAdmin(),
             ],
           'currentShop' => $this->psAccountsService->getCurrentShop(),

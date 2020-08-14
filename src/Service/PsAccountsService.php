@@ -21,13 +21,15 @@
 namespace PrestaShop\AccountsAuth\Service;
 
 use Context;
+use Lcobucci\JWT\Parser;
 use Module;
-use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
+use PrestaShop\AccountsAuth\Api\Firebase\Auth;
 use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Api\Client\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 
 /**
  * Construct the psaccounts service.
@@ -52,24 +54,34 @@ class PsAccountsService
     public $shopContext;
 
     /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    protected $container;
-
-    /**
      * @var string | null
      */
     public $psxName = null;
 
     /**
-     * @var Configuration
+     * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
-    public $configuration;
+    protected $container;
 
     /**
      * @var LinkAdapter
      */
     protected $linkAdapter;
+
+    /**
+     * @var ConfigurationRepository
+     */
+    private $configuration;
+
+    /**
+     * @var Auth
+     */
+    private $auth;
+
+    /**
+     * @var Token
+     */
+    private $token;
 
     public function __construct()
     {
@@ -79,8 +91,13 @@ class PsAccountsService
         $this->shopContext = new ShopContext();
         $this->linkAdapter = new LinkAdapter($this->context->link);
 
-        $this->configuration = new Configuration();
-        $this->configuration->setIdShop((int) $this->getCurrentShop()['id']);
+        //$configuration = new Configuration();
+        //$configuration->setIdShop((int) $this->getCurrentShop()['id']);
+        //$this->configuration = new ConfigurationRepository($configuration);
+
+        $this->configuration = new ConfigurationRepository();
+        $this->auth = new Auth();
+        $this->token = new Token();
     }
 
     /**
@@ -118,33 +135,112 @@ class PsAccountsService
     }
 
     /**
-     * @return void
+     * Override of native function to always retrieve Symfony container instead of legacy admin container on legacy context.
      *
-     * @throws \Exception
+     * @param string $serviceName
+     *
+     * @return mixed
      */
-    public function manageOnboarding()
+    public function get($serviceName)
     {
-        $currentShop = $this->getCurrentShop();
-        $this->generateSshKey($currentShop['id']);
-        $this->saveQueriesParams($currentShop['id']);
+        if (null === $this->container) {
+            $this->container = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance();
+        }
+
+        return $this->container->get($serviceName);
     }
 
     /**
-     * FIXME : redundant with Token ?
+     * @return bool
+     */
+    public function isShopContext()
+    {
+        if (\Shop::isFeatureActive() && \Shop::getContext() !== \Shop::CONTEXT_SHOP) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCurrentShop()
+    {
+        $shop = \Shop::getShop($this->context->shop->id);
+
+        return [
+            'id' => $shop['id_shop'],
+            'name' => $shop['name'],
+            'domain' => $shop['domain'],
+            'domainSsl' => $shop['domain_ssl'],
+            'url' => $this->linkAdapter->getAdminLink(
+                'AdminModules',
+                true,
+                [],
+                [
+                    'configure' => $this->psxName,
+                    'setShopContext' => 's-' . $shop['id_shop'],
+                ]
+            ),
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getShopsTree()
+    {
+        $shopList = [];
+
+        if (true === $this->isShopContext()) {
+            return $shopList;
+        }
+
+        foreach (\Shop::getTree() as $groupId => $groupData) {
+            $shops = [];
+            foreach ($groupData['shops'] as $shopId => $shopData) {
+                $shops[] = [
+                    'id' => $shopId,
+                    'name' => $shopData['name'],
+                    'domain' => $shopData['domain'],
+                    'domainSsl' => $shopData['domain_ssl'],
+                    'url' => $this->linkAdapter->getAdminLink(
+                        'AdminModules',
+                        true,
+                        [],
+                        [
+                            'configure' => $this->module->name,
+                            'setShopContext' => 's-' . $shopId,
+                        ]
+                    ),
+                ];
+            }
+
+            $shopList[] = [
+                'id' => $groupId,
+                'name' => $groupData['name'],
+                'shops' => $shops,
+            ];
+        }
+
+        return $shopList;
+    }
+
+    /**
      * @return string | null
      */
     public function getFirebaseRefreshToken()
     {
-        return $this->configuration->get('PS_PSX_FIREBASE_REFRESH_TOKEN') ?: null;
+        return $this->configuration->getFirebaseRefreshToken() ?: null;
     }
 
     /**
-     * FIXME : redundant with Token ?
      * @return string | null
      */
     public function getFirebaseIdToken()
     {
-        return $this->configuration->get('PS_PSX_FIREBASE_ID_TOKEN') ?: null;
+        return $this->configuration->getFirebaseIdToken() ?: null;
     }
 
     /**
@@ -153,8 +249,56 @@ class PsAccountsService
     public function getSuperAdminEmail()
     {
         $employee = new \Employee(1);
-
         return $employee->email;
+    }
+
+    /**
+     * @return string | null
+     */
+    public function getEmail()
+    {
+        return $this->configuration->getFirebaseEmail() ?: null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailValidated()
+    {
+        return $this->configuration->firebaseEmailIsVerified();
+    }
+
+    /**
+     * @return bool
+     */
+    public function sslEnabled()
+    {
+        return $this->configuration->sslEnabled();
+    }
+
+    /**
+     * @return string
+     */
+    public function getProtocol()
+    {
+        return false == $this->sslEnabled() ? 'http' : 'https';
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomainName()
+    {
+        $currentShop = $this->getCurrentShop();
+        return false == $this->sslEnabled() ? $currentShop['domain'] : $currentShop['domainSsl'];
+    }
+
+    /**
+     * @return string | false
+     */
+    public function getShopUuidV4()
+    {
+        return $this->configuration->getShopUuid();
     }
 
     /**
@@ -206,113 +350,11 @@ class PsAccountsService
     }
 
     /**
-     * @param int $shopId
-     *
-     * @return string | null
-     */
-    public function getEmail($shopId)
-    {
-        return $this->configuration->getRaw(
-            'PS_PSX_FIREBASE_EMAIL',
-            null,
-            null,
-            (int) $shopId
-        ) ?: null;
-    }
-
-    /**
-     * @param int $shopId
-     *
-     * @return bool
-     */
-    public function isEmailValidated($shopId)
-    {
-        return in_array($this->configuration->getRaw(
-            'PS_PSX_FIREBASE_EMAIL_IS_VERIFIED',
-            null,
-            null,
-            (int) $shopId),
-            ['1', 1, true]
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function getCurrentShop()
-    {
-        $shop = \Shop::getShop($this->context->shop->id);
-
-        return [
-            'id' => $shop['id_shop'],
-            'name' => $shop['name'],
-            'domain' => $shop['domain'],
-            'domainSsl' => $shop['domain_ssl'],
-            'url' => $this->linkAdapter->getAdminLink(
-                'AdminModules',
-                true,
-                [],
-                [
-                    'configure' => $this->psxName,
-                    'setShopContext' => 's-' . $shop['id_shop'],
-                ]
-            ),
-        ];
-    }
-
-    /**
-     * @param mixed $shopId
-     *
-     * @return bool
-     */
-    public function sslEnabled($shopId = false)
-    {
-        $shopId = $shopId ? $shopId : $this->getCurrentShop()['id'];
-
-        return true == $this->configuration->getRaw(
-                'PS_SSL_ENABLED',
-                null,
-                null,
-                (int) $shopId
-            );
-    }
-
-    /**
-     * @param mixed $shopId
-     *
-     * @return string
-     */
-    public function getProtocol($shopId = false)
-    {
-        return false == $this->sslEnabled($shopId) ? 'http' : 'https';
-    }
-
-    /**
-     * @param mixed $shopId
-     *
-     * @return string
-     */
-    public function getDomainName($shopId = false)
-    {
-        if ($shopId === false) {
-            $currentShop = $this->getCurrentShop();
-
-            return false == $this->sslEnabled() ? $currentShop['domain'] : $currentShop['domainSsl'];
-        }
-
-        $shop = \Shop::getShop($shopId);
-
-        return false == $this->sslEnabled($shopId) ? $shop['domain'] : $shop['domain_ssl'];
-    }
-
-    /**
-     * @param int $shopId
-     *
      * @return string
      *
      * @throws \Exception
      */
-    public function getOnboardingLink($shopId)
+    public function getOnboardingLink()
     {
         if (false === Module::isInstalled('ps_accounts')) {
             return '';
@@ -328,17 +370,14 @@ class PsAccountsService
         if (false === $uiSvcBaseUrl) {
             throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
         }
-        $protocol = $this->getProtocol($shopId);
-        $domainName = $this->getDomainName($shopId);
-        $currentShop = \Shop::getShop($shopId);
+
+        $protocol = $this->getProtocol();
+        $domainName = $this->getDomainName();
+        $currentShop = $this->getCurrentShop();
+
         $queryParams = [
             'bo' => $callback,
-            'pubKey' => $this->configuration->getRaw(
-                'PS_ACCOUNTS_RSA_PUBLIC_KEY',
-                null,
-                null,
-                (int) $shopId
-            ),
+            'pubKey' => $this->configuration->getAccountsRsaPublicKey(),
             'next' => preg_replace(
                 '/^https?:\/\/[^\/]+/',
                 '',
@@ -353,165 +392,9 @@ class PsAccountsService
             $queryParamsArray[] = $key . '=' . urlencode($value);
         }
         $strQueryParams = implode('&', $queryParamsArray);
-        $response = $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName
+
+        return  $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName
             . '/' . $protocol . '/' . $domainName . '/' . $this->psxName . '?' . $strQueryParams;
-
-        return $response;
-    }
-
-    /**
-     * @param int $shopId
-     *
-     * @return void
-     */
-    public function generateSshKey($shopId)
-    {
-        if (false === $this->hasSshKey($shopId)) {
-
-            $sshKey = new SshKey();
-
-            $key = $sshKey->generate();
-
-            $this->configuration->setRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', $key['privatekey'], false, null, (int) $shopId);
-            $this->configuration->setRaw('PS_ACCOUNTS_RSA_PUBLIC_KEY', $key['publickey'], false, null, (int) $shopId);
-
-            $this->configuration->setRaw(
-                'PS_ACCOUNTS_RSA_SIGN_DATA',
-                $sshKey->signData(
-                    $this->configuration->getRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId),
-                    self::STR_TO_SIGN
-                ),
-                false, null, (int) $shopId
-            );
-        }
-    }
-
-    /**
-     * @param int $shopId
-     *
-     * @return bool
-     */
-    public function hasSshKey($shopId)
-    {
-        return false !== $this->configuration->getRaw('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId)
-            && !empty($this->configuration->getRaw('PS_ACCOUNTS_RSA_PUBLIC_KEY', null, null, (int) $shopId))
-            && false !== $this->configuration->getRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId)
-            && !empty($this->configuration->getRaw('PS_ACCOUNTS_RSA_PRIVATE_KEY', null, null, (int) $shopId))
-            && false !== $this->configuration->getRaw('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId)
-            && !empty($this->configuration->getRaw('PS_ACCOUNTS_RSA_SIGN_DATA', null, null, (int) $shopId));
-    }
-
-    /**
-     * @return bool
-     */
-    public function isShopContext()
-    {
-        if (\Shop::isFeatureActive() && \Shop::getContext() !== \Shop::CONTEXT_SHOP) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return array
-     */
-    public function getShopsTree()
-    {
-        $shopList = [];
-
-        if (true === $this->isShopContext()) {
-            return $shopList;
-        }
-
-        foreach (\Shop::getTree() as $groupId => $groupData) {
-            $shops = [];
-            foreach ($groupData['shops'] as $shopId => $shopData) {
-                $shops[] = [
-                    'id' => $shopId,
-                    'name' => $shopData['name'],
-                    'domain' => $shopData['domain'],
-                    'domainSsl' => $shopData['domain_ssl'],
-                    'url' => $this->linkAdapter->getAdminLink(
-                        'AdminModules',
-                        true,
-                        [],
-                        [
-                            'configure' => $this->module->name,
-                            'setShopContext' => 's-' . $shopId,
-                        ]
-                    ),
-                ];
-            }
-
-            $shopList[] = [
-                'id' => $groupId,
-                'name' => $groupData['name'],
-                'shops' => $shops,
-            ];
-        }
-
-        return $shopList;
-    }
-
-    /**
-     * Only callable during onboarding
-     *
-     * Prepare onboarding data
-     *
-     * @param int $shopId
-     *
-     * @return void
-     *
-     * @throws \Exception
-     */
-    public function saveQueriesParams($shopId)
-    {
-        if (false === $this->hasSshKey($shopId)) {
-            return;
-        }
-
-        if (! $this->storeIdAndRefreshToken(
-            \Tools::getValue('adminToken'),
-            $shopId)
-        ) {
-            return;
-        }
-
-        $this->storeEmailVerifiedStatus(
-            \Tools::getValue('email'),
-            \Tools::getValue('emailVerified'),
-            $shopId
-        );
-
-        // refresh token : WHY ?
-        //(new Token())->refresh($shopId);
-    }
-
-    /**
-     * @param mixed $shopId
-     *
-     * @return string | false
-     */
-    public function getShopUuidV4($shopId = false)
-    {
-        return $this->configuration->getRaw('PSX_UUID_V4', null, null, (int) ($shopId ? $shopId : $this->getCurrentShop()['id']));
-    }
-
-    /**
-     * Override of native function to always retrieve Symfony container instead of legacy admin container on legacy context.
-     *
-     * @param string $serviceName
-     *
-     * @return mixed
-     */
-    public function get($serviceName)
-    {
-        if (null === $this->container) {
-            $this->container = \PrestaShop\PrestaShop\Adapter\SymfonyContainer::getInstance();
-        }
-
-        return $this->container->get($serviceName);
     }
 
     /**
@@ -522,17 +405,23 @@ class PsAccountsService
      */
     public function changeUrl($bodyHttp, $trigger)
     {
-        $shopId = array_key_exists('shop_id', $bodyHttp) ? $bodyHttp['shop_id'] : $this->getCurrentShop()['id']; // id for multishop
-        $sslEnabled = $this->sslEnabled($shopId);
-        $protocol = $this->getProtocol($shopId);
+        if (array_key_exists('shop_id', $bodyHttp)) {
+            // id for multishop
+            $this->configuration->setShopId($bodyHttp['shop_id']);
+        }
+
+        $sslEnabled = $this->sslEnabled();
+        $protocol = $this->getProtocol();
         $domain = $sslEnabled ? $bodyHttp['domain_ssl'] : $bodyHttp['domain'];
-        $uuid = $this->getShopUuidV4($shopId);
+
+        $uuid = $this->getShopUuidV4();
+
         $response = false;
         $boUrl = preg_replace(
-             '/^https?:\/\/[^\/]+/',
-             $protocol . '://' . $domain,
-             $this->linkAdapter->getAdminLink('AdminModules', true)
-         );
+            '/^https?:\/\/[^\/]+/',
+            $protocol . '://' . $domain,
+            $this->linkAdapter->getAdminLink('AdminModules', true)
+        );
 
         if ($uuid && strlen($uuid) > 0) {
             $response = (new ServicesAccountsClient($this->getContext()->link))->changeUrl(
@@ -549,36 +438,160 @@ class PsAccountsService
         return $response;
     }
 
+
     /**
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function manageOnboarding()
+    {
+        $this->generateSshKey();
+        $this->updateOnboardingData();
+    }
+
+    /**
+     * @return void
+     */
+    public function generateSshKey()
+    {
+        if (false === $this->configuration->hasSshKey()) {
+
+            $sshKey = new SshKey();
+
+            $key = $sshKey->generate();
+            $this->configuration->updateAccountsRsaPrivateKey($key['privatekey']);
+            $this->configuration->updateAccountsRsaPublicKey($key['publickey']);
+
+            $this->configuration->updateAccountsRsaSignData(
+                $sshKey->signData(
+                    $this->configuration->getAccountsRsaPrivateKey(),
+                    self::STR_TO_SIGN
+                )
+            );
+        }
+    }
+
+    /**
+     * Only callable during onboarding
+     *
+     * Prepare onboarding data
+     *
+     * @return void
+     *
+     */
+    public function updateOnboardingData()
+    {
+        $email = \Tools::getValue('email');
+        $emailVerified = \Tools::getValue('emailVerified');
+        $customToken = \Tools::getValue('adminToken');
+
+        if (false === $this->configuration->hasSshKey()) {
+            return;
+        }
+
+        if (! $this->exchangeCustomTokenForIdAndRefreshToken($customToken)) {
+            return;
+        }
+
+        if (!empty($email)) {
+            $this->configuration->updateFirebaseEmail($email);
+
+            if (!empty($emailVerified)) {
+                $this->configuration->updateFirebaseEmailIsVerified('true' === $emailVerified);
+            }
+        }
+    }
+
+    /**
+     * Get the user firebase token.
+     *
+     * @return string
+     *
+     * @throws \Exception
+     */
+    public function getOrRefreshIdToken()
+    {
+        if (
+            $this->configuration->hasFirebaseRefreshToken()
+            && $this->isFirebaseIdTokenExpired()
+        ) {
+            $this->refreshIdToken();
+        }
+        return $this->configuration->getFirebaseIdToken();
+    }
+
+    /**
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    public function refreshIdToken()
+    {
+        $response = $this->token->exchangeRefreshTokenForIdToken(
+            $this->configuration->getFirebaseRefreshToken()
+        );
+
+        if ($response && true === $response['status']) {
+            $this->configuration->updateFirebaseIdAndRefreshTokens(
+                $response['body']['id_token'],
+                $response['body']['refresh_token']
+            );
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * get refreshToken.
+     *
+     * @see https://firebase.google.com/docs/reference/rest/auth Firebase documentation
+     *
      * @param string $customToken
-     * @param int $shopId
+     * @return bool
+     *
+     */
+    public function exchangeCustomTokenForIdAndRefreshToken($customToken)
+    {
+        $response = $this->auth->signInWithCustomToken($customToken);
+
+        if ($response && true === $response['status']) {
+            $uid = (new Parser())->parse((string) $customToken)->getClaim('uid');
+
+            $this->configuration->updateShopUuid($uid);
+
+            $this->configuration->updateFirebaseIdAndRefreshTokens(
+                $response['body']['idToken'],
+                $response['body']['refreshToken']
+            );
+
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * Check the token validity. The token expire time is set to 3600 seconds.
      *
      * @return bool
      *
      * @throws \Exception
      */
-    protected function storeIdAndRefreshToken($customToken, $shopId)
+    public function isFirebaseIdTokenExpired()
     {
-        return (new Token())->exchangeCustomTokenForIdAndRefreshToken($customToken, $shopId);
-    }
+        // iat, exp
 
-    /**
-     * @param string $email
-     * @param bool $status
-     * @param $shopId
-     */
-    protected function storeEmailVerifiedStatus($email, $status, $shopId)
-    {
-        $this->configuration->setIdShop((int) $shopId);
+        $token = (new Parser())->parse($this->configuration->getFirebaseIdToken());
 
-        if (null !== $email && !empty($email)) {
+        return $token->isExpired();
 
-            $this->configuration->set('PS_PSX_FIREBASE_EMAIL', $email);
+        /*$refresh_date = $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_DATE);
 
-            if (null !== $status && !empty($status)) {
-
-                $this->configuration->set('PS_PSX_FIREBASE_EMAIL_IS_VERIFIED', 'true' === $status);
-            }
+        if (empty($refresh_date)) {
+            return true;
         }
+
+        return strtotime($refresh_date) + 3600 < time();*/
     }
 }

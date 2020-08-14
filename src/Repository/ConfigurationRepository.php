@@ -20,11 +20,7 @@
 
 namespace PrestaShop\AccountsAuth\Repository;
 
-use Lcobucci\JWT\Parser;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
-use PrestaShop\AccountsAuth\Api\Firebase\Auth;
-use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 class ConfigurationRepository
 {
@@ -34,39 +30,44 @@ class ConfigurationRepository
     private $configuration;
 
     /**
-     * @var Token
-     */
-    private $token;
-
-    /**
-     * @var Auth
-     */
-    private $auth;
-
-    /**
      * ConfigurationRepository constructor.
      *
-     * @param Configuration $configuration
-     * @param Token $token
-     * @param Auth $auth
+     * @param Configuration|null $configuration
      */
-    public function __construct($configuration, $token, $auth)
+    public function __construct($configuration = null)
     {
-        $this->injectDefaultDependencies($configuration, $token, $auth);
+        $this->injectDefaultDependencies($configuration);
     }
 
-    // TODO : kill refresh date
-    // TODO : kill admin_token
-    // TODO : what if no token returned
-    //
-    // 'Authorization' => 'Bearer ' . (new Token())->getToken((int) $context->shop->id),
-    // (new ConfigurationRepository())->getOrRefreshIdToken()
+    /**
+     * @param int $shopId
+     */
+    public function setShopId($shopId)
+    {
+        $this->configuration->setIdShop($shopId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirebaseIdToken()
+    {
+        $this->configuration->get(Configuration::PS_PSX_FIREBASE_ID_TOKEN);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirebaseRefreshToken()
+    {
+        $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN);
+    }
 
     /**
      * @param string $idToken
      * @param string $refreshToken
      */
-    public function updateIdAndRefreshTokens($idToken, $refreshToken)
+    public function updateFirebaseIdAndRefreshTokens($idToken, $refreshToken)
     {
         $this->configuration->set(Configuration::PS_PSX_FIREBASE_ID_TOKEN, $idToken);
         $this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, $refreshToken);
@@ -76,105 +77,60 @@ class ConfigurationRepository
     }
 
     /**
-     * Get the user firebase token.
-     *
-     * @return string
-     *
-     * @throws \Exception
-     */
-    public function getOrRefreshIdToken()
-    {
-        if ($this->hasRefreshToken() && $this->isIdTokenExpired()) {
-            $this->refreshIdToken();
-        }
-        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_ID_TOKEN);
-    }
-
-    /**
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    public function refreshIdToken()
-    {
-        $response = $this->token->exchangeRefreshTokenForIdToken(
-            $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN)
-        );
-
-        if ($response && true === $response['status']) {
-            $this->updateIdAndRefreshTokens(
-                $response['body']['id_token'],
-                $response['body']['refresh_token']
-            );
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * get refreshToken.
-     *
-     * @see https://firebase.google.com/docs/reference/rest/auth Firebase documentation
-     *
-     * @param string $customToken
-     * @return bool
-     *
-     */
-    public function exchangeCustomTokenForIdAndRefreshToken($customToken)
-    {
-        $response = $this->auth->signInWithCustomToken($customToken);
-
-        if ($response && true === $response['status']) {
-            $uid = (new Parser())->parse((string) $customToken)->getClaim('uid');
-
-            $this->updateShopUuid($uid);
-
-            $this->updateIdAndRefreshTokens(
-                $response['body']['idToken'],
-                $response['body']['refreshToken']
-            );
-
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * Check if we have a refresh token.
      *
      * @return bool
      */
-    public function hasRefreshToken()
+    public function hasFirebaseRefreshToken()
     {
         return !empty($this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN));
     }
 
     /**
-     * Check the token validity. The token expire time is set to 3600 seconds.
-     *
-     * @return bool
-     *
-     * @throws \Exception
+     * @return string | null
      */
-    public function isIdTokenExpired()
+    public function getFirebaseEmail()
     {
-        // iat, exp
+        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_EMAIL);
+    }
 
-        $token = (new Parser())->parse(
-            $this->configuration->get(
-                Configuration::PS_PSX_FIREBASE_ID_TOKEN
-            )
+    /**
+     * @param string $email
+     */
+    public function updateFirebaseEmail($email)
+    {
+        $this->configuration->set(Configuration::PS_PSX_FIREBASE_EMAIL, $email);
+    }
+
+    /**
+     * @return bool
+     */
+    public function firebaseEmailIsVerified()
+    {
+        return in_array(
+            $this->configuration->get(Configuration::PS_PSX_FIREBASE_EMAIL_IS_VERIFIED),
+            ['1', 1, true]
         );
+    }
 
-        return $token->isExpired();
 
-        /*$refresh_date = $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_DATE);
+    /**
+     * @param bool $status
+     */
+    public function updateFirebaseEmailIsVerified($status)
+    {
+        $this->configuration->set(
+            Configuration::PS_PSX_FIREBASE_EMAIL_IS_VERIFIED,
+            'true' === $status
+        );
+    }
 
-        if (empty($refresh_date)) {
-            return true;
-        }
-
-        return strtotime($refresh_date) + 3600 < time();*/
+    /**
+     * @return string
+     */
+    public function getShopUuid()
+    {
+        return $this->configuration->get(Configuration::PSX_UUID_V4);
     }
 
     /**
@@ -189,25 +145,85 @@ class ConfigurationRepository
     }
 
     /**
-     * @param Configuration|null $configuration
-     * @param $token
-     * @param $auth
+     * @return string
      */
-    private function injectDefaultDependencies($configuration, $token, $auth)
+    public function getAccountsRsaPrivateKey()
+    {
+        return $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY);
+    }
+
+    /**
+     * @param $key
+     */
+    public function updateAccountsRsaPrivateKey($key)
+    {
+        $this->configuration->set(Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY, $key);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountsRsaPublicKey()
+    {
+        return $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY);
+    }
+
+    /**
+     * @param $key
+     */
+    public function updateAccountsRsaPublicKey($key)
+    {
+        $this->configuration->set(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY, $key);
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccountsRsaSignData()
+    {
+        return $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_SIGN_DATA);
+    }
+
+    /**
+     * @param $signData
+     */
+    public function updateAccountsRsaSignData($signData)
+    {
+        $this->configuration->set(Configuration::PS_ACCOUNTS_RSA_SIGN_DATA, $signData);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSshKey()
+    {
+        return false !== $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY)
+            && !empty($this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY))
+            && false !== $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY)
+            && !empty($this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY))
+            && false !== $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_SIGN_DATA)
+            && !empty($this->configuration->get(Configuration::PS_ACCOUNTS_RSA_SIGN_DATA));
+    }
+
+    /**
+     * @return bool
+     */
+    public function sslEnabled()
+    {
+        return true == $this->configuration->get('PS_SSL_ENABLED');
+    }
+
+    /**
+     * @param Configuration|null $configuration
+     */
+    private function injectDefaultDependencies($configuration)
     {
         if (! $configuration) {
             $configuration = new Configuration();
-            $psAccountsService = new PsAccountsService();
-            $configuration->setIdShop((int) $psAccountsService->getCurrentShop()['id']);
-        }
-        if(! $token) {
-            $token = new Token();
-        }
-        if(! $auth) {
-            $auth = new Auth();
+            //$psAccountsService = new PsAccountsService();
+            //$configuration->setIdShop((int) $psAccountsService->getCurrentShop()['id']);
+            $configuration->setIdShop((int) \Context::getContext()->shop->id);
         }
         $this->configuration = $configuration;
-        $this->token = $token;
-        $this->auth = $auth;
     }
 }

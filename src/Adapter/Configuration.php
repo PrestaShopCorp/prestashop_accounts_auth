@@ -26,12 +26,15 @@ class Configuration
     const PS_PSX_FIREBASE_REFRESH_TOKEN = 'PS_PSX_FIREBASE_REFRESH_TOKEN';
     const PS_CHECKOUT_SHOP_UUID_V4 = 'PS_CHECKOUT_SHOP_UUID_V4';
     const PSX_UUID_V4 = 'PSX_UUID_V4';
-
     /** @var string FIXME : useless to store (custom_token) */
     const PS_PSX_FIREBASE_ADMIN_TOKEN = 'PS_PSX_FIREBASE_ADMIN_TOKEN';
-
     /** @var string FIXME : get expiry date from JWT */
     const PS_PSX_FIREBASE_REFRESH_DATE = 'PS_PSX_FIREBASE_REFRESH_DATE';
+    const PS_PSX_FIREBASE_EMAIL = 'PS_PSX_FIREBASE_EMAIL';
+    const PS_PSX_FIREBASE_EMAIL_IS_VERIFIED = 'PS_PSX_FIREBASE_EMAIL_IS_VERIFIED';
+    const PS_ACCOUNTS_RSA_PUBLIC_KEY = 'PS_ACCOUNTS_RSA_PUBLIC_KEY';
+    const PS_ACCOUNTS_RSA_PRIVATE_KEY = 'PS_ACCOUNTS_RSA_PRIVATE_KEY';
+    const PS_ACCOUNTS_RSA_SIGN_DATA = 'PS_ACCOUNTS_RSA_SIGN_DATA';
 
     /**
      * @var int
@@ -145,27 +148,5 @@ class Configuration
     public function setRaw($key, $values, $html = false, $idShopGroup = null, $idShop = null)
     {
         return \Configuration::updateValue($key, $values, $html, $idShopGroup, $idShop);
-    }
-
-    /**
-     * @param $shopId
-     *
-     * @return bool
-     */
-    public function getLock($shopId)
-    {
-        if (true == $this->getRaw('PS_PSX_FIREBASE_LOCK', null, null, (int) $shopId)) {
-            return false;
-        }
-        $this->setRaw('PS_PSX_FIREBASE_LOCK', true, false, null, (int) $shopId);
-        return true;
-    }
-
-    /**
-     * @param $shopId
-     */
-    public function freeLock($shopId)
-    {
-        $this->setRaw('PS_PSX_FIREBASE_LOCK', false, false, null, (int) $shopId);
     }
 }
