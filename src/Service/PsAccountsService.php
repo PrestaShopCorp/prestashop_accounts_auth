@@ -24,10 +24,10 @@ use Context;
 use Lcobucci\JWT\Parser;
 use Module;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
-use PrestaShop\AccountsAuth\Api\Firebase\Auth;
-use PrestaShop\AccountsAuth\Api\Firebase\Token;
+use PrestaShop\AccountsAuth\Api\Client\FirebaseClient;
 use PrestaShop\AccountsAuth\Api\Client\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
+use PrestaShop\AccountsAuth\DependencyInjection\DependencyContainer;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 
@@ -74,30 +74,48 @@ class PsAccountsService
     private $configuration;
 
     /**
-     * @var Auth
+     * @var FirebaseClient
      */
-    private $auth;
+    private $firebaseClient;
 
     /**
-     * @var Token
+     * PsAccountsService constructor.
+     *
+     * @param ConfigurationRepository|null $configuration
+     * @param FirebaseClient|null $firebaseClient
+     * @param Module|null $module
+     * @param Context|null $context
+     * @param ShopContext|null $shopContext
+     * @param LinkAdapter|null $linkAdapter
+     *
+     * @throws \ReflectionException
      */
-    private $token;
-
-    public function __construct()
-    {
+    public function __construct(
+        ConfigurationRepository $configuration = null,
+        FirebaseClient $firebaseClient = null,
+        Module $module = null,
+        Context $context = null,
+        ShopContext $shopContext = null,
+        LinkAdapter $linkAdapter = null
+    ) {
         new Env();
-        $this->module = Module::getInstanceByName('ps_accounts');
-        $this->context = Context::getContext();
-        $this->shopContext = new ShopContext();
-        $this->linkAdapter = new LinkAdapter($this->context->link);
 
-        //$configuration = new Configuration();
-        //$configuration->setIdShop((int) $this->getCurrentShop()['id']);
-        //$this->configuration = new ConfigurationRepository($configuration);
+        // FIXME : compat behaviour
+        foreach ((new DependencyContainer())->buildDependencies($this, func_get_args())
+                 as $param => $value
+        ) {
+            $this->$param = $value;
+        }
+    }
 
-        $this->configuration = new ConfigurationRepository();
-        $this->auth = new Auth();
-        $this->token = new Token();
+    /**
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public static function getInstance()
+    {
+        return (new DependencyContainer())->get(self::class);
     }
 
     /**
@@ -455,7 +473,7 @@ class PsAccountsService
      */
     public function generateSshKey()
     {
-        if (false === $this->configuration->hasSshKey()) {
+        if (false === $this->configuration->hasAccountsSshKeys()) {
 
             $sshKey = new SshKey();
 
@@ -479,6 +497,7 @@ class PsAccountsService
      *
      * @return void
      *
+     * @throws \Exception
      */
     public function updateOnboardingData()
     {
@@ -486,8 +505,8 @@ class PsAccountsService
         $emailVerified = \Tools::getValue('emailVerified');
         $customToken = \Tools::getValue('adminToken');
 
-        if (false === $this->configuration->hasSshKey()) {
-            return;
+        if (false === $this->configuration->hasAccountsSshKeys()) {
+            throw new \Exception('SSH keys were not found');
         }
 
         if (! $this->exchangeCustomTokenForIdAndRefreshToken($customToken)) {
@@ -510,13 +529,13 @@ class PsAccountsService
      *
      * @throws \Exception
      */
-    public function getOrRefreshIdToken()
+    public function getOrRefreshToken()
     {
         if (
             $this->configuration->hasFirebaseRefreshToken()
-            && $this->isFirebaseIdTokenExpired()
+            && $this->isTokenExpired()
         ) {
-            $this->refreshIdToken();
+            $this->refreshToken();
         }
         return $this->configuration->getFirebaseIdToken();
     }
@@ -526,9 +545,9 @@ class PsAccountsService
      *
      * @throws \Exception
      */
-    public function refreshIdToken()
+    public function refreshToken()
     {
-        $response = $this->token->exchangeRefreshTokenForIdToken(
+        $response = $this->firebaseClient->exchangeRefreshTokenForIdToken(
             $this->configuration->getFirebaseRefreshToken()
         );
 
@@ -553,7 +572,7 @@ class PsAccountsService
      */
     public function exchangeCustomTokenForIdAndRefreshToken($customToken)
     {
-        $response = $this->auth->signInWithCustomToken($customToken);
+        $response = $this->firebaseClient->signInWithCustomToken($customToken);
 
         if ($response && true === $response['status']) {
             $uid = (new Parser())->parse((string) $customToken)->getClaim('uid');
@@ -578,14 +597,8 @@ class PsAccountsService
      *
      * @throws \Exception
      */
-    public function isFirebaseIdTokenExpired()
+    public function isTokenExpired()
     {
-        // iat, exp
-
-        $token = (new Parser())->parse($this->configuration->getFirebaseIdToken());
-
-        return $token->isExpired();
-
         /*$refresh_date = $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_DATE);
 
         if (empty($refresh_date)) {
@@ -593,5 +606,11 @@ class PsAccountsService
         }
 
         return strtotime($refresh_date) + 3600 < time();*/
+
+        // iat, exp
+
+        $token = (new Parser())->parse($this->configuration->getFirebaseIdToken());
+
+        return $token->isExpired();
     }
 }

@@ -26,9 +26,7 @@ class Configuration
     const PS_PSX_FIREBASE_REFRESH_TOKEN = 'PS_PSX_FIREBASE_REFRESH_TOKEN';
     const PS_CHECKOUT_SHOP_UUID_V4 = 'PS_CHECKOUT_SHOP_UUID_V4';
     const PSX_UUID_V4 = 'PSX_UUID_V4';
-    /** @var string FIXME : useless to store (custom_token) */
     const PS_PSX_FIREBASE_ADMIN_TOKEN = 'PS_PSX_FIREBASE_ADMIN_TOKEN';
-    /** @var string FIXME : get expiry date from JWT */
     const PS_PSX_FIREBASE_REFRESH_DATE = 'PS_PSX_FIREBASE_REFRESH_DATE';
     const PS_PSX_FIREBASE_EMAIL = 'PS_PSX_FIREBASE_EMAIL';
     const PS_PSX_FIREBASE_EMAIL_IS_VERIFIED = 'PS_PSX_FIREBASE_EMAIL_IS_VERIFIED';

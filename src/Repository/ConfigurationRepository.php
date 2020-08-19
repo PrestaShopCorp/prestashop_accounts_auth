@@ -34,9 +34,9 @@ class ConfigurationRepository
      *
      * @param Configuration|null $configuration
      */
-    public function __construct($configuration = null)
+    public function __construct(Configuration $configuration = null)
     {
-        $this->injectDefaultDependencies($configuration);
+        $this->configuration = $configuration;
     }
 
     /**
@@ -52,7 +52,7 @@ class ConfigurationRepository
      */
     public function getFirebaseIdToken()
     {
-        $this->configuration->get(Configuration::PS_PSX_FIREBASE_ID_TOKEN);
+        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_ID_TOKEN);
     }
 
     /**
@@ -60,7 +60,7 @@ class ConfigurationRepository
      */
     public function getFirebaseRefreshToken()
     {
-        $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN);
+        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN);
     }
 
     /**
@@ -71,9 +71,7 @@ class ConfigurationRepository
     {
         $this->configuration->set(Configuration::PS_PSX_FIREBASE_ID_TOKEN, $idToken);
         $this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, $refreshToken);
-
-        // FIXME : use JWT expiry date
-        $this->configuration->set('PS_PSX_FIREBASE_REFRESH_DATE', date('Y-m-d H:i:s'));
+        //$this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_DATE, date('Y-m-d H:i:s'));
     }
 
     /**
@@ -121,7 +119,7 @@ class ConfigurationRepository
     {
         $this->configuration->set(
             Configuration::PS_PSX_FIREBASE_EMAIL_IS_VERIFIED,
-            'true' === $status
+            $status
         );
     }
 
@@ -195,7 +193,7 @@ class ConfigurationRepository
     /**
      * @return bool
      */
-    public function hasSshKey()
+    public function hasAccountsSshKeys()
     {
         return false !== $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY)
             && !empty($this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY))
@@ -211,19 +209,5 @@ class ConfigurationRepository
     public function sslEnabled()
     {
         return true == $this->configuration->get('PS_SSL_ENABLED');
-    }
-
-    /**
-     * @param Configuration|null $configuration
-     */
-    private function injectDefaultDependencies($configuration)
-    {
-        if (! $configuration) {
-            $configuration = new Configuration();
-            //$psAccountsService = new PsAccountsService();
-            //$configuration->setIdShop((int) $psAccountsService->getCurrentShop()['id']);
-            $configuration->setIdShop((int) \Context::getContext()->shop->id);
-        }
-        $this->configuration = $configuration;
     }
 }
