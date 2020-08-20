@@ -139,8 +139,8 @@ class Configuration
      * @param string $key
      * @param string|array $values
      * @param bool $html
-     * @param null $idShopGroup
-     * @param null $idShop
+     * @param int|null $idShopGroup
+     * @param int|null $idShop
      *
      * @return mixed
      */
