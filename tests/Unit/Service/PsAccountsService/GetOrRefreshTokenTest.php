@@ -5,8 +5,6 @@ namespace PrestaShop\AccountsAuth\Tests\Unit\Service\PsAccountsService;
 use Lcobucci\JWT\Builder;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Api\Client\FirebaseClient;
-use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\DependencyInjection\DependencyContainer;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 use PrestaShop\AccountsAuth\Tests\TestCase;
@@ -31,10 +29,10 @@ class GetOrRefreshTokenTest extends TestCase
         $refreshToken = (new Builder())->getToken();
 
         /** @var Configuration $configMock */
-        $configMock =  $this->getConfigurationMock([
+        $configMock = $this->getConfigurationMock([
             [Configuration::PS_PSX_FIREBASE_REFRESH_DATE, false, $date->format('Y-m-d h:m:s')],
             [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
-            [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken]
+            [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
         $configuration = new ConfigurationRepository($configMock);
@@ -78,10 +76,10 @@ class GetOrRefreshTokenTest extends TestCase
             ]);
 
         /** @var Configuration $configMock */
-        $configMock =  $this->getConfigurationMock([
+        $configMock = $this->getConfigurationMock([
             [Configuration::PS_PSX_FIREBASE_REFRESH_DATE, false, $date->format('Y-m-d h:m:s')],
             [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
-            [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken]
+            [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
         $this->container->set(Configuration::class, $configMock);

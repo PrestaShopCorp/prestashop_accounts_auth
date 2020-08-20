@@ -1,6 +1,7 @@
 <?php
 
-class Context {
+class Context
+{
     public $link;
 
     public function __construct()

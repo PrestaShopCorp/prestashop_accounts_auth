@@ -111,7 +111,6 @@ class ConfigurationRepository
         );
     }
 
-
     /**
      * @param bool $status
      */

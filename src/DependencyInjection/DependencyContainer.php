@@ -16,7 +16,7 @@ class DependencyContainer
     /**
      * @var array kinda service container
      */
-    private $container = array();
+    private $container = [];
 
     /**
      * @var self
@@ -28,9 +28,10 @@ class DependencyContainer
      */
     public static function getInstance()
     {
-        if (! self::$instance) {
+        if (!self::$instance) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -44,44 +45,42 @@ class DependencyContainer
      *
      * @throws \Exception
      */
-    public function get($class, array $arguments = array()) {
-
-        if (! array_key_exists($class, $this->container)) {
-
+    public function get($class, array $arguments = [])
+    {
+        if (!array_key_exists($class, $this->container)) {
             $dep = null;
 
             switch ($class) {
-
-                case FirebaseClient::class :
+                case FirebaseClient::class:
                     $dep = new FirebaseClient();
                     break;
 
-                case Module::class :
+                case Module::class:
                     $dep = Module::getInstanceByName('ps_accounts');
                     break;
 
-                case Context::class :
+                case Context::class:
                     $dep = Context::getContext();
                     break;
 
-                case ShopContext::class :
+                case ShopContext::class:
                     $dep = new ShopContext();
                     break;
 
-                case LinkAdapter::class :
+                case LinkAdapter::class:
                     $dep = new LinkAdapter(\Context::getContext()->link);
                     break;
 
-                case Configuration::class :
+                case Configuration::class:
                     $dep = new Configuration();
                     $dep->setIdShop((int) \Context::getContext()->shop->id);
                     break;
 
-                case ConfigurationRepository::class :
+                case ConfigurationRepository::class:
                     $dep = new ConfigurationRepository($this->get(Configuration::class));
                     break;
 
-                case PsAccountsService::class :
+                case PsAccountsService::class:
                     $dep = new PsAccountsService(
                         $this->get(ConfigurationRepository::class),
                         $this->get(FirebaseClient::class),
@@ -93,7 +92,7 @@ class DependencyContainer
                     break;
 
                 default:
-                    $msg = "Cannot build dependency : " . $class;
+                    $msg = 'Cannot build dependency : ' . $class;
                     error_log($msg);
                     //throw new \Exception("Cannot build dependency : " . $class);
                     break;
@@ -124,7 +123,7 @@ class DependencyContainer
      */
     public function clearCache()
     {
-        $this->container = array();
+        $this->container = [];
     }
 
     /**
@@ -138,21 +137,19 @@ class DependencyContainer
      * @throws \ReflectionException
      * @throws \Exception
      */
-    public function buildDependencies($method, array $params = array())
+    public function buildDependencies($method, array $params = [])
     {
         $reflectionMethod = $method;
-        if (! $method instanceof \ReflectionMethod) {
+        if (!$method instanceof \ReflectionMethod) {
             $reflectionMethod = new \ReflectionMethod(get_class($method), '__construct');
         }
 
-        $dependencies = array();
+        $dependencies = [];
 
         foreach ($reflectionMethod->getParameters() as $index => $reflectionParameter) {
-
             $param = $reflectionParameter->getName();
 
-            if (! isset($params[$index]) || $params[$index] === null) {
-
+            if (!isset($params[$index]) || $params[$index] === null) {
                 $dependencies[$param] = $this->get($reflectionParameter->getClass()->getName());
             } else {
                 $dependencies[$param] = $params[$index];
@@ -162,4 +159,3 @@ class DependencyContainer
         return $dependencies;
     }
 }
-

@@ -4,9 +4,8 @@ namespace PrestaShop\AccountsAuth\Tests;
 
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\DependencyInjection\DependencyContainer;
-use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 
-if (! defined('_PS_MODULE_DIR_')) {
+if (!defined('_PS_MODULE_DIR_')) {
     define('_PS_MODULE_DIR_', '');
 }
 
@@ -56,26 +55,24 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $configuration = $this->createMock(Configuration::class);
 
         $configuration->method('get')
-            ->will($this->returnCallback(function ($key, $default=null) {
-
+            ->will($this->returnCallback(function ($key, $default = null) {
                 foreach ($this->config as $map) {
-
                     $return = array_pop($map);
                     if ([$key, $default] === $map) {
                         return $return;
                     }
                 }
+
                 return null;
             }));
-            //->will($this->returnValueMap($valueMap));
+        //->will($this->returnValueMap($valueMap));
 
         $configuration->method('set')
-            ->will($this->returnCallback(function ($key, $values, $html=false) use ($configuration) {
-
+            ->will($this->returnCallback(function ($key, $values, $html = false) use ($configuration) {
                 foreach ($this->config as &$row) {
-
                     if ($row[0] == $key) {
                         $row[2] = (string) $values;
+
                         return;
                     }
                 }

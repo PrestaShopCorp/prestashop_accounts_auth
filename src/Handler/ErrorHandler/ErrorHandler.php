@@ -71,6 +71,8 @@ class ErrorHandler
      * @param bool|null $throw
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function handle($error, $code = null, $throw = true)
     {

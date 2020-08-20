@@ -104,7 +104,7 @@ class Configuration
      *
      * @return mixed
      */
-    public function get($key, $default=false)
+    public function get($key, $default = false)
     {
         return $this->getRaw($key, $this->idLang, $this->idShopGroup, $this->idShop, $default);
     }

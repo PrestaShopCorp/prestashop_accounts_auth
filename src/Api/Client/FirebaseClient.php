@@ -45,7 +45,7 @@ class FirebaseClient extends GenericClient
                 'allow_redirects' => false,
                 'query' => [
                     //'key' => $_ENV['FIREBASE_API_KEY'],
-                    'key' => getenv('FIREBASE_API_KEY')
+                    'key' => getenv('FIREBASE_API_KEY'),
                 ],
                 'headers' => [
                     'Accept' => 'application/json',

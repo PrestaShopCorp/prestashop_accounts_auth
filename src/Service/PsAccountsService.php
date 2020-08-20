@@ -101,7 +101,6 @@ class PsAccountsService
     ) {
         Env::getInstance();
 
-        // FIXME : compat behaviour
         foreach (DependencyContainer::getInstance()->buildDependencies($this, func_get_args())
                  as $param => $value
         ) {
@@ -268,6 +267,7 @@ class PsAccountsService
     public function getSuperAdminEmail()
     {
         $employee = new \Employee(1);
+
         return $employee->email;
     }
 
@@ -309,6 +309,7 @@ class PsAccountsService
     public function getDomainName()
     {
         $currentShop = $this->getCurrentShop();
+
         return false == $this->sslEnabled() ? $currentShop['domain'] : $currentShop['domainSsl'];
     }
 
@@ -457,7 +458,6 @@ class PsAccountsService
         return $response;
     }
 
-
     /**
      * @return void
      *
@@ -475,7 +475,6 @@ class PsAccountsService
     public function generateSshKey()
     {
         if (false === $this->configuration->hasAccountsSshKeys()) {
-
             $sshKey = new SshKey();
 
             $key = $sshKey->generate();
@@ -510,7 +509,7 @@ class PsAccountsService
             throw new \Exception('SSH keys were not found');
         }
 
-        if (! $this->exchangeCustomTokenForIdAndRefreshToken($customToken)) {
+        if (!$this->exchangeCustomTokenForIdAndRefreshToken($customToken)) {
             return;
         }
 
@@ -538,6 +537,7 @@ class PsAccountsService
         ) {
             $this->refreshToken();
         }
+
         return $this->configuration->getFirebaseIdToken();
     }
 
@@ -557,8 +557,10 @@ class PsAccountsService
                 $response['body']['id_token'],
                 $response['body']['refresh_token']
             );
+
             return true;
         }
+
         return false;
     }
 
@@ -568,8 +570,8 @@ class PsAccountsService
      * @see https://firebase.google.com/docs/reference/rest/auth Firebase documentation
      *
      * @param string $customToken
-     * @return bool
      *
+     * @return bool
      */
     public function exchangeCustomTokenForIdAndRefreshToken($customToken)
     {
@@ -587,9 +589,9 @@ class PsAccountsService
 
             return true;
         }
+
         return false;
     }
-
 
     /**
      * Check the token validity. The token expire time is set to 3600 seconds.
