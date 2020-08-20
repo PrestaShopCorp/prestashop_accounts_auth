@@ -25,6 +25,7 @@ use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Client\ServicesBillingClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Exception\BillingException;
 
 /**
  * Construct the psbilling service.
@@ -53,7 +54,7 @@ class PsBillingService
 
     public function __construct()
     {
-        new Env();
+        Env::getInstance();
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();
     }
@@ -120,7 +121,7 @@ class PsBillingService
 
             $response = $billingClient->getBillingCustomer($uuid);
             if (!$response || !array_key_exists('httpCode', $response)) {
-                throw new \Exception('Billing customer request failed.', 50);
+                throw new BillingException('Billing customer request failed.', 50);
             }
             if ($response['httpCode'] === 404) {
                 $response = $billingClient->createBillingCustomer(
@@ -128,14 +129,14 @@ class PsBillingService
                     $customerIp ? ['created_from_ip' => $customerIp] : []
                 );
                 if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 200) {
-                    throw new \Exception('Billing customer creation failed.', 60);
+                    throw new BillingException('Billing customer creation failed.', 60);
                 }
             }
             $toReturn['customerId'] = $response['body']['customer']['id'];
 
             $response = $billingClient->getBillingSubscriptions($uuid, $module);
             if (!$response || !array_key_exists('httpCode', $response)) {
-                throw new \Exception('Billing subscriptions request failed.', 51);
+                throw new BillingException('Billing subscriptions request failed.', 51);
             }
 
             if ($response['httpCode'] === 404) {
@@ -143,10 +144,11 @@ class PsBillingService
                 if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] >= 400) {
                     if ($response && array_key_exists('body', $response)
                         && array_key_exists('message', $response['body'])
-                        && array_key_exists(0, $response['body']['message'])) {
-                        throw new \Exception($response['body']['message'][0]);
+                        && array_key_exists(0, $response['body']['message'])
+                    ) {
+                        throw new BillingException($response['body']['message'][0]);
                     }
-                    throw new \Exception('Billing subscription creation failed.', 65);
+                    throw new BillingException('Billing subscription creation failed.', 65);
                 }
 
                 $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
@@ -162,7 +164,7 @@ class PsBillingService
 
                     return $toReturn;
                 } else {
-                    throw new \Exception('Subscription plan name mismatch.', 20);
+                    throw new BillingException('Subscription plan name mismatch.', 20);
                 }
             }
         }

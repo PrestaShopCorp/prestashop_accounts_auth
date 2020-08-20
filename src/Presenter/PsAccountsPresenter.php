@@ -20,7 +20,9 @@
 
 namespace PrestaShop\AccountsAuth\Presenter;
 
+use Module;
 use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Handler\Error\ErrorHandler;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
@@ -40,7 +42,7 @@ class PsAccountsPresenter
      */
     public function __construct($psxName)
     {
-        new Env();
+        Env::getInstance();
         $this->psAccountsService = new PsAccountsService();
         $this->psAccountsService->setPsxName($psxName);
         $this->psAccountsService->manageOnboarding();
@@ -55,20 +57,27 @@ class PsAccountsPresenter
      */
     public function present()
     {
-        return [
-          'psIs17' => $this->psAccountsService->getShopContext()->isShop17(),
-          'psAccountsInstallLink' => $this->psAccountsService->getPsAccountsInstallLink(),
-          'psAccountsEnableLink' => $this->psAccountsService->getPsAccountsEnableLink(),
-          'onboardingLink' => $this->psAccountsService->getOnboardingLink(),
-          'user' => [
-              'email' => $this->psAccountsService->getEmail(),
-              'emailIsValidated' => $this->psAccountsService->isEmailValidated(),
-              'isSuperAdmin' => $this->psAccountsService->getContext()->employee->isSuperAdmin(),
-            ],
-          'currentShop' => $this->psAccountsService->getCurrentShop(),
-          'shops' => $this->psAccountsService->getShopsTree(),
-          'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
-          'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
-        ];
+        try {
+            return [
+                'psIs17' => $this->psAccountsService->getShopContext()->isShop17(),
+                'psAccountsInstallLink' => $this->psAccountsService->getPsAccountsInstallLink(),
+                'psAccountsEnableLink' => $this->psAccountsService->getPsAccountsEnableLink(),
+                'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
+                'psAccountsIsEnabled' => Module::isEnabled('ps_accounts'),
+                'onboardingLink' => $this->psAccountsService->getOnboardingLink(),
+                'user' => [
+                    'email' => $this->psAccountsService->getEmail(),
+                    'emailIsValidated' => $this->psAccountsService->isEmailValidated(),
+                    'isSuperAdmin' => $this->psAccountsService->getContext()->employee->isSuperAdmin(),
+                ],
+                'currentShop' => $this->psAccountsService->getCurrentShop(),
+                'shops' => $this->psAccountsService->getShopsTree(),
+                'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
+                'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
+            ];
+        } catch (\Exception $e) {
+            $errorHandler = ErrorHandler::getInstance();
+            $errorHandler->handle($e, $e->getCode());
+        }
     }
 }

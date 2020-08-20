@@ -52,7 +52,12 @@ class Install
 
         $moduleManagerBuilder = ModuleManagerBuilder::getInstance();
         $moduleManager = $moduleManagerBuilder->build();
+        $moduleIsInstalled = $moduleManager->install($this->psAccounts);
+        if (false === $moduleIsInstalled) {
+            $errorHandler = \PrestaShop\AccountsAuth\Handler\Error\ErrorHandler::getInstance();
+            $errorHandler->handle(new \Exception('Module ps_accounts can\'t be install', 500), 500);
+        }
 
-        return $moduleManager->install($this->psAccounts);
+        return $moduleIsInstalled;
     }
 }

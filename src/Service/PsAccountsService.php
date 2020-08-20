@@ -29,6 +29,7 @@ use PrestaShop\AccountsAuth\Api\Client\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\DependencyInjection\DependencyContainer;
 use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Exception\EnvVarException;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 
 /**
@@ -98,7 +99,7 @@ class PsAccountsService
         ShopContext $shopContext = null,
         LinkAdapter $linkAdapter = null
     ) {
-        new Env();
+        Env::getInstance();
 
         // FIXME : compat behaviour
         foreach (DependencyContainer::getInstance()->buildDependencies($this, func_get_args())
@@ -386,7 +387,7 @@ class PsAccountsService
 
         $uiSvcBaseUrl = $_ENV['ACCOUNTS_SVC_UI_URL'];
         if (false === $uiSvcBaseUrl) {
-            throw new \Exception('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
+            throw new EnvVarException('Environmenrt variable ACCOUNTS_SVC_UI_URL should not be empty');
         }
 
         $protocol = $this->getProtocol();
