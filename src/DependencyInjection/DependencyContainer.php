@@ -16,7 +16,23 @@ class DependencyContainer
     /**
      * @var array kinda service container
      */
-    private static $container = array();
+    private $container = array();
+
+    /**
+     * @var self
+     */
+    private static $instance;
+
+    /**
+     * @return DependencyContainer
+     */
+    public static function getInstance()
+    {
+        if (! self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
 
     /**
      * Dependency boilerplate lives here
@@ -30,7 +46,7 @@ class DependencyContainer
      */
     public function get($class, array $arguments = array()) {
 
-        if (! array_key_exists($class, self::$container)) {
+        if (! array_key_exists($class, $this->container)) {
 
             $dep = null;
 
@@ -83,10 +99,10 @@ class DependencyContainer
                     break;
             }
 
-            self::$container[$class] = $dep;
+            $this->container[$class] = $dep;
         }
 
-        return self::$container[$class];
+        return $this->container[$class];
     }
 
     /**
@@ -100,7 +116,7 @@ class DependencyContainer
             $class = get_class($instance);
         }
 
-        self::$container[$class] = $instance;
+        $this->container[$class] = $instance;
     }
 
     /**
@@ -108,7 +124,7 @@ class DependencyContainer
      */
     public function clearCache()
     {
-        self::$container = array();
+        $this->container = array();
     }
 
     /**

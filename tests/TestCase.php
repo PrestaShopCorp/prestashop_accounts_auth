@@ -38,7 +38,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         $this->faker = \Faker\Factory::create();
 
-        $this->container = (new DependencyContainer());
+        $this->container = DependencyContainer::getInstance();
         $this->container->clearCache();
     }
 

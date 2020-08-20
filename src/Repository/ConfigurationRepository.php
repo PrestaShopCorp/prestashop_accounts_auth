@@ -124,6 +124,22 @@ class ConfigurationRepository
     }
 
     /**
+     * @return string | null
+     */
+    public function getFirebaseLocalId()
+    {
+        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_LOCAL_ID);
+    }
+
+    /**
+     * @param string $localId
+     */
+    public function updateFirebaseLocalId($localId)
+    {
+        $this->configuration->set(Configuration::PS_PSX_FIREBASE_LOCAL_ID, $localId);
+    }
+
+    /**
      * @return string
      */
     public function getShopUuid()

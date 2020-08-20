@@ -101,7 +101,7 @@ class PsAccountsService
         new Env();
 
         // FIXME : compat behaviour
-        foreach ((new DependencyContainer())->buildDependencies($this, func_get_args())
+        foreach (DependencyContainer::getInstance()->buildDependencies($this, func_get_args())
                  as $param => $value
         ) {
             $this->$param = $value;
@@ -115,7 +115,7 @@ class PsAccountsService
      */
     public static function getInstance()
     {
-        return (new DependencyContainer())->get(self::class);
+        return DependencyContainer::getInstance()->get(self::class);
     }
 
     /**
