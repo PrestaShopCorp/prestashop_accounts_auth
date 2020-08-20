@@ -69,7 +69,7 @@ class DependencyContainer
                     break;
 
                 case LinkAdapter::class :
-                    $dep = new LinkAdapter();
+                    $dep = new LinkAdapter(\Context::getContext()->link);
                     break;
 
                 case Configuration::class :

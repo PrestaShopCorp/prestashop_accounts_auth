@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-namespace PrestaShop\AccountsAuth\Handler\Error;
+namespace PrestaShop\AccountsAuth\Handler\ErrorHandler;
 
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 use Raven_Client;

@@ -44,7 +44,8 @@ class FirebaseClient extends GenericClient
                 'exceptions' => $this->catchExceptions,
                 'allow_redirects' => false,
                 'query' => [
-                    'key' => $_ENV['FIREBASE_API_KEY'],
+                    //'key' => $_ENV['FIREBASE_API_KEY'],
+                    'key' => getenv('FIREBASE_API_KEY')
                 ],
                 'headers' => [
                     'Accept' => 'application/json',
