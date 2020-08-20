@@ -21,7 +21,6 @@
 namespace PrestaShop\AccountsAuth\Api\Client;
 
 use GuzzleHttp\Client;
-use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
