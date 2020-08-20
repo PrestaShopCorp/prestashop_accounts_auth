@@ -2,36 +2,43 @@
 
 namespace PrestaShop\AccountsAuth\Tests\Unit\Service\PsAccountsService;
 
-use Lcobucci\JWT\Builder;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
+use PrestaShop\AccountsAuth\Tests\TestCase;
 
-class GenerateSshKeyTest
+class GenerateSshKeyTest extends TestCase
 {
+    /**
+     * @test
+     *
+     * @throws \ReflectionException
+     */
     public function it_should_update_ssh_keys()
     {
-        //$date = (new \DateTime('tomorrow'));
-        $date = $this->faker->dateTimeBetween('now', '+2 hours');
-
-        $idToken = (new Builder())
-            ->expiresAt($date->getTimestamp())
-            //->withClaim('uid', $this->faker->uuid)
-            ->getToken();
-
-        $refreshToken = (new Builder())->getToken();
-
         /** @var Configuration $configMock */
         $configMock = $this->getConfigurationMock([
-            [Configuration::PS_PSX_FIREBASE_REFRESH_DATE, false, $date->format('Y-m-d h:m:s')],
-            [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
-            [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
+            [Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY, false, null],
+            [Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY, false, null],
+            [Configuration::PS_ACCOUNTS_RSA_SIGN_DATA, false, null],
         ]);
 
         $configuration = new ConfigurationRepository($configMock);
 
         $service = new PsAccountsService($configuration);
 
-        $this->assertEquals((string) $idToken, $service->generateSshKey());
+        $this->assertEmpty($configuration->getAccountsRsaPrivateKey());
+
+        $this->assertEmpty($configuration->getAccountsRsaPublicKey());
+
+        $this->assertEmpty($configuration->getAccountsRsaSignData());
+
+        $service->generateSshKey();
+
+        $this->assertNotEmpty($configuration->getAccountsRsaPrivateKey());
+
+        $this->assertNotEmpty($configuration->getAccountsRsaPublicKey());
+
+        $this->assertNotEmpty($configuration->getAccountsRsaSignData());
     }
 }

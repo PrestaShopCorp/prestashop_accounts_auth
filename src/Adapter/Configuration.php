@@ -99,8 +99,8 @@ class Configuration
     }
 
     /**
-     * @param $key
-     * @param bool $default
+     * @param string $key
+     * @param string|bool $default
      *
      * @return mixed
      */
@@ -110,11 +110,11 @@ class Configuration
     }
 
     /**
-     * @param $key
-     * @param null $idLang
-     * @param null $idShopGroup
-     * @param null $idShop
-     * @param bool $default
+     * @param string $key
+     * @param int|null $idLang
+     * @param int|null $idShopGroup
+     * @param int|null $idShop
+     * @param string|bool $default
      *
      * @return mixed
      */
@@ -124,8 +124,8 @@ class Configuration
     }
 
     /**
-     * @param $key
-     * @param $values
+     * @param string $key
+     * @param string|array $values
      * @param bool $html
      *
      * @return mixed
@@ -136,8 +136,8 @@ class Configuration
     }
 
     /**
-     * @param $key
-     * @param $values
+     * @param string $key
+     * @param string|array $values
      * @param bool $html
      * @param null $idShopGroup
      * @param null $idShop

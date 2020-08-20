@@ -29,12 +29,21 @@ use PrestaShop\AccountsAuth\Service\PsAccountsService;
  */
 class ServicesBillingClient extends GenericClient
 {
+    /**
+     * ServicesBillingClient constructor.
+     *
+     * @param \Link $link
+     * @param Client|null $client
+     *
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
     public function __construct(\Link $link, Client $client = null)
     {
         parent::__construct();
         $psAccountsService = new PsAccountsService();
         $shopId = $psAccountsService->getCurrentShop()['id'];
-        $token = (new Token())->getIdToken($shopId);
+        $token = $psAccountsService->getOrRefreshToken();
         $this->setLink($link);
 
         // Client can be provided for tests
