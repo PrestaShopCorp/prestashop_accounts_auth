@@ -28,7 +28,7 @@ class DependencyContainer
      */
     public static function getInstance()
     {
-        if (!self::$instance) {
+        if (self::$instance === null) {
             self::$instance = new self();
         }
 
@@ -107,6 +107,8 @@ class DependencyContainer
     /**
      * @param mixed $class
      * @param mixed $instance
+     *
+     * @return void
      */
     public function set($class, $instance = null)
     {
@@ -120,6 +122,8 @@ class DependencyContainer
 
     /**
      * Empties dependency cache
+     *
+     * @return void
      */
     public function clearCache()
     {
