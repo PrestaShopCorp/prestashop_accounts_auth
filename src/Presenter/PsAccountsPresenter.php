@@ -21,6 +21,7 @@
 namespace PrestaShop\AccountsAuth\Presenter;
 
 use Module;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Handler\Error\ErrorHandler;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
@@ -42,7 +43,7 @@ class PsAccountsPresenter
      */
     public function __construct($psxName)
     {
-        Env::getInstance();
+        PsAccountsServiceProvider::getInstance()->get(Env::class);
         $this->psAccountsService = new PsAccountsService();
         $this->psAccountsService->setPsxName($psxName);
         $this->psAccountsService->manageOnboarding();

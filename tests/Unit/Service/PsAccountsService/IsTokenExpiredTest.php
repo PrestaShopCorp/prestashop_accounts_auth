@@ -32,7 +32,7 @@ class IsTokenExpiredTest extends TestCase
             [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
-        $this->container->set(Configuration::class, $configMock);
+        $this->container->singleton(Configuration::class, $configMock);
 
         $service = new PsAccountsService(
             //new ConfigurationRepository($configMock)
@@ -64,7 +64,7 @@ class IsTokenExpiredTest extends TestCase
             [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
-        $this->container->set(Configuration::class, $configMock);
+        $this->container->singleton(Configuration::class, $configMock);
 
         $service = new PsAccountsService(
             //new ConfigurationRepository($configMock)

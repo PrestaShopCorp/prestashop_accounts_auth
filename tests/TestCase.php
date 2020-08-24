@@ -3,7 +3,7 @@
 namespace PrestaShop\AccountsAuth\Tests;
 
 use PrestaShop\AccountsAuth\Adapter\Configuration;
-use PrestaShop\AccountsAuth\DependencyInjection\DependencyContainer;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 
 if (!defined('_PS_MODULE_DIR_')) {
     define('_PS_MODULE_DIR_', '');
@@ -17,7 +17,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
     public $faker;
 
     /**
-     * @var DependencyContainer
+     * @var PsAccountsServiceProvider
      */
     public $container;
 
@@ -37,8 +37,8 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         $this->faker = \Faker\Factory::create();
 
-        $this->container = DependencyContainer::getInstance();
-        $this->container->clearCache();
+        $this->container = PsAccountsServiceProvider::getInstance();
+        $this->container->reset();
     }
 
     /**

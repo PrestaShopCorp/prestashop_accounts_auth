@@ -24,8 +24,10 @@ use Context;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Client\ServicesBillingClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Exception\BillingException;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 
 /**
  * Construct the psbilling service.
@@ -52,9 +54,14 @@ class PsBillingService
      */
     protected $linkAdapter;
 
+    /**
+     * PsBillingService constructor.
+     *
+     * @throws ServiceNotFoundException
+     */
     public function __construct()
     {
-        Env::getInstance();
+        PsAccountsServiceProvider::getInstance()->get(Env::class);
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();
     }

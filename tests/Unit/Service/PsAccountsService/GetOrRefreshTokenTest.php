@@ -82,15 +82,10 @@ class GetOrRefreshTokenTest extends TestCase
             [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
-        $this->container->set(Configuration::class, $configMock);
-        $this->container->set(FirebaseClient::class, $firebaseClient);
+        $this->container->singleton(Configuration::class, $configMock);
+        $this->container->singleton(FirebaseClient::class, $firebaseClient);
 
-        //$configuration = new ConfigurationRepository($configMock);
-
-        $service = new PsAccountsService(
-            //$configuration,
-            //$firebaseClient
-        );
+        $service = new PsAccountsService();
 
         $this->assertEquals((string) $idTokenRefreshed, $service->getOrRefreshToken());
     }

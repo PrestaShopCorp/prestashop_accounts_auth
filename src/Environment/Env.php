@@ -20,7 +20,9 @@
 
 namespace PrestaShop\AccountsAuth\Environment;
 
+use PrestaShop\AccountsAuth\Exception\EnvironmentFileException;
 use Symfony\Component\Dotenv\Dotenv;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Load environment variables.
@@ -39,7 +41,12 @@ class Env
      */
     private static $instance;
 
-    private function __construct()
+    /**
+     * Env constructor.
+     *
+     * @throws EnvironmentFileException
+     */
+    public function __construct()
     {
         $dotenv = new Dotenv();
         if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {
@@ -47,7 +54,7 @@ class Env
         } elseif (file_exists(dirname(__FILE__) . '/env')) {
             $dotenv->load(dirname(__FILE__) . '/env');
         } else {
-            throw new \Exception('Couldn\'t find env file');
+            throw new EnvironmentFileException('Environment file not found');
         }
         $this->setFirebaseApiKey(getenv('FIREBASE_API_KEY'));
     }
@@ -76,6 +83,8 @@ class Env
 
     /**
      * @return Env
+     *
+     * @throws EnvironmentFileException
      */
     public static function getInstance()
     {

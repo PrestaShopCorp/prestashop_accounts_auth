@@ -27,7 +27,7 @@ use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
 use PrestaShop\AccountsAuth\Api\Client\FirebaseClient;
 use PrestaShop\AccountsAuth\Api\Client\ServicesAccountsClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
-use PrestaShop\AccountsAuth\DependencyInjection\DependencyContainer;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Exception\EnvVarException;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
@@ -88,6 +88,7 @@ class PsAccountsService
      * @param Context|null $context
      * @param ShopContext|null $shopContext
      * @param LinkAdapter|null $linkAdapter
+     * @param Env|null $env
      *
      * @throws \ReflectionException
      */
@@ -97,25 +98,14 @@ class PsAccountsService
         Module $module = null,
         Context $context = null,
         ShopContext $shopContext = null,
-        LinkAdapter $linkAdapter = null
+        LinkAdapter $linkAdapter = null,
+        Env $env = null
     ) {
-        Env::getInstance();
-
-        foreach (DependencyContainer::getInstance()->buildDependencies($this, func_get_args())
+        foreach (PsAccountsServiceProvider::getInstance()->buildMethodDependencies($this, func_get_args())
                  as $param => $value
         ) {
             $this->$param = $value;
         }
-    }
-
-    /**
-     * @return mixed
-     *
-     * @throws \Exception
-     */
-    public static function getInstance()
-    {
-        return DependencyContainer::getInstance()->get(self::class);
     }
 
     /**

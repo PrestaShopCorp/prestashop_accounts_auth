@@ -21,7 +21,10 @@
 namespace PrestaShop\AccountsAuth\Api\Client;
 
 use GuzzleHttp\Client;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
+use PrestaShop\AccountsAuth\Exception\EnvironmentFileException;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;
 
 /**
@@ -64,9 +67,15 @@ abstract class GenericClient
      */
     protected $timeout = 10;
 
+    /**
+     * GenericClient constructor.
+     *
+     * @throws ServiceNotFoundException
+     */
     public function __construct()
     {
-        Env::getInstance();
+        // FIXME : should not be called here
+        PsAccountsServiceProvider::getInstance()->get(Env::class);
     }
 
     /**

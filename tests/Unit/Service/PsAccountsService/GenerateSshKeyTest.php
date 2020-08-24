@@ -5,6 +5,7 @@ namespace PrestaShop\AccountsAuth\Tests\Unit\Service\PsAccountsService;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
+use PrestaShop\AccountsAuth\Service\SshKey;
 use PrestaShop\AccountsAuth\Tests\TestCase;
 
 class GenerateSshKeyTest extends TestCase
@@ -28,17 +29,25 @@ class GenerateSshKeyTest extends TestCase
         $service = new PsAccountsService($configuration);
 
         $this->assertEmpty($configuration->getAccountsRsaPrivateKey());
-
         $this->assertEmpty($configuration->getAccountsRsaPublicKey());
-
         $this->assertEmpty($configuration->getAccountsRsaSignData());
 
         $service->generateSshKey();
 
         $this->assertNotEmpty($configuration->getAccountsRsaPrivateKey());
-
         $this->assertNotEmpty($configuration->getAccountsRsaPublicKey());
-
         $this->assertNotEmpty($configuration->getAccountsRsaSignData());
+
+        $sshKey = new SshKey();
+        $data = $this->faker->sentence();
+        $signedData = $sshKey->signData($configuration->getAccountsRsaPrivateKey(), $data);
+
+        $this->assertTrue(
+            $sshKey->verifySignature(
+                $configuration->getAccountsRsaPublicKey(),
+                $signedData,
+                $data
+            )
+        );
     }
 }
