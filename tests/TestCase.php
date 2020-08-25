@@ -55,7 +55,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         $configuration = $this->createMock(Configuration::class);
 
         $configuration->method('get')
-            ->will($this->returnCallback(function ($key, $default = null) {
+            ->will($this->returnCallback(function ($key, $default = false) {
                 foreach ($this->config as $map) {
                     $return = array_pop($map);
                     if ([$key, $default] === $map) {
@@ -76,7 +76,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
                         return;
                     }
                 }
-                $this->config[] = [$key, null, (string) $values];
+                $this->config[] = [$key, false, (string) $values];
             }));
 
         return $configuration;
