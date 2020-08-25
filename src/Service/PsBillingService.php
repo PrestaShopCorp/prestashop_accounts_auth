@@ -122,9 +122,6 @@ class PsBillingService
 
             $response = $billingClient->getBillingCustomer($uuid);
 
-            $shopId = $psAccountsService->getCurrentShop()['id'];
-            $token = (new Token())->getToken($shopId);
-
             if (!$response || !array_key_exists('httpCode', $response)) {
                 throw new BillingException('Billing customer request failed.', 50);
             }
@@ -164,8 +161,10 @@ class PsBillingService
                 if (array_key_exists('body', $response) && $response['body']
                     && array_key_exists('subscription', $response['body'])
                     && array_key_exists('plan_id', $response['body']['subscription'])
-                    && $response['body']['subscription']['plan_id'] === $planName) {
+                    && $response['body']['subscription']['plan_id'] === $planName
+                ) {
                     $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
+                    (new Token())->getToken($shopId);
 
                     return $toReturn;
                 } else {
