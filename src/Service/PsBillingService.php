@@ -28,6 +28,7 @@ use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Exception\BillingException;
 use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
+use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 
 /**
  * Construct the psbilling service.
@@ -116,11 +117,15 @@ class PsBillingService
     public function subscribeToFreePlan($module, $planName, $shopId = false, $customerIp = null)
     {
         $psAccountsService = new PsAccountsService();
-        if ($shopId === false) {
-            $shopId = $psAccountsService->getCurrentShop()['id'];
+
+        if ($shopId !== false) {
+            /** @var ConfigurationRepository $configurationRepository */
+            $configurationRepository = PsAccountsServiceProvider::getInstance()
+                ->get(ConfigurationRepository::class);
+            $configurationRepository->setShopId($shopId);
         }
 
-        $uuid = $psAccountsService->getShopUuidV4($shopId);
+        $uuid = $psAccountsService->getShopUuidV4();
         $toReturn = ['shopAccountId' => $uuid];
 
         if ($uuid && strlen($uuid) > 0) {

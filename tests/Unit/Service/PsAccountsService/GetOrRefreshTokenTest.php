@@ -5,7 +5,6 @@ namespace PrestaShop\AccountsAuth\Tests\Unit\Service\PsAccountsService;
 use Lcobucci\JWT\Builder;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\Api\Client\FirebaseClient;
-use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 use PrestaShop\AccountsAuth\Tests\TestCase;
 
@@ -35,9 +34,9 @@ class GetOrRefreshTokenTest extends TestCase
             [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
-        $configuration = new ConfigurationRepository($configMock);
+        $this->container->singleton(Configuration::class, $configMock);
 
-        $service = new PsAccountsService($configuration);
+        $service = new PsAccountsService();
 
         $this->assertEquals((string) $idToken, $service->getOrRefreshToken());
     }

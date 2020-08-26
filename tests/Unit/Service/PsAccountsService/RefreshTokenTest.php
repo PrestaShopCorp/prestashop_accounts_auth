@@ -66,9 +66,12 @@ class RefreshTokenTest extends TestCase
             [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
         ]);
 
-        $configuration = new ConfigurationRepository($configMock);
+        $this->container->singleton(Configuration::class, $configMock);
+        $this->container->singleton(FirebaseClient::class, $firebaseClient);
 
-        $service = new PsAccountsService($configuration, $firebaseClient);
+        $configuration = $this->container->get(ConfigurationRepository::class);
+
+        $service = new PsAccountsService();
 
         $this->assertTrue($service->refreshToken());
 
@@ -107,10 +110,12 @@ class RefreshTokenTest extends TestCase
 
         $configuration = new ConfigurationRepository($configMock);
 
-        //$configuration->expects($this->never())
-        //    ->method('updateFirebaseIdAndRefreshTokens');
+        $this->container->singleton(Configuration::class, $configMock);
+        $this->container->singleton(FirebaseClient::class, $firebaseClient);
 
-        $service = new PsAccountsService($configuration, $firebaseClient);
+        $configuration = $this->container->get(ConfigurationRepository::class);
+
+        $service = new PsAccountsService();
 
         $this->assertFalse($service->refreshToken());
 

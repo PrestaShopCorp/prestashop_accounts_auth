@@ -40,6 +40,14 @@ class ConfigurationRepository
     }
 
     /**
+     * @return int
+     */
+    public function getShopId()
+    {
+        return $this->configuration->getIdShop();
+    }
+
+    /**
      * @param int $shopId
      *
      * @return void

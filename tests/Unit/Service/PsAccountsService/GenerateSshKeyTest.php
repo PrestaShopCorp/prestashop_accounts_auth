@@ -3,6 +3,7 @@
 namespace PrestaShop\AccountsAuth\Tests\Unit\Service\PsAccountsService;
 
 use PrestaShop\AccountsAuth\Adapter\Configuration;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 use PrestaShop\AccountsAuth\Service\SshKey;
@@ -14,6 +15,7 @@ class GenerateSshKeyTest extends TestCase
      * @test
      *
      * @throws \ReflectionException
+     * @throws ServiceNotFoundException
      */
     public function it_should_update_ssh_keys()
     {
@@ -24,9 +26,11 @@ class GenerateSshKeyTest extends TestCase
             [Configuration::PS_ACCOUNTS_RSA_SIGN_DATA, false, null],
         ]);
 
-        $configuration = new ConfigurationRepository($configMock);
+        $this->container->singleton(Configuration::class, $configMock);
 
-        $service = new PsAccountsService($configuration);
+        $configuration = $this->container->get(ConfigurationRepository::class);
+
+        $service = new PsAccountsService();
 
         $this->assertEmpty($configuration->getAccountsRsaPrivateKey());
         $this->assertEmpty($configuration->getAccountsRsaPublicKey());

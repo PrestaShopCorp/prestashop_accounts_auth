@@ -55,7 +55,7 @@ class Env
         } else {
             throw new EnvironmentFileException('Environment file not found');
         }
-        $this->setFirebaseApiKey(getenv('FIREBASE_API_KEY'));
+        $this->setFirebaseApiKey(getenv('FIREBASE_API_KEY') ?: null);
     }
 
     /**

@@ -30,6 +30,7 @@ use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Exception\EnvVarException;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 
 /**
@@ -65,6 +66,11 @@ class PsAccountsService
     protected $container;
 
     /**
+     * @var PsAccountsServiceProvider
+     */
+    protected $psAccountContainer;
+
+    /**
      * @var LinkAdapter
      */
     protected $linkAdapter;
@@ -82,30 +88,20 @@ class PsAccountsService
     /**
      * PsAccountsService constructor.
      *
-     * @param ConfigurationRepository|null $configuration
-     * @param FirebaseClient|null $firebaseClient
-     * @param Module|null $module
-     * @param Context|null $context
-     * @param ShopContext|null $shopContext
-     * @param LinkAdapter|null $linkAdapter
-     * @param Env|null $env
-     *
-     * @throws \ReflectionException
+     * @throws ServiceNotFoundException
      */
-    public function __construct(
-        ConfigurationRepository $configuration = null,
-        FirebaseClient $firebaseClient = null,
-        Module $module = null,
-        Context $context = null,
-        ShopContext $shopContext = null,
-        LinkAdapter $linkAdapter = null,
-        Env $env = null
-    ) {
-        foreach (PsAccountsServiceProvider::getInstance()->buildMethodDependencies($this, func_get_args())
-                 as $param => $value
-        ) {
-            $this->$param = $value;
-        }
+    public function __construct()
+    {
+        $this->psAccountContainer = PsAccountsServiceProvider::getInstance();
+
+        $this->psAccountContainer->get(Env::class);
+
+        $this->configuration = $this->psAccountContainer->get(ConfigurationRepository::class);
+        $this->firebaseClient = $this->psAccountContainer->get(FirebaseClient::class);
+        $this->module = $this->psAccountContainer->get(Module::class);
+        $this->context = $this->psAccountContainer->get(Context::class);
+        $this->shopContext = $this->psAccountContainer->get(ShopContext::class);
+        $this->linkAdapter = $this->psAccountContainer->get(LinkAdapter::class);
     }
 
     /**
