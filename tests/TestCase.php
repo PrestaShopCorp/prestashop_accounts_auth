@@ -31,6 +31,9 @@ class TestCase extends \PHPUnit\Framework\TestCase
         parent::__construct($name, $data, $dataName);
     }
 
+    /**
+     * @return void
+     */
     protected function setUp()
     {
         parent::setUp();
