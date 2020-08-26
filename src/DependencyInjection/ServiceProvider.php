@@ -27,9 +27,9 @@ abstract class ServiceProvider
     abstract public function register();
 
     /**
-     * @return static
+     * @return ServiceProvider|static
      */
-    public static function getInstance()
+    final public static function getInstance()
     {
         if (self::$instance === null) {
             self::$instance = new static();

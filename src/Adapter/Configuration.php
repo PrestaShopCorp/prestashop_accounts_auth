@@ -20,6 +20,10 @@
 
 namespace PrestaShop\AccountsAuth\Adapter;
 
+use PrestaShop\AccountsAuth\Context\ShopContext;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
+
 class Configuration
 {
     const PS_PSX_FIREBASE_ID_TOKEN = 'PS_PSX_FIREBASE_ID_TOKEN';
@@ -51,6 +55,21 @@ class Configuration
     private $idLang = null;
 
     /**
+     * @var ShopContext
+     */
+    private $context;
+
+    /**
+     * Configuration constructor.
+     *
+     * @throws ServiceNotFoundException
+     */
+    public function __construct()
+    {
+        $this->context = PsAccountsServiceProvider::getInstance()->get(ShopContext::class);
+    }
+
+    /**
      * @return int
      */
     public function getIdShop()
@@ -60,6 +79,8 @@ class Configuration
 
     /**
      * @param int $idShop
+     *
+     * @return void
      */
     public function setIdShop($idShop)
     {
@@ -76,6 +97,8 @@ class Configuration
 
     /**
      * @param int $idShopGroup
+     *
+     * @return void
      */
     public function setIdShopGroup($idShopGroup)
     {
@@ -92,6 +115,8 @@ class Configuration
 
     /**
      * @param int $idLang
+     *
+     * @return void
      */
     public function setIdLang($idLang)
     {
@@ -120,7 +145,11 @@ class Configuration
      */
     public function getRaw($key, $idLang = null, $idShopGroup = null, $idShop = null, $default = false)
     {
-        return \Configuration::get($key, $idLang, $idShopGroup, $idShop, $default);
+        if ($this->context->isShop17()) {
+            return \Configuration::get($key, $idLang, $idShopGroup, $idShop, $default);
+        }
+
+        return \Configuration::get($key, $idLang, $idShopGroup, $idShop);
     }
 
     /**

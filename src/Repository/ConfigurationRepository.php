@@ -41,6 +41,8 @@ class ConfigurationRepository
 
     /**
      * @param int $shopId
+     *
+     * @return void
      */
     public function setShopId($shopId)
     {
@@ -66,6 +68,8 @@ class ConfigurationRepository
     /**
      * @param string $idToken
      * @param string $refreshToken
+     *
+     * @return void
      */
     public function updateFirebaseIdAndRefreshTokens($idToken, $refreshToken)
     {
@@ -94,6 +98,8 @@ class ConfigurationRepository
 
     /**
      * @param string $email
+     *
+     * @return void
      */
     public function updateFirebaseEmail($email)
     {
@@ -113,6 +119,8 @@ class ConfigurationRepository
 
     /**
      * @param bool $status
+     *
+     * @return void
      */
     public function updateFirebaseEmailIsVerified($status)
     {
@@ -132,6 +140,8 @@ class ConfigurationRepository
 
     /**
      * @param string $localId
+     *
+     * @return void
      */
     public function updateFirebaseLocalId($localId)
     {
@@ -148,6 +158,8 @@ class ConfigurationRepository
 
     /**
      * @param string $uuid Firebase User UUID
+     *
+     * @return void
      */
     public function updateShopUuid($uuid)
     {
@@ -167,6 +179,8 @@ class ConfigurationRepository
 
     /**
      * @param $key
+     *
+     * @return void
      */
     public function updateAccountsRsaPrivateKey($key)
     {
@@ -183,6 +197,8 @@ class ConfigurationRepository
 
     /**
      * @param $key
+     *
+     * @return void
      */
     public function updateAccountsRsaPublicKey($key)
     {
@@ -199,6 +215,8 @@ class ConfigurationRepository
 
     /**
      * @param $signData
+     *
+     * @return void
      */
     public function updateAccountsRsaSignData($signData)
     {
