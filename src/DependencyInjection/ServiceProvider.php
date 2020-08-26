@@ -24,7 +24,7 @@ abstract class ServiceProvider
     /**
      * @return void
      */
-    abstract function register();
+    abstract public function register();
 
     /**
      * @return static
@@ -121,4 +121,3 @@ abstract class ServiceProvider
         return $dependencies;
     }
 }
-

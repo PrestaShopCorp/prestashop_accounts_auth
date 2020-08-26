@@ -23,7 +23,6 @@ namespace PrestaShop\AccountsAuth\Api\Client;
 use GuzzleHttp\Client;
 use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
-use PrestaShop\AccountsAuth\Exception\EnvironmentFileException;
 use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 use PrestaShop\AccountsAuth\Handler\Response\ResponseApiHandler;
 

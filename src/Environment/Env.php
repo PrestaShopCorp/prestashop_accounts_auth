@@ -22,7 +22,6 @@ namespace PrestaShop\AccountsAuth\Environment;
 
 use PrestaShop\AccountsAuth\Exception\EnvironmentFileException;
 use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * Load environment variables.

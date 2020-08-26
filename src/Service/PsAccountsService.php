@@ -412,6 +412,7 @@ class PsAccountsService
      * @param string $trigger
      *
      * @return mixed
+     *
      * @throws \ReflectionException
      */
     public function changeUrl($bodyHttp, $trigger)

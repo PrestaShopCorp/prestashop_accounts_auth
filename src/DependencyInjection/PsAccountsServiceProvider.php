@@ -15,45 +15,46 @@ use PrestaShop\AccountsAuth\Service\PsAccountsService;
 class PsAccountsServiceProvider extends ServiceProvider
 {
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    function register()
+    public function register()
     {
-        $this->singleton(Env::class, static function() {
+        $this->singleton(Env::class, static function () {
             return new Env();
         });
 
-        $this->singleton(FirebaseClient::class, static function() {
+        $this->singleton(FirebaseClient::class, static function () {
             return new FirebaseClient();
         });
 
-        $this->singleton(Module::class, static function() {
+        $this->singleton(Module::class, static function () {
             return Module::getInstanceByName('ps_accounts');
         });
 
-        $this->singleton(Context::class, static function() {
+        $this->singleton(Context::class, static function () {
             return Context::getContext();
         });
 
-        $this->singleton(ShopContext::class, static function() {
+        $this->singleton(ShopContext::class, static function () {
             return new ShopContext();
         });
 
-        $this->singleton(LinkAdapter::class, static function() {
+        $this->singleton(LinkAdapter::class, static function () {
             return new LinkAdapter(\Context::getContext()->link);
         });
 
-        $this->singleton(Configuration::class, static function() {
+        $this->singleton(Configuration::class, static function () {
             $configuration = new Configuration();
             $configuration->setIdShop((int) \Context::getContext()->shop->id);
+
             return $configuration;
         });
 
-        $this->singleton(ConfigurationRepository::class, function() {
+        $this->singleton(ConfigurationRepository::class, function () {
             return new ConfigurationRepository($this->get(Configuration::class));
         });
 
-        $this->singleton(PsAccountsService::class, function() {
+        $this->singleton(PsAccountsService::class, function () {
             return new PsAccountsService(
                 $this->get(ConfigurationRepository::class),
                 $this->get(FirebaseClient::class),
