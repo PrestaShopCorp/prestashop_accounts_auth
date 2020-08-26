@@ -12,7 +12,7 @@ abstract class ServiceProvider
     protected $container = [];
 
     /**
-     * @var self
+     * @var static
      */
     protected static $instance;
 
@@ -25,18 +25,6 @@ abstract class ServiceProvider
      * @return void
      */
     abstract public function register();
-
-    /**
-     * @return ServiceProvider|static
-     */
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new static();
-        }
-
-        return self::$instance;
-    }
 
     /**
      * @param string $class

@@ -10,10 +10,21 @@ use PrestaShop\AccountsAuth\Api\Client\FirebaseClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
-use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 class PsAccountsServiceProvider extends ServiceProvider
 {
+    /**
+     * @return PsAccountsServiceProvider|ServiceProvider
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -52,18 +63,6 @@ class PsAccountsServiceProvider extends ServiceProvider
 
         $this->singleton(ConfigurationRepository::class, function () {
             return new ConfigurationRepository($this->get(Configuration::class));
-        });
-
-        $this->singleton(PsAccountsService::class, function () {
-            return new PsAccountsService(
-                $this->get(ConfigurationRepository::class),
-                $this->get(FirebaseClient::class),
-                $this->get(Module::class),
-                $this->get(Context::class),
-                $this->get(ShopContext::class),
-                $this->get(LinkAdapter::class),
-                $this->get(Env::class)
-            );
         });
     }
 }
