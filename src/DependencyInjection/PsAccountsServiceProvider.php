@@ -14,7 +14,7 @@ use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 class PsAccountsServiceProvider extends ServiceProvider
 {
     /**
-     * @return PsAccountsServiceProvider|ServiceProvider
+     * @return PsAccountsServiceProvider
      */
     public static function getInstance()
     {
