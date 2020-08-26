@@ -57,7 +57,7 @@ class ErrorHandler
                     'prestashop_vesion' => _PS_VERSION_,
                     'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
                     'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
-                    'email' => $psAccountsService->getEmail($psAccountsService->getCurrentShop()['id']),
+                    'email' => $psAccountsService->getEmail(),
                 ],
             ]
         );

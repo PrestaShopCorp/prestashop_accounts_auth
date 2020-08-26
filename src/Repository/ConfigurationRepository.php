@@ -126,7 +126,7 @@ class ConfigurationRepository
     {
         $this->configuration->set(
             Configuration::PS_PSX_FIREBASE_EMAIL_IS_VERIFIED,
-            $status
+            (string) $status
         );
     }
 
@@ -178,7 +178,7 @@ class ConfigurationRepository
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
      * @return void
      */
@@ -196,7 +196,7 @@ class ConfigurationRepository
     }
 
     /**
-     * @param $key
+     * @param string $key
      *
      * @return void
      */
@@ -214,7 +214,7 @@ class ConfigurationRepository
     }
 
     /**
-     * @param $signData
+     * @param string $signData
      *
      * @return void
      */
