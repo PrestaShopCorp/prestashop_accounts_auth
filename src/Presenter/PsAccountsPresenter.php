@@ -80,5 +80,7 @@ class PsAccountsPresenter
             $errorHandler = ErrorHandler::getInstance();
             $errorHandler->handle($e, $e->getCode());
         }
+
+        return [];
     }
 }

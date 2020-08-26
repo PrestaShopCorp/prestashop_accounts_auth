@@ -14,18 +14,6 @@ use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 class PsAccountsServiceProvider extends ServiceProvider
 {
     /**
-     * @return PsAccountsServiceProvider
-     */
-    public static function getInstance()
-    {
-        if (self::$instance === null) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function register()
@@ -50,13 +38,13 @@ class PsAccountsServiceProvider extends ServiceProvider
             return new ShopContext();
         });
 
-        $this->singleton(LinkAdapter::class, static function () {
-            return new LinkAdapter(\Context::getContext()->link);
+        $this->singleton(LinkAdapter::class, function () {
+            return new LinkAdapter($this->get(Context::class)->link);
         });
 
-        $this->singleton(Configuration::class, static function () {
+        $this->singleton(Configuration::class, function () {
             $configuration = new Configuration();
-            $configuration->setIdShop((int) \Context::getContext()->shop->id);
+            $configuration->setIdShop((int) $this->get(Context::class)->shop->id);
 
             return $configuration;
         });

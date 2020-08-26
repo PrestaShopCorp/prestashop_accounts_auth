@@ -16,7 +16,7 @@ abstract class ServiceProvider
      */
     protected static $instance;
 
-    public function __construct()
+    final public function __construct()
     {
         $this->register();
     }
@@ -25,6 +25,18 @@ abstract class ServiceProvider
      * @return void
      */
     abstract public function register();
+
+    /**
+     * @return static
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new static();
+        }
+
+        return self::$instance;
+    }
 
     /**
      * @param string $class
@@ -99,7 +111,7 @@ abstract class ServiceProvider
         foreach ($reflectionMethod->getParameters() as $index => $reflectionParameter) {
             $param = $reflectionParameter->getName();
 
-            if (!isset($params[$index]) || $params[$index] === null) {
+            if (!isset($params[$index]) || $params[$index] == null) {
                 $dependencies[$param] = $this->get($reflectionParameter->getClass()->getName());
             } else {
                 $dependencies[$param] = $params[$index];

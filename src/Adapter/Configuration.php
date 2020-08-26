@@ -145,11 +145,9 @@ class Configuration
      */
     public function getRaw($key, $idLang = null, $idShopGroup = null, $idShop = null, $default = false)
     {
-        if ($this->context->isShop17()) {
-            return \Configuration::get($key, $idLang, $idShopGroup, $idShop, $default);
-        }
+        $value = \Configuration::get($key, $idLang, $idShopGroup, $idShop);
 
-        return \Configuration::get($key, $idLang, $idShopGroup, $idShop);
+        return $value ?: ($default !== false ? $default : $value);
     }
 
     /**
