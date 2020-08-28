@@ -22,6 +22,7 @@ namespace PrestaShop\AccountsAuth\Service;
 
 use Context;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
+use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Api\ServicesBillingClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
 use PrestaShop\AccountsAuth\Environment\Env;
@@ -120,6 +121,7 @@ class PsBillingService
             $billingClient = new ServicesBillingClient($this->getContext()->link);
 
             $response = $billingClient->getBillingCustomer($uuid);
+
             if (!$response || !array_key_exists('httpCode', $response)) {
                 throw new BillingException('Billing customer request failed.', 50);
             }
@@ -159,8 +161,10 @@ class PsBillingService
                 if (array_key_exists('body', $response) && $response['body']
                     && array_key_exists('subscription', $response['body'])
                     && array_key_exists('plan_id', $response['body']['subscription'])
-                    && $response['body']['subscription']['plan_id'] === $planName) {
+                    && $response['body']['subscription']['plan_id'] === $planName
+                ) {
                     $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
+                    (new Token())->getToken($shopId);
 
                     return $toReturn;
                 } else {
