@@ -70,6 +70,7 @@ class PsAccountsPresenter
                 'shops' => $this->psAccountsService->getShopsTree(),
                 'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
                 'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
+                'manageAccountLink' => $this->psAccountsService->getManageAccountLink(),
             ];
         } catch (\Exception $e) {
             $errorHandler = ErrorHandler::getInstance();
