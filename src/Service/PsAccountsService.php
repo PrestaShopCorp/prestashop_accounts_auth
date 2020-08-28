@@ -327,7 +327,8 @@ class PsAccountsService
 
         return  $this->linkAdapter->getAdminLink('AdminModules', true, [], [
             'module_name' => $this->psxName,
-            'install' => $this->psxName,
+            'configure' => $this->psxName,
+            'install' => 'ps_accounts',
         ]);
     }
 
@@ -351,7 +352,8 @@ class PsAccountsService
 
         return  $this->linkAdapter->getAdminLink('AdminModules', true, [], [
             'module_name' => $this->psxName,
-            'enable' => '1',
+            'configure' => $this->psxName,
+            'enable' => 'ps_accounts',
         ]);
     }
 
