@@ -531,6 +531,7 @@ class PsAccountsService
     {
         $url = $_ENV['SSO_MANAGE_ACCOUNT'];
         $langIsoCode = $this->context->language->iso_code;
+
         return $url . '?lang=' . substr($langIsoCode, 0, 2);
     }
 }
