@@ -18,7 +18,7 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-namespace PrestaShop\AccountsAuth\Api;
+namespace PrestaShop\AccountsAuth\Api\Client;
 
 use GuzzleHttp\Client;
 
@@ -44,14 +44,52 @@ class FirebaseClient extends GenericClient
                 'exceptions' => $this->catchExceptions,
                 'allow_redirects' => false,
                 'query' => [
-                    'key' => $_ENV['FIREBASE_API_KEY'],
+                    //'key' => $_ENV['FIREBASE_API_KEY'],
+                    'key' => getenv('FIREBASE_API_KEY'),
                 ],
                 'headers' => [
+                    'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ],
             ],
         ]);
 
         $this->setClient($client);
+    }
+
+    /**
+     * @param string $customToken
+     *
+     * @return array response
+     */
+    public function signInWithCustomToken($customToken)
+    {
+        $this->setRoute('https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken');
+
+        return $this->post([
+            'json' => [
+                'token' => $customToken,
+                'returnSecureToken' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * @see https://firebase.google.com/docs/reference/rest/auth#section-refresh-token Firebase documentation
+     *
+     * @param string $refreshToken
+     *
+     * @return array response
+     */
+    public function exchangeRefreshTokenForIdToken($refreshToken)
+    {
+        $this->setRoute('https://securetoken.googleapis.com/v1/token');
+
+        return $this->post([
+            'json' => [
+                'grant_type' => 'refresh_token',
+                'refresh_token' => $refreshToken,
+            ],
+        ]);
     }
 }

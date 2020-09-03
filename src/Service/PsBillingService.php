@@ -22,11 +22,13 @@ namespace PrestaShop\AccountsAuth\Service;
 
 use Context;
 use PrestaShop\AccountsAuth\Adapter\LinkAdapter;
-use PrestaShop\AccountsAuth\Api\Firebase\Token;
-use PrestaShop\AccountsAuth\Api\ServicesBillingClient;
+use PrestaShop\AccountsAuth\Api\Client\ServicesBillingClient;
 use PrestaShop\AccountsAuth\Context\ShopContext;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Exception\BillingException;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
+use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 
 /**
  * Construct the psbilling service.
@@ -53,9 +55,14 @@ class PsBillingService
      */
     protected $linkAdapter;
 
+    /**
+     * PsBillingService constructor.
+     *
+     * @throws ServiceNotFoundException
+     */
     public function __construct()
     {
-        Env::getInstance();
+        PsAccountsServiceProvider::getInstance()->get(Env::class);
         $this->context = Context::getContext();
         $this->shopContext = new ShopContext();
     }
@@ -110,11 +117,15 @@ class PsBillingService
     public function subscribeToFreePlan($module, $planName, $shopId = false, $customerIp = null)
     {
         $psAccountsService = new PsAccountsService();
-        if ($shopId === false) {
-            $shopId = $psAccountsService->getCurrentShop()['id'];
+
+        if ($shopId !== false) {
+            /** @var ConfigurationRepository $configurationRepository */
+            $configurationRepository = PsAccountsServiceProvider::getInstance()
+                ->get(ConfigurationRepository::class);
+            $configurationRepository->setShopId($shopId);
         }
 
-        $uuid = $psAccountsService->getShopUuidV4($shopId);
+        $uuid = $psAccountsService->getShopUuidV4();
         $toReturn = ['shopAccountId' => $uuid];
 
         if ($uuid && strlen($uuid) > 0) {
@@ -164,7 +175,7 @@ class PsBillingService
                     && $response['body']['subscription']['plan_id'] === $planName
                 ) {
                     $toReturn['subscriptionId'] = $response['body']['subscription']['id'];
-                    (new Token())->getToken($shopId);
+                    $psAccountsService->getOrRefreshToken();
 
                     return $toReturn;
                 } else {

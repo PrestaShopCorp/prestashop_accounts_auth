@@ -21,8 +21,9 @@
 namespace PrestaShop\AccountsAuth\Presenter;
 
 use Module;
+use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
-use PrestaShop\AccountsAuth\Handler\Error\ErrorHandler;
+use PrestaShop\AccountsAuth\Handler\ErrorHandler\ErrorHandler;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
@@ -37,10 +38,12 @@ class PsAccountsPresenter
 
     /**
      * @param string $psxName
+     *
+     * @throws \Exception
      */
     public function __construct($psxName)
     {
-        Env::getInstance();
+        PsAccountsServiceProvider::getInstance()->get(Env::class);
         $this->psAccountsService = new PsAccountsService();
         $this->psAccountsService->setPsxName($psxName);
         $this->psAccountsService->manageOnboarding();
@@ -49,7 +52,9 @@ class PsAccountsPresenter
     /**
      * Present the PsAccounts module for vue.
      *
-     * @return mixed
+     * @return array
+     *
+     * @throws \Exception
      */
     public function present()
     {
@@ -60,10 +65,10 @@ class PsAccountsPresenter
                 'psAccountsEnableLink' => $this->psAccountsService->getPsAccountsEnableLink(),
                 'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
                 'psAccountsIsEnabled' => Module::isEnabled('ps_accounts'),
-                'onboardingLink' => $this->psAccountsService->getOnboardingLink($this->psAccountsService->getCurrentShop()['id']),
+                'onboardingLink' => $this->psAccountsService->getOnboardingLink(),
                 'user' => [
-                    'email' => $this->psAccountsService->getEmail($this->psAccountsService->getCurrentShop()['id']),
-                    'emailIsValidated' => $this->psAccountsService->isEmailValidated($this->psAccountsService->getCurrentShop()['id']),
+                    'email' => $this->psAccountsService->getEmail(),
+                    'emailIsValidated' => $this->psAccountsService->isEmailValidated(),
                     'isSuperAdmin' => $this->psAccountsService->getContext()->employee->isSuperAdmin(),
                 ],
                 'currentShop' => $this->psAccountsService->getCurrentShop(),
@@ -76,5 +81,7 @@ class PsAccountsPresenter
             $errorHandler = ErrorHandler::getInstance();
             $errorHandler->handle($e, $e->getCode());
         }
+
+        return [];
     }
 }

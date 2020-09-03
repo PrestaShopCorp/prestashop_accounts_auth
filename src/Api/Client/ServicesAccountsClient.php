@@ -18,29 +18,37 @@
  * International Registered Trademark & Property of PrestaShop SA
  */
 
-namespace PrestaShop\AccountsAuth\Api;
+namespace PrestaShop\AccountsAuth\Api\Client;
 
 use GuzzleHttp\Client;
-use PrestaShop\AccountsAuth\Api\Firebase\Token;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
  * Handle call api Services
  */
-class ServicesBillingClient extends GenericClient
+class ServicesAccountsClient extends GenericClient
 {
+    /**
+     * ServicesAccountsClient constructor.
+     *
+     * @param \Link $link
+     * @param Client|null $client
+     *
+     * @throws \ReflectionException
+     * @throws \Exception
+     */
     public function __construct(\Link $link, Client $client = null)
     {
         parent::__construct();
         $psAccountsService = new PsAccountsService();
         $shopId = $psAccountsService->getCurrentShop()['id'];
-        $token = (new Token())->getToken($shopId);
+        $token = $psAccountsService->getOrRefreshToken();
         $this->setLink($link);
 
         // Client can be provided for tests
         if (null === $client) {
             $client = new Client([
-                'base_url' => $_ENV['BILLING_SVC_API_URL'],
+                'base_url' => $_ENV['ACCOUNTS_SVC_API_URL'],
                 'defaults' => [
                     'timeout' => $this->timeout,
                     'exceptions' => $this->catchExceptions,
@@ -62,56 +70,15 @@ class ServicesBillingClient extends GenericClient
 
     /**
      * @param mixed $shopUuidV4
-     *
-     * @return array | false
-     */
-    public function getBillingCustomer($shopUuidV4)
-    {
-        $this->setRoute('/shops/' . $shopUuidV4);
-
-        return $this->get();
-    }
-
-    /**
-     * @param mixed $shopUuidV4
      * @param array $bodyHttp
      *
      * @return array | false
      */
-    public function createBillingCustomer($shopUuidV4, $bodyHttp)
+    public function changeUrl($shopUuidV4, $bodyHttp)
     {
-        // $this->setRoute('/shops/' . $shopUuidV4);
-        $this->setRoute('/shops');
+        $this->setRoute('/shops/' . $shopUuidV4 . '/url');
 
-        return $this->post([
-            'body' => $bodyHttp,
-        ]);
-    }
-
-    /**
-     * @param mixed $shopUuidV4
-     * @param string $module
-     *
-     * @return array | false
-     */
-    public function getBillingSubscriptions($shopUuidV4, $module)
-    {
-        $this->setRoute('/shops/' . $shopUuidV4 . '/subscriptions?module=' . $module);
-
-        return $this->get();
-    }
-
-    /**
-     * @param mixed $shopUuidV4
-     * @param array $bodyHttp
-     *
-     * @return array | false
-     */
-    public function createBillingSubscriptions($shopUuidV4, $bodyHttp)
-    {
-        $this->setRoute('/shops/' . $shopUuidV4 . '/subscriptions');
-
-        return $this->post([
+        return $this->patch([
             'body' => $bodyHttp,
         ]);
     }

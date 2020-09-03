@@ -24,7 +24,7 @@
 *  International Registered Trademark & Property of PrestaShop SA
 */
 
-namespace PrestaShop\AccountsAuth\Handler\Error;
+namespace PrestaShop\AccountsAuth\Handler\ErrorHandler;
 
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 use Raven_Client;
@@ -57,7 +57,7 @@ class ErrorHandler
                     'prestashop_vesion' => _PS_VERSION_,
                     'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
                     'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
-                    'email' => $psAccountsService->getEmail($psAccountsService->getCurrentShop()['id']),
+                    'email' => $psAccountsService->getEmail(),
                 ],
             ]
         );
@@ -71,6 +71,8 @@ class ErrorHandler
      * @param bool|null $throw
      *
      * @return void
+     *
+     * @throws \Exception
      */
     public function handle($error, $code = null, $throw = true)
     {
