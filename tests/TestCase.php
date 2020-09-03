@@ -5,14 +5,6 @@ namespace PrestaShop\AccountsAuth\Tests;
 use PrestaShop\AccountsAuth\Adapter\Configuration;
 use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 
-require_once __DIR__ . '/Mock/Link.php';
-require_once __DIR__ . '/Mock/Context.php';
-require_once __DIR__ . '/Mock/Module.php';
-
-if (!defined('_PS_MODULE_DIR_')) {
-    define('_PS_MODULE_DIR_', '');
-}
-
 class TestCase extends \PHPUnit\Framework\TestCase
 {
     /**

@@ -38,6 +38,8 @@ class Install
      * Method to call in every psx modules during the installation process
      *
      * @return bool
+     *
+     * @throws \Exception
      */
     public function installPsAccounts()
     {
@@ -54,8 +56,8 @@ class Install
         $moduleManager = $moduleManagerBuilder->build();
         $moduleIsInstalled = $moduleManager->install($this->psAccounts);
         if (false === $moduleIsInstalled) {
-            $errorHandler = \PrestaShop\AccountsAuth\Handler\Error\ErrorHandler::getInstance();
-            $errorHandler->handle(new \Exception('Module ps_accounts can\'t be install', 500), 500);
+            $errorHandler = \PrestaShop\AccountsAuth\Handler\ErrorHandler\ErrorHandler::getInstance();
+            $errorHandler->handle(new \Exception('Module ps_accounts can\'t be installed', 500), 500);
         }
 
         return $moduleIsInstalled;
