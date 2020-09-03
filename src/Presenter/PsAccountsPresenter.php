@@ -23,7 +23,7 @@ namespace PrestaShop\AccountsAuth\Presenter;
 use Module;
 use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
-use PrestaShop\AccountsAuth\Handler\Error\ErrorHandler;
+use PrestaShop\AccountsAuth\Handler\ErrorHandler\ErrorHandler;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 
 /**
