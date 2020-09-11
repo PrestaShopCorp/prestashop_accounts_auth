@@ -32,6 +32,7 @@ use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Exception\EnvVarException;
 use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
+use Tools;
 
 /**
  * Construct the psaccounts service.
@@ -319,7 +320,7 @@ class PsAccountsService
         if ($this->shopContext->isShop17()) {
             $router = $this->get('router');
 
-            return substr(\Tools::getShopDomainSsl(true) . __PS_BASE_URI__, 0, -1) . $router->generate('admin_module_manage_action', [
+            return Tools::getHttpHost(true) . $router->generate('admin_module_manage_action', [
                 'action' => 'install',
                 'module_name' => 'ps_accounts',
             ]);
@@ -344,7 +345,7 @@ class PsAccountsService
         if ($this->shopContext->isShop17()) {
             $router = $this->get('router');
 
-            return substr(\Tools::getShopDomainSsl(true) . __PS_BASE_URI__, 0, -1) . $router->generate('admin_module_manage_action', [
+            return Tools::getHttpHost(true) . $router->generate('admin_module_manage_action', [
                 'action' => 'enable',
                 'module_name' => 'ps_accounts',
             ]);
