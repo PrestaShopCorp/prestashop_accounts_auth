@@ -148,7 +148,7 @@ class PsBillingService
             $toReturn['customerId'] = $response['body']['customer']['id'];
 
             $response = $billingClient->getBillingSubscriptions($uuid, $module);
-            if (!$response || !array_key_exists('httpCode', $response)) {
+            if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] >= 500) {
                 throw new BillingException('Billing subscriptions request failed.', 51);
             }
 
