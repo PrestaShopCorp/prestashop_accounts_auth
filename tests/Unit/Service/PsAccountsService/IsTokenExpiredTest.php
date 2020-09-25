@@ -29,7 +29,7 @@ class IsTokenExpiredTest extends TestCase
         $configMock = $this->getConfigurationMock([
             [Configuration::PS_PSX_FIREBASE_REFRESH_DATE, false, $date->format('Y-m-d h:m:s')],
             [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
-            [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
+            [Configuration::PS_ACCOUNTS_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
         $this->container->singleton(Configuration::class, $configMock);
@@ -61,7 +61,7 @@ class IsTokenExpiredTest extends TestCase
         $configMock = $this->getConfigurationMock([
             [Configuration::PS_PSX_FIREBASE_REFRESH_DATE, false, $date->format('Y-m-d h:m:s')],
             [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
-            [Configuration::PS_PSX_FIREBASE_ID_TOKEN, false, (string) $idToken],
+            [Configuration::PS_ACCOUNTS_FIREBASE_ID_TOKEN, false, (string) $idToken],
         ]);
 
         $this->container->singleton(Configuration::class, $configMock);

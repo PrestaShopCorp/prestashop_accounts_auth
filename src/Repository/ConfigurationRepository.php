@@ -62,7 +62,7 @@ class ConfigurationRepository
      */
     public function getFirebaseIdToken()
     {
-        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_ID_TOKEN);
+        return $this->configuration->get(Configuration::PS_ACCOUNTS_FIREBASE_ID_TOKEN);
     }
 
     /**
@@ -81,7 +81,11 @@ class ConfigurationRepository
      */
     public function updateFirebaseIdAndRefreshTokens($idToken, $refreshToken)
     {
-        $this->configuration->set(Configuration::PS_PSX_FIREBASE_ID_TOKEN, $idToken);
+        if (false === $this->configuration->get(Configuration::PS_PSX_FIREBASE_ID_TOKEN)) {
+            $this->configuration->set(Configuration::PS_PSX_FIREBASE_ID_TOKEN, $idToken);
+        }
+        $this->configuration->set(Configuration::PS_ACCOUNTS_FIREBASE_ID_TOKEN, $idToken);
+
         $this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, $refreshToken);
         //$this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_DATE, date('Y-m-d H:i:s'));
     }
