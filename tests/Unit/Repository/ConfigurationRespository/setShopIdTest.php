@@ -21,7 +21,7 @@ class setShopIdTest extends TestCase
 
         $configMock->expects($this->once())
             ->method('getRaw')
-            ->with(Configuration::PS_PSX_FIREBASE_EMAIL, null, null, $shopId, false);
+            ->with(Configuration::PS_ACCOUNTS_FIREBASE_EMAIL, null, null, $shopId, false);
 
         $configuration = new ConfigurationRepository($configMock);
         $configuration->setShopId($shopId);
@@ -44,7 +44,7 @@ class setShopIdTest extends TestCase
 
         $configMock->expects($this->once())
             ->method('setRaw')
-            ->with(Configuration::PS_PSX_FIREBASE_EMAIL, $email, false, null, $shopId);
+            ->with(Configuration::PS_ACCOUNTS_FIREBASE_EMAIL, $email, false, null, $shopId);
 
         $configuration = new ConfigurationRepository($configMock);
         $configuration->setShopId($shopId);
