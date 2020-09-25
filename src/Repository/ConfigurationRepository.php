@@ -105,7 +105,7 @@ class ConfigurationRepository
      */
     public function getFirebaseEmail()
     {
-        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_EMAIL);
+        return $this->configuration->get(Configuration::PS_ACCOUNTS_FIREBASE_EMAIL);
     }
 
     /**
@@ -115,7 +115,10 @@ class ConfigurationRepository
      */
     public function updateFirebaseEmail($email)
     {
-        $this->configuration->set(Configuration::PS_PSX_FIREBASE_EMAIL, $email);
+        if (false === $this->configuration->get(Configuration::PS_PSX_FIREBASE_EMAIL)) {
+            $this->configuration->set(Configuration::PS_PSX_FIREBASE_EMAIL, $email);
+        }
+        $this->configuration->set(Configuration::PS_ACCOUNTS_FIREBASE_EMAIL, $email);
     }
 
     /**
@@ -124,7 +127,7 @@ class ConfigurationRepository
     public function firebaseEmailIsVerified()
     {
         return in_array(
-            $this->configuration->get(Configuration::PS_PSX_FIREBASE_EMAIL_IS_VERIFIED),
+            $this->configuration->get(Configuration::PS_ACCOUNTS_FIREBASE_EMAIL_IS_VERIFIED),
             ['1', 1, true]
         );
     }
@@ -137,7 +140,7 @@ class ConfigurationRepository
     public function updateFirebaseEmailIsVerified($status)
     {
         $this->configuration->set(
-            Configuration::PS_PSX_FIREBASE_EMAIL_IS_VERIFIED,
+            Configuration::PS_ACCOUNTS_FIREBASE_EMAIL_IS_VERIFIED,
             (string) $status
         );
     }
@@ -147,7 +150,7 @@ class ConfigurationRepository
      */
     public function getFirebaseLocalId()
     {
-        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_LOCAL_ID);
+        return $this->configuration->get(Configuration::PS_ACCOUNTS_FIREBASE_LOCAL_ID);
     }
 
     /**
@@ -157,7 +160,10 @@ class ConfigurationRepository
      */
     public function updateFirebaseLocalId($localId)
     {
-        $this->configuration->set(Configuration::PS_PSX_FIREBASE_LOCAL_ID, $localId);
+        if (false === $this->configuration->get(Configuration::PS_PSX_FIREBASE_LOCAL_ID)) {
+            $this->configuration->set(Configuration::PS_PSX_FIREBASE_LOCAL_ID, $localId);
+        }
+        $this->configuration->set(Configuration::PS_ACCOUNTS_FIREBASE_LOCAL_ID, $localId);
     }
 
     /**
