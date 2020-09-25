@@ -70,7 +70,7 @@ class ConfigurationRepository
      */
     public function getFirebaseRefreshToken()
     {
-        return $this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN);
+        return $this->configuration->get(Configuration::PS_ACCOUNTS_FIREBASE_REFRESH_TOKEN);
     }
 
     /**
@@ -83,11 +83,11 @@ class ConfigurationRepository
     {
         if (false === $this->configuration->get(Configuration::PS_PSX_FIREBASE_ID_TOKEN)) {
             $this->configuration->set(Configuration::PS_PSX_FIREBASE_ID_TOKEN, $idToken);
+            $this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, $refreshToken);
+            $this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_DATE, date('Y-m-d H:i:s'));
         }
         $this->configuration->set(Configuration::PS_ACCOUNTS_FIREBASE_ID_TOKEN, $idToken);
-
-        $this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, $refreshToken);
-        //$this->configuration->set(Configuration::PS_PSX_FIREBASE_REFRESH_DATE, date('Y-m-d H:i:s'));
+        $this->configuration->set(Configuration::PS_ACCOUNTS_FIREBASE_REFRESH_TOKEN, $refreshToken);
     }
 
     /**
@@ -97,7 +97,7 @@ class ConfigurationRepository
      */
     public function hasFirebaseRefreshToken()
     {
-        return !empty($this->configuration->get(Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN));
+        return !empty($this->configuration->get(Configuration::PS_ACCOUNTS_FIREBASE_REFRESH_TOKEN));
     }
 
     /**

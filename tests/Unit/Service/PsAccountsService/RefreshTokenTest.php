@@ -63,7 +63,7 @@ class RefreshTokenTest extends TestCase
         /** @var Configuration $configMock */
         $configMock = $this->getConfigurationMock([
             [Configuration::PS_ACCOUNTS_FIREBASE_ID_TOKEN, false, (string) $idToken],
-            [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
+            [Configuration::PS_ACCOUNTS_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
         ]);
 
         $this->container->singleton(Configuration::class, $configMock);
@@ -105,7 +105,7 @@ class RefreshTokenTest extends TestCase
         /** @var Configuration $configMock */
         $configMock = $this->getConfigurationMock([
             [Configuration::PS_ACCOUNTS_FIREBASE_ID_TOKEN, false, (string) $idToken],
-            [Configuration::PS_PSX_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
+            [Configuration::PS_ACCOUNTS_FIREBASE_REFRESH_TOKEN, false, (string) $refreshToken],
         ]);
 
         $configuration = new ConfigurationRepository($configMock);
