@@ -34,9 +34,7 @@ class setShopIdTest extends TestCase
      */
     public function it_should_pass_shop_id_calling_update()
     {
-        $this->markTestSkipped(
-            'Configuration is not loaded.'
-          );
+
         $shopId = $this->faker->randomNumber();
 
         $email = $this->faker->safeEmail;
