@@ -3,6 +3,8 @@ FIREBASE_API_KEY=AIzaSyBEm26bA2KR893rY68enLdVGpqnkoW2Juo
 ACCOUNTS_SVC_UI_URL=https://accounts.psessentials.net
 ACCOUNTS_SVC_API_URL=https://accounts-api.psessentials.net
 
+BILLING_SVC_API_URL=https://billing-api.psessentials.net
+
 SSO_RESEND_VERIFICATION_EMAIL=https://auth.prestashop.com/account/send-verification-email
 SSO_MANAGE_ACCOUNT=https://auth.prestashop.com/login
 
