@@ -48,8 +48,8 @@ class Env
     public function __construct()
     {
         $dotenv = new Dotenv();
-        if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {
-            $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+        if (file_exists(dirname(__FILE__) . '/env.dev')) {
+            $dotenv->load(dirname(__FILE__) . '/env.dev');
         } elseif (file_exists(dirname(__FILE__) . '/env')) {
             $dotenv->load(dirname(__FILE__) . '/env');
         } else {
