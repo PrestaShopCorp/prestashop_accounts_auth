@@ -34,21 +34,19 @@ class setShopIdTest extends TestCase
      */
     public function it_should_pass_shop_id_calling_update()
     {
-        $this->markTestSkipped(
-            'Configuration is not loaded.'
-          );
         $shopId = $this->faker->randomNumber();
 
         $email = $this->faker->safeEmail;
-
         $configMock = $this->getMockBuilder(Configuration::class)
-            ->setMethods(['setRaw'])
+            ->setMethods(['setRaw', 'get'])
             ->getMock();
 
         $configMock->expects($this->once())
+            ->method('get')
+            ->with(Configuration::PS_PSX_FIREBASE_EMAIL);
+        $configMock->expects($this->once())
             ->method('setRaw')
-            ->with(Configuration::PS_PSX_FIREBASE_EMAIL, $email, false, null, $shopId);
-
+            ->with(Configuration::PS_ACCOUNTS_FIREBASE_EMAIL, $email, false, null, $shopId);
         $configuration = new ConfigurationRepository($configMock);
         $configuration->setShopId($shopId);
 
