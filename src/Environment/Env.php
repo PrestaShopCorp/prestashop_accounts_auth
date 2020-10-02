@@ -48,12 +48,19 @@ class Env
     public function __construct()
     {
         $dotenv = new Dotenv();
-        if (file_exists(dirname(__FILE__) . '/env.dev')) {
-            $dotenv->load(dirname(__FILE__) . '/env.dev');
-        } elseif (file_exists(dirname(__FILE__) . '/env')) {
-            $dotenv->load(dirname(__FILE__) . '/env');
+        // load prestashop var env
+        if (file_exists(_PS_ROOT_DIR_ . '.env')) {
+            $dotenv->load(_PS_ROOT_DIR_ . '.env');
+        }
+        // load module var env
+        if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {
+            $dotenv->load(_PS_MODULE_DIR_ . 'ps_accounts/.env');
+        }
+        // load lib var env
+        elseif (file_exists(dirname(__FILE__) . '/.env')) {
+            $dotenv->load(dirname(__FILE__) . '/.env');
         } else {
-            throw new EnvironmentFileException('Environment file not found');
+            $dotenv->load(dirname(__FILE__) . '/env');
         }
         $this->setFirebaseApiKey(getenv('FIREBASE_API_KEY') ?: null);
     }
