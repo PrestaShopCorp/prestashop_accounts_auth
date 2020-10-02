@@ -29,6 +29,11 @@ use PrestaShop\AccountsAuth\Tests\TestCase;
 
 class RefreshTokenTest extends TestCase
 {
+    public function __construct()
+    {
+        define('_PS_ROOT_DIR_', '');
+    }
+
     /**
      * @test
      *
