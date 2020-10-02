@@ -1,6 +1,6 @@
 .idea/
 .php_cs.cache
-vendor
-env.dev
+.env
 composer-dev.json
 composer-dev.lock
+vendor
