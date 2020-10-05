@@ -621,7 +621,7 @@ class PsAccountsService
 
     /**
      * @return string
-     * 
+     *
      * @throws ServiceNotFoundException
      */
     public function getAccountsRsaPublicKey()
