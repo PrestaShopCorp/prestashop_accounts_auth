@@ -618,4 +618,24 @@ class PsAccountsService
 
         return $url . '?lang=' . substr($langIsoCode, 0, 2);
     }
+
+    /**
+     * @return string
+     * 
+     * @throws ServiceNotFoundException
+     */
+    public function getAccountsRsaPublicKey()
+    {
+        return $this->configuration->getAccountsRsaPublicKey();
+    }
+
+    /**
+     * @return string
+     *
+     * @throws ServiceNotFoundException
+     */
+    public function getAccountsRsaSignData()
+    {
+        return $this->configuration->getAccountsRsaSignData();
+    }
 }
