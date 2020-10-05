@@ -246,12 +246,19 @@ class ConfigurationRepository
      */
     public function hasAccountsSshKeys()
     {
-        return false !== $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY)
-            && !empty($this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY))
-            && false !== $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY)
-            && !empty($this->configuration->get(Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY))
-            && false !== $this->configuration->get(Configuration::PS_ACCOUNTS_RSA_SIGN_DATA)
-            && !empty($this->configuration->get(Configuration::PS_ACCOUNTS_RSA_SIGN_DATA));
+        $sshKeys = [
+            Configuration::PS_ACCOUNTS_RSA_PUBLIC_KEY,
+            Configuration::PS_ACCOUNTS_RSA_PRIVATE_KEY,
+            Configuration::PS_ACCOUNTS_RSA_SIGN_DATA,
+        ];
+
+        foreach ($sshKeys as $sshKey) {
+            if (empty($this->configuration->get($sshKey))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
