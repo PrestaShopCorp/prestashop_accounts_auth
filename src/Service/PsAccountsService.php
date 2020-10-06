@@ -31,6 +31,7 @@ use PrestaShop\AccountsAuth\DependencyInjection\PsAccountsServiceProvider;
 use PrestaShop\AccountsAuth\Environment\Env;
 use PrestaShop\AccountsAuth\Exception\EnvVarException;
 use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
+use PrestaShop\AccountsAuth\Exception\SshKeysNotFoundException;
 use PrestaShop\AccountsAuth\Repository\ConfigurationRepository;
 use Tools;
 
@@ -471,13 +472,15 @@ class PsAccountsService
             $key = $sshKey->generate();
             $this->configuration->updateAccountsRsaPrivateKey($key['privatekey']);
             $this->configuration->updateAccountsRsaPublicKey($key['publickey']);
-
             $this->configuration->updateAccountsRsaSignData(
                 $sshKey->signData(
                     $this->configuration->getAccountsRsaPrivateKey(),
                     self::STR_TO_SIGN
                 )
             );
+            if (empty($this->configuration->getAccountsRsaPrivateKey())) {
+                throw new SshKeysNotFoundException('SshKeys not found');
+            }
         }
     }
 
