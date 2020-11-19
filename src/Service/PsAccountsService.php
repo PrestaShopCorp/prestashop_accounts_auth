@@ -451,6 +451,42 @@ class PsAccountsService
     }
 
     /**
+     * @throws \ReflectionException
+     */
+    public function unlinkShop()
+    {
+        $response = (new ServicesAccountsClient($this->getContext()->link))
+            ->deleteShop($this->getShopUuidV4());
+
+        // Réponse: 201: Shop supprimé avec payload contenant un message de confirmation
+        // Réponse: 404: La shop n'existe pas (not found)
+        // Réponse: 401: L'utilisateur n'est pas autorisé à supprimer cette shop
+
+        if ($response['httpCode'] == 201) {
+            $this->resetOnboardingData();
+        }
+
+        return $response;
+    }
+
+    /**
+     * Empty onboarding configuration values
+     *
+     * @return void
+     */
+    public function resetOnboardingData()
+    {
+        //$this->configuration->updateAccountsRsaPrivateKey('');
+        //$this->configuration->updateAccountsRsaPublicKey('');
+        //$this->configuration->updateAccountsRsaSignData('');
+        $this->configuration->updateFirebaseIdAndRefreshTokens('', '');
+        $this->configuration->updateFirebaseLocalId('');
+        $this->configuration->updateFirebaseEmail('');
+        $this->configuration->updateFirebaseEmailIsVerified(false);
+        $this->configuration->updateShopUuid('');
+    }
+
+    /**
      * @return void
      *
      * @throws \Exception
@@ -463,6 +499,8 @@ class PsAccountsService
 
     /**
      * @return void
+     *
+     * @throws SshKeysNotFoundException
      */
     public function generateSshKey()
     {
@@ -624,8 +662,6 @@ class PsAccountsService
 
     /**
      * @return string
-     *
-     * @throws ServiceNotFoundException
      */
     public function getAccountsRsaPublicKey()
     {
@@ -634,8 +670,6 @@ class PsAccountsService
 
     /**
      * @return string
-     *
-     * @throws ServiceNotFoundException
      */
     public function getAccountsRsaSignData()
     {

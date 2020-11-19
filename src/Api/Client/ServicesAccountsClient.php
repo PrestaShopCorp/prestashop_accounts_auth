@@ -82,4 +82,16 @@ class ServicesAccountsClient extends GenericClient
             'body' => $bodyHttp,
         ]);
     }
+
+    /**
+     * @param string $shopUuidV4
+     *
+     * @return array|false
+     */
+    public function deleteShop($shopUuidV4)
+    {
+        $this->setRoute('/shop/' . $shopUuidV4);
+
+        return $this->delete();
+    }
 }
