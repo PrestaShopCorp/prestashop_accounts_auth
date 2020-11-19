@@ -462,7 +462,7 @@ class PsAccountsService
         // Réponse: 404: La shop n'existe pas (not found)
         // Réponse: 401: L'utilisateur n'est pas autorisé à supprimer cette shop
 
-        if ($response['httpCode'] == 201) {
+        if ($response['status'] && $response['httpCode'] === 201) {
             $this->resetOnboardingData();
         }
 
@@ -476,13 +476,15 @@ class PsAccountsService
      */
     public function resetOnboardingData()
     {
-        //$this->configuration->updateAccountsRsaPrivateKey('');
-        //$this->configuration->updateAccountsRsaPublicKey('');
-        //$this->configuration->updateAccountsRsaSignData('');
+        $this->configuration->updateAccountsRsaPrivateKey('');
+        $this->configuration->updateAccountsRsaPublicKey('');
+        $this->configuration->updateAccountsRsaSignData('');
+
         $this->configuration->updateFirebaseIdAndRefreshTokens('', '');
         $this->configuration->updateFirebaseLocalId('');
         $this->configuration->updateFirebaseEmail('');
         $this->configuration->updateFirebaseEmailIsVerified(false);
+
         $this->configuration->updateShopUuid('');
     }
 

@@ -180,6 +180,7 @@ abstract class GenericClient
 
         return $response;
     }
+
     /**
      * Wrapper of method delete from guzzle client.
      *
