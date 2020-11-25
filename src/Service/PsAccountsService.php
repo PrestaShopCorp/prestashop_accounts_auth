@@ -458,11 +458,11 @@ class PsAccountsService
         $response = (new ServicesAccountsClient($this->getContext()->link))
             ->deleteShop($this->getShopUuidV4());
 
-        // Réponse: 201: Shop supprimé avec payload contenant un message de confirmation
+        // Réponse: 200: Shop supprimé avec payload contenant un message de confirmation
         // Réponse: 404: La shop n'existe pas (not found)
         // Réponse: 401: L'utilisateur n'est pas autorisé à supprimer cette shop
 
-        if ($response['status'] && $response['httpCode'] === 201) {
+        if ($response['status'] && $response['httpCode'] === 200) {
             $this->resetOnboardingData();
         }
 
@@ -676,5 +676,19 @@ class PsAccountsService
     public function getAccountsRsaSignData()
     {
         return $this->configuration->getAccountsRsaSignData();
+    }
+
+    /**
+     * Generate ajax admin link with token
+     * available via PsAccountsPresenter into page dom,
+     * ex :
+     * let url = window.contextPsAccounts.adminAjaxLink + '&action=unlinkShop'
+     *
+     * @return string
+     */
+    public function getAdminAjaxLink()
+    {
+//        Tools::getAdminTokenLite('AdminAjaxPsAccounts'));
+        return $this->linkAdapter->getAdminLink('AdminAjaxPsAccounts', true, [], ['ajax' => 1]);
     }
 }

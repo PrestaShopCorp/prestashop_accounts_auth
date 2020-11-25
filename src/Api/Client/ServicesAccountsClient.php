@@ -90,7 +90,7 @@ class ServicesAccountsClient extends GenericClient
      */
     public function deleteShop($shopUuidV4)
     {
-        $this->setRoute('/shops/' . $shopUuidV4);
+        $this->setRoute('/shop/' . $shopUuidV4);
 
         return $this->delete();
     }
