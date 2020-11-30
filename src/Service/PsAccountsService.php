@@ -451,7 +451,7 @@ class PsAccountsService
     }
 
     /**
-     * @return array|false
+     * @return array
      *
      * @throws \ReflectionException
      */
@@ -650,7 +650,7 @@ class PsAccountsService
 
         $token = (new Parser())->parse($this->configuration->getFirebaseIdToken());
 
-        return $token->isExpired();
+        return $token->isExpired(new \DateTime());
     }
 
     /**
