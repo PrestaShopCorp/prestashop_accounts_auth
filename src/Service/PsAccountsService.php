@@ -451,12 +451,14 @@ class PsAccountsService
     }
 
     /**
+     * @return array|false
+     *
      * @throws \ReflectionException
      */
     public function unlinkShop()
     {
         $response = (new ServicesAccountsClient($this->getContext()->link))
-            ->deleteShop($this->getShopUuidV4());
+            ->deleteShop((string) $this->getShopUuidV4());
 
         // Réponse: 200: Shop supprimé avec payload contenant un message de confirmation
         // Réponse: 404: La shop n'existe pas (not found)

@@ -86,7 +86,7 @@ class ServicesAccountsClient extends GenericClient
     /**
      * @param string $shopUuidV4
      *
-     * @return array|false
+     * @return array
      */
     public function deleteShop($shopUuidV4)
     {

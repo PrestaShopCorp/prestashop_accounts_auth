@@ -186,7 +186,7 @@ abstract class GenericClient
      *
      * @param array $options payload
      *
-     * @return array return response or false if no response
+     * @return array return response array
      */
     protected function delete(array $options = [])
     {
