@@ -76,6 +76,7 @@ class PsAccountsPresenter
                 'superAdminEmail' => $this->psAccountsService->getSuperAdminEmail(),
                 'ssoResendVerificationEmail' => $_ENV['SSO_RESEND_VERIFICATION_EMAIL'],
                 'manageAccountLink' => $this->psAccountsService->getManageAccountLink(),
+                'adminAjaxLink' => $this->psAccountsService->getAdminAjaxLink(),
             ];
         } catch (\Exception $e) {
             $errorHandler = ErrorHandler::getInstance();

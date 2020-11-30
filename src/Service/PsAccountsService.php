@@ -451,6 +451,46 @@ class PsAccountsService
     }
 
     /**
+     * @return array|false
+     *
+     * @throws \ReflectionException
+     */
+    public function unlinkShop()
+    {
+        $response = (new ServicesAccountsClient($this->getContext()->link))
+            ->deleteShop((string) $this->getShopUuidV4());
+
+        // Réponse: 200: Shop supprimé avec payload contenant un message de confirmation
+        // Réponse: 404: La shop n'existe pas (not found)
+        // Réponse: 401: L'utilisateur n'est pas autorisé à supprimer cette shop
+
+        if ($response['status'] && $response['httpCode'] === 200) {
+            $this->resetOnboardingData();
+        }
+
+        return $response;
+    }
+
+    /**
+     * Empty onboarding configuration values
+     *
+     * @return void
+     */
+    public function resetOnboardingData()
+    {
+        $this->configuration->updateAccountsRsaPrivateKey('');
+        $this->configuration->updateAccountsRsaPublicKey('');
+        $this->configuration->updateAccountsRsaSignData('');
+
+        $this->configuration->updateFirebaseIdAndRefreshTokens('', '');
+        $this->configuration->updateFirebaseLocalId('');
+        $this->configuration->updateFirebaseEmail('');
+        $this->configuration->updateFirebaseEmailIsVerified(false);
+
+        $this->configuration->updateShopUuid('');
+    }
+
+    /**
      * @return void
      *
      * @throws \Exception
@@ -463,6 +503,8 @@ class PsAccountsService
 
     /**
      * @return void
+     *
+     * @throws SshKeysNotFoundException
      */
     public function generateSshKey()
     {
@@ -624,8 +666,6 @@ class PsAccountsService
 
     /**
      * @return string
-     *
-     * @throws ServiceNotFoundException
      */
     public function getAccountsRsaPublicKey()
     {
@@ -634,11 +674,23 @@ class PsAccountsService
 
     /**
      * @return string
-     *
-     * @throws ServiceNotFoundException
      */
     public function getAccountsRsaSignData()
     {
         return $this->configuration->getAccountsRsaSignData();
+    }
+
+    /**
+     * Generate ajax admin link with token
+     * available via PsAccountsPresenter into page dom,
+     * ex :
+     * let url = window.contextPsAccounts.adminAjaxLink + '&action=unlinkShop'
+     *
+     * @return string
+     */
+    public function getAdminAjaxLink()
+    {
+//        Tools::getAdminTokenLite('AdminAjaxPsAccounts'));
+        return $this->linkAdapter->getAdminLink('AdminAjaxPsAccounts', true, [], ['ajax' => 1]);
     }
 }
