@@ -188,7 +188,7 @@ abstract class GenericClient
      *
      * @return array return response array
      */
-    protected function delete(array $options = [])
+    protected function transitionalDelete(array $options = [])
     {
         $response = $this->getClient()->delete($this->getRoute(), $options);
         $responseHandler = new ResponseApiHandler();

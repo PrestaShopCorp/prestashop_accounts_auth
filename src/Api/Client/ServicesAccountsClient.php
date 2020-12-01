@@ -92,6 +92,6 @@ class ServicesAccountsClient extends GenericClient
     {
         $this->setRoute('/shop/' . $shopUuidV4);
 
-        return $this->delete();
+        return $this->transitionalDelete();
     }
 }
