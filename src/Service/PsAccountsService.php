@@ -216,7 +216,7 @@ class PsAccountsService
                         true,
                         [],
                         [
-                            'configure' => $this->module->name,
+                            'configure' => $this->psxName,
                             'setShopContext' => 's-' . $shopId,
                         ]
                     ),
