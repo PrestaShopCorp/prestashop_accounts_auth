@@ -483,7 +483,6 @@ class PsAccountsService
         $this->configuration->updateAccountsRsaSignData('');
 
         $this->configuration->updateFirebaseIdAndRefreshTokens('', '');
-        $this->configuration->updateFirebaseLocalId('');
         $this->configuration->updateFirebaseEmail('');
         $this->configuration->updateFirebaseEmailIsVerified(false);
 
