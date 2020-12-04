@@ -20,7 +20,12 @@
 
 namespace PrestaShop\AccountsAuth\Installer;
 
+// FIXME : why nothing for 1.6
+// FIXME : why no upgrade if not installed
+// FIXME : manage dependencies here
+
 use PrestaShop\AccountsAuth\Context\ShopContext;
+use PrestaShop\AccountsAuth\Handler\ErrorHandler\ErrorHandler;
 use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 
 /**
@@ -34,6 +39,19 @@ class Install
     private $psAccounts = 'ps_accounts';
 
     /**
+     * @var ShopContext
+     */
+    private $shopContext;
+
+    /**
+     * Install constructor.
+     */
+    public function __construct()
+    {
+        $this->shopContext = new ShopContext();
+    }
+
+    /**
      * Install ps_accounts module if not installed
      * Method to call in every psx modules during the installation process
      *
@@ -43,23 +61,43 @@ class Install
      */
     public function installPsAccounts()
     {
-        if (true === \Module::isInstalled($this->psAccounts)) {
-            return true;
+        if (true === $this->shopContext->isShop17()) {
+            return $this->installPsAccounts17();
         }
+        return $this->installPsAccounts16();
+    }
 
-        // if on PrestaShop 1.6, do nothing
-        if (false === (new ShopContext())->isShop17()) {
-            return true;
-        }
+    /**
+     * @return bool
+     *
+     * @throws \Exception
+     */
+    public function installPsAccounts17()
+    {
+        $moduleManager = ModuleManagerBuilder::getInstance()->build();
 
-        $moduleManagerBuilder = ModuleManagerBuilder::getInstance();
-        $moduleManager = $moduleManagerBuilder->build();
+//        if (true === $moduleManager->isInstalled($this->psAccounts)) {
+//            return true;
+//        }
+
+        // install or upgrade module
         $moduleIsInstalled = $moduleManager->install($this->psAccounts);
         if (false === $moduleIsInstalled) {
-            $errorHandler = \PrestaShop\AccountsAuth\Handler\ErrorHandler\ErrorHandler::getInstance();
-            $errorHandler->handle(new \Exception('Module ps_accounts can\'t be installed', 500), 500);
+            ErrorHandler::getInstance()->handle(
+                new \Exception('Module ps_accounts can\'t be installed', 500),
+                500
+            );
         }
 
         return $moduleIsInstalled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function installPsAccounts16()
+    {
+        // if on PrestaShop 1.6, do nothing
+        return true;
     }
 }
