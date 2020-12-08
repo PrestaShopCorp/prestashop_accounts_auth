@@ -20,12 +20,10 @@
 
 namespace PrestaShop\AccountsAuth\Installer;
 
-// FIXME : why nothing for 1.6
-// FIXME : why no upgrade if not installed
-// FIXME : manage dependencies here
-
 use PrestaShop\AccountsAuth\Context\ShopContext;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 use PrestaShop\AccountsAuth\Handler\ErrorHandler\ErrorHandler;
+use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManager;
 use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
 
 /**
@@ -33,10 +31,8 @@ use PrestaShop\PrestaShop\Core\Addon\Module\ModuleManagerBuilder;
  */
 class Install
 {
-    /**
-     * @var string
-     */
-    private $psAccounts = 'ps_accounts';
+    const PS_ACCOUNTS = 'ps_accounts';
+    const PS_EVENTBUS = 'ps_eventbus';
 
     /**
      * @var ShopContext
@@ -44,60 +40,75 @@ class Install
     private $shopContext;
 
     /**
+     * @var ModuleManager
+     */
+    private $moduleManager;
+
+    /**
      * Install constructor.
      */
     public function __construct()
     {
         $this->shopContext = new ShopContext();
+
+        $this->moduleManager = ModuleManagerBuilder::getInstance()->build();
     }
 
     /**
-     * Install ps_accounts module if not installed
-     * Method to call in every psx modules during the installation process
+     * @param $moduleName
+     * @param bool $upgrade
      *
      * @return bool
      *
      * @throws \Exception
      */
-    public function installPsAccounts()
+    public function installModule($moduleName, $upgrade = true)
     {
         if (true === $this->shopContext->isShop17()) {
-            return $this->installPsAccounts17();
+            return true;
         }
-        return $this->installPsAccounts16();
-    }
 
-    /**
-     * @return bool
-     *
-     * @throws \Exception
-     */
-    public function installPsAccounts17()
-    {
-        $moduleManager = ModuleManagerBuilder::getInstance()->build();
-
-//        if (true === $moduleManager->isInstalled($this->psAccounts)) {
-//            return true;
-//        }
+        if (false === $upgrade && true === $this->moduleManager->isInstalled($moduleName)) {
+            return true;
+        }
 
         // install or upgrade module
-        $moduleIsInstalled = $moduleManager->install($this->psAccounts);
+        $moduleIsInstalled = $this->moduleManager->install($moduleName);
+
         if (false === $moduleIsInstalled) {
-            ErrorHandler::getInstance()->handle(
-                new \Exception('Module ps_accounts can\'t be installed', 500),
-                500
-            );
+            throw new \Exception("Module ${moduleName} can't be installed", 500);
         }
 
         return $moduleIsInstalled;
     }
 
     /**
+     * @param bool $upgrade
      * @return bool
+     *
+     * @throws \Exception
      */
-    public function installPsAccounts16()
+    public function installDependencies($upgrade = true)
     {
-        // if on PrestaShop 1.6, do nothing
-        return true;
+        return $this->installModule(self::PS_ACCOUNTS, $upgrade)
+            && $this->installModule(self::PS_EVENTBUS, $upgrade);
+
+    }
+
+    /**
+     * @return bool
+     *
+     * @throws ServiceNotFoundException
+     * @throws \Raven_Exception
+     * @throws \Exception
+     */
+    public function installPsAccounts()
+    {
+        try {
+            return $this->installModule(self::PS_ACCOUNTS, false);
+        } catch (\Exception $e) {
+            ErrorHandler::getInstance()->handle($e, 500);
+            return true;
+        }
     }
 }

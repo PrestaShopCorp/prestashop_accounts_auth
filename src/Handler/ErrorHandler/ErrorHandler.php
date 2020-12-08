@@ -27,6 +27,7 @@
 namespace PrestaShop\AccountsAuth\Handler\ErrorHandler;
 
 use PrestaShop\AccountsAuth\Adapter\Configuration;
+use PrestaShop\AccountsAuth\Exception\ServiceNotFoundException;
 use PrestaShop\AccountsAuth\Service\PsAccountsService;
 use Raven_Client;
 
@@ -36,21 +37,27 @@ use Raven_Client;
 class ErrorHandler
 {
     /**
-     * @var PsAccountsService
-     */
-    private $psAccountsService;
-
-    /**
      * @var Raven_Client
      */
     protected $client;
+
+    /**
+     * @var PsAccountsService
+     */
+    protected $psAccountsService;
 
     /**
      * @var ErrorHandler
      */
     private static $instance;
 
-    private function __construct()
+    /**
+     * ErrorHandler constructor.
+     *
+     * @throws ServiceNotFoundException
+     * @throws \Raven_Exception
+     */
+    public final function __construct()
     {
         $this->psAccountsService = new PsAccountsService();
 
@@ -99,6 +106,9 @@ class ErrorHandler
 
     /**
      * @return ErrorHandler
+     *
+     * @throws ServiceNotFoundException
+     * @throws \Raven_Exception
      */
     public static function getInstance()
     {
