@@ -327,7 +327,7 @@ class PsAccountsService
             ]);
         }
 
-        return  $this->linkAdapter->getAdminLink('AdminModules', true, [], [
+        return $this->linkAdapter->getAdminLink('AdminModules', true, [], [
             'module_name' => $this->psxName,
             'configure' => $this->psxName,
             'install' => 'ps_accounts',
@@ -352,7 +352,7 @@ class PsAccountsService
             ]);
         }
 
-        return  $this->linkAdapter->getAdminLink('AdminModules', true, [], [
+        return $this->linkAdapter->getAdminLink('AdminModules', true, [], [
             'module_name' => $this->psxName,
             'configure' => $this->psxName,
             'enable' => 'ps_accounts',
@@ -403,7 +403,7 @@ class PsAccountsService
         }
         $strQueryParams = implode('&', $queryParamsArray);
 
-        return  $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName
+        return $uiSvcBaseUrl . '/shop/account/link/' . $protocol . '/' . $domainName
             . '/' . $protocol . '/' . $domainName . '/' . $this->psxName . '?' . $strQueryParams;
     }
 
@@ -467,7 +467,6 @@ class PsAccountsService
 
         if ($response['status'] && $response['httpCode'] === 200
             || $response['httpCode'] === 404) {
-
             $this->resetOnboardingData();
 
             $this->regenerateSshKey();
@@ -480,6 +479,7 @@ class PsAccountsService
      * Empty onboarding configuration values
      *
      * @return void
+     *
      * @throws SshKeysNotFoundException
      */
     public function resetOnboardingData()
