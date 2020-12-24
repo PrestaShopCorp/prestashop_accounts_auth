@@ -64,7 +64,7 @@ class Install
      */
     public function installModule($moduleName, $upgrade = true)
     {
-        if (true === $this->shopContext->isShop17()) {
+        if (false === $this->shopContext->isShop17()) {
             return true;
         }
 
