@@ -74,6 +74,6 @@ class SshKey
     {
         $this->rsa->loadKey($publicKey, RSA::PUBLIC_FORMAT_PKCS1);
 
-        return  $this->rsa->verify($data, base64_decode($signature));
+        return $this->rsa->verify($data, base64_decode($signature));
     }
 }

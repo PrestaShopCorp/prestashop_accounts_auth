@@ -2,8 +2,8 @@ name: Accounts Quality Control PHP
 
 on:
   pull_request:
-    paths-ignore:
-      - 'tests/**'
+    paths:
+      - 'src/**'
 
 jobs:
   php-linter:
