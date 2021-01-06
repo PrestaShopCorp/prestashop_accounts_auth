@@ -1,6 +1,9 @@
 name: Accounts Quality Control PHP
 
-on: [pull_request]
+on:
+  pull_request:
+    paths-ignore:
+      - 'tests/**'
 
 jobs:
   php-linter:
