@@ -67,7 +67,7 @@ class TestCase extends \PHPUnit\Framework\TestCase
         //->will($this->returnValueMap($valueMap));
 
         $configuration->method('set')
-            ->will($this->returnCallback(function ($key, $values, $html = false) use ($configuration) {
+            ->will($this->returnCallback(function ($key, $values, $html = false) {
                 foreach ($this->config as &$row) {
                     if ($row[0] == $key) {
                         $row[2] = (string) $values;
