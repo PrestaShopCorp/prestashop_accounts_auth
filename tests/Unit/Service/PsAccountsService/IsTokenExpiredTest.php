@@ -16,14 +16,11 @@ class IsTokenExpiredTest extends TestCase
      */
     public function it_should_return_true()
     {
-        $date = $this->faker->dateTime('now');
+        $date = new \DateTimeImmutable('yesterday');
 
-        $idToken = (new Builder())
-            ->expiresAt($date->getTimestamp())
-            //->withClaim('uid', $this->faker->uuid)
-            ->getToken();
+        $idToken = $this->makeJwtToken($date);
 
-        $refreshToken = (new Builder())->getToken();
+        $refreshToken = $this->makeJwtToken(new \DateTimeImmutable('+1 year'));
 
         /** @var Configuration $configMock */
         $configMock = $this->getConfigurationMock([
@@ -48,14 +45,11 @@ class IsTokenExpiredTest extends TestCase
      */
     public function it_should_return_false()
     {
-        $date = $this->faker->dateTimeBetween('+2 hours', '+4 hours');
+        $date = new \DateTimeImmutable('+2 hours');
 
-        $idToken = (new Builder())
-            ->expiresAt($date->getTimestamp())
-            //->withClaim('uid', $this->faker->uuid)
-            ->getToken();
+        $idToken = $this->makeJwtToken($date);
 
-        $refreshToken = (new Builder())->getToken();
+        $refreshToken = $this->makeJwtToken(new \DateTimeImmutable('+1 year'));
 
         /** @var Configuration $configMock */
         $configMock = $this->getConfigurationMock([
