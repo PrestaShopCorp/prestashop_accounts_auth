@@ -70,6 +70,10 @@ jobs:
     steps:
     - name: checkout project
       uses: actions/checkout@v1
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
     - name: composer install missing files
       run: composer install
     - name: PHPUnit tests
