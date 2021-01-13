@@ -80,4 +80,26 @@ class TestCase extends \PHPUnit\Framework\TestCase
 
         return $configuration;
     }
+
+    /**
+     * @param \DateTimeImmutable|null $expiresAt
+     * @param array $claims
+     *
+     * @return \Lcobucci\JWT\Token
+     */
+    public function makeJwtToken(\DateTimeImmutable $expiresAt = null, array $claims = [])
+    {
+        $builder = (new \Lcobucci\JWT\Builder())->expiresAt($expiresAt);
+
+        foreach ($claims as $claim => $value) {
+            $builder->withClaim($claim, $value);
+        }
+
+        $configuration = \Lcobucci\JWT\Configuration::forUnsecuredSigner();
+
+        return $builder->getToken(
+            $configuration->signer(),
+            $configuration->signingKey()
+        );
+    }
 }

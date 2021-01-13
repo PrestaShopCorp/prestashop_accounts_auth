@@ -1,6 +1,9 @@
 name: Accounts Quality Control PHP
 
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      - 'src/**'
 
 jobs:
   php-linter:
@@ -32,6 +35,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2.0.0
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
       - name: Cache vendor folder
         uses: actions/cache@v1
         with:
@@ -63,6 +70,10 @@ jobs:
     steps:
     - name: checkout project
       uses: actions/checkout@v1
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.4'
     - name: composer install missing files
       run: composer install
     - name: PHPUnit tests
