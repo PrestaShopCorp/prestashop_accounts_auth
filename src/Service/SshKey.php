@@ -58,7 +58,7 @@ class SshKey
      */
     public function signData($privateKey, $data)
     {
-        $this->rsa->loadKey($privateKey);
+        $this->rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
 
         return base64_encode($this->rsa->sign($data));
     }
@@ -72,8 +72,8 @@ class SshKey
      */
     public function verifySignature($publicKey, $signature, $data)
     {
-        $this->rsa->loadKey($publicKey);
+        $this->rsa->loadKey($publicKey, RSA::PUBLIC_FORMAT_PKCS1);
 
-        return  $this->rsa->verify($data, base64_decode($signature));
+        return $this->rsa->verify($data, base64_decode($signature));
     }
 }

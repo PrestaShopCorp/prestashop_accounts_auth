@@ -41,17 +41,11 @@ class RefreshTokenTest extends TestCase
      */
     public function it_should_handle_response_success()
     {
-        $idToken = (new Builder())
-            ->expiresAt($this->faker->dateTimeBetween('now', '+2 hours')->getTimestamp())
-            //->withClaim('uid', $this->faker->uuid)
-            ->getToken();
+        $idToken = $this->makeJwtToken(new \DateTimeImmutable('yesterday'));
 
-        $idTokenRefreshed = (new Builder())
-            ->expiresAt($this->faker->dateTimeBetween('+2 hours', '+4 hours')->getTimestamp())
-            //->withClaim('uid', $this->faker->uuid)
-            ->getToken();
+        $idTokenRefreshed = $this->makeJwtToken(new \DateTimeImmutable('tomorrow'));
 
-        $refreshToken = (new Builder())->getToken();
+        $refreshToken = $this->makeJwtToken(new \DateTimeImmutable('+1 year'));
 
         /** @var FirebaseClient $firebaseClient */
         $firebaseClient = $this->createMock(FirebaseClient::class);
@@ -92,12 +86,9 @@ class RefreshTokenTest extends TestCase
      */
     public function it_should_handle_response_error()
     {
-        $idToken = (new Builder())
-            ->expiresAt($this->faker->dateTimeBetween('now', '+2 hours')->getTimestamp())
-            //->withClaim('uid', $this->faker->uuid)
-            ->getToken();
+        $idToken = $this->makeJwtToken(new \DateTimeImmutable('tomorrow'));
 
-        $refreshToken = (new Builder())->getToken();
+        $refreshToken = $this->makeJwtToken(new \DateTimeImmutable('+1 year'));
 
         /** @var FirebaseClient $firebaseClient */
         $firebaseClient = $this->createMock(FirebaseClient::class);
