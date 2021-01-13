@@ -534,6 +534,8 @@ class PsAccountsService
     }
 
     /**
+     * @return void
+     *
      * @throws SshKeysNotFoundException
      */
     public function regenerateSshKey()
