@@ -51,7 +51,7 @@ jobs:
           key: php-composer-cache
       - name: git clone ps_accounts
         run: |
-          git clone https://${{ secrets.ACCESS_TOKEN }}@github.com/PrestaShopCorp/ps_accounts.git ~/ps_accounts
+          git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/PrestaShopCorp/ps_accounts.git ~/ps_accounts
           cd ~/ps_accounts
       - name: composer install
         run: composer install && cd ~/ps_accounts && composer install

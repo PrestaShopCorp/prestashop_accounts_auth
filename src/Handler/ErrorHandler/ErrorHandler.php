@@ -52,7 +52,7 @@ class ErrorHandler
 
     private function __construct()
     {
-        $this->psAccountsService = new PsAccountsService();
+        $this->psAccountsService = new PsAccountsService();//
 
         $this->client = new Raven_Client(
             $_ENV['SENTRY_CREDENTIALS'],
