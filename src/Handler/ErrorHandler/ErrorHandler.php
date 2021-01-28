@@ -54,13 +54,18 @@ class ErrorHandler
     {
         $this->psAccountsService = new PsAccountsService();
 
+        $version = null;
+        if (class_exists('\Ps_accounts')) {
+            $version = \Ps_accounts::VERSION;
+        }
+
         $this->client = new Raven_Client(
             $_ENV['SENTRY_CREDENTIALS'],
             [
                 'level' => 'warning',
                 'tags' => [
                     'php_version' => phpversion(),
-                    'ps_accounts_version' => \Ps_accounts::VERSION,
+                    'ps_accounts_version' => $version,
                     'prestashop_version' => _PS_VERSION_,
                     'ps_accounts_is_enabled' => \Module::isEnabled('ps_accounts'),
                     'ps_accounts_is_installed' => \Module::isInstalled('ps_accounts'),
