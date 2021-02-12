@@ -1,4 +1,5 @@
 <?php
+
 /**
  * 2007-2020 PrestaShop and Contributors.
  *
@@ -66,6 +67,7 @@ class PsAccountsPresenter
                 'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),
                 'psAccountsIsEnabled' => Module::isEnabled('ps_accounts'),
                 'onboardingLink' => $this->psAccountsService->getOnboardingLink(),
+                'shopId' => $this->psAccountsService->getShopUuidV4(),
                 'user' => [
                     'email' => $this->psAccountsService->getEmail(),
                     'emailIsValidated' => $this->psAccountsService->isEmailValidated(),
