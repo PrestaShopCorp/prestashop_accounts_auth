@@ -110,6 +110,7 @@ class ServicesBillingClient extends GenericClient
 
     /**
      * @param mixed $shopUuidV4
+     * @param string $module
      * @param array $bodyHttp
      *
      * @return array | false
