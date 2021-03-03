@@ -141,7 +141,7 @@ class PsBillingService
                     $uuid,
                     $customerIp ? ['created_from_ip' => $customerIp] : []
                 );
-                if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 200) {
+                if (!$response || !array_key_exists('httpCode', $response) || $response['httpCode'] !== 201) {
                     throw new BillingException('Billing customer creation failed.', 60);
                 }
             }
