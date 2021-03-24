@@ -49,8 +49,8 @@ class Env
     {
         $dotenv = new Dotenv();
         // load prestashop var env
-        if (file_exists(_PS_ROOT_DIR_ . '.env')) {
-            $dotenv->load(_PS_ROOT_DIR_ . '.env');
+        if (file_exists(_PS_ROOT_DIR_ . '/.env')) {
+            $dotenv->load(_PS_ROOT_DIR_ . '/.env');
         }
         // load module var env
         if (file_exists(_PS_MODULE_DIR_ . 'ps_accounts/.env')) {
