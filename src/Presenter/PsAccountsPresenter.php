@@ -61,6 +61,7 @@ class PsAccountsPresenter
         try {
             return [
                 'psIs17' => $this->psAccountsService->getShopContext()->isShop17(),
+                'psxName' => $this->psAccountsService->getPsxName(),
                 'psAccountsInstallLink' => $this->psAccountsService->getPsAccountsInstallLink(),
                 'psAccountsEnableLink' => $this->psAccountsService->getPsAccountsEnableLink(),
                 'psAccountsIsInstalled' => Module::isInstalled('ps_accounts'),

@@ -454,6 +454,7 @@ class PsAccountsService
      * @return array
      *
      * @throws \ReflectionException
+     * @throws SshKeysNotFoundException
      */
     public function unlinkShop()
     {
@@ -464,8 +465,11 @@ class PsAccountsService
         // Réponse: 404: La shop n'existe pas (not found)
         // Réponse: 401: L'utilisateur n'est pas autorisé à supprimer cette shop
 
-        if ($response['status'] && $response['httpCode'] === 200) {
+        if ($response['status'] && $response['httpCode'] === 200
+            || $response['httpCode'] === 404) {
             $this->resetOnboardingData();
+
+            $this->regenerateSshKey();
         }
 
         return $response;
@@ -475,6 +479,8 @@ class PsAccountsService
      * Empty onboarding configuration values
      *
      * @return void
+     *
+     * @throws SshKeysNotFoundException
      */
     public function resetOnboardingData()
     {
@@ -501,13 +507,15 @@ class PsAccountsService
     }
 
     /**
+     * @param bool $refresh
+     *
      * @return void
      *
      * @throws SshKeysNotFoundException
      */
-    public function generateSshKey()
+    public function generateSshKey($refresh = false)
     {
-        if (false === $this->configuration->hasAccountsSshKeys()) {
+        if ($refresh || false === $this->configuration->hasAccountsSshKeys()) {
             $sshKey = new SshKey();
 
             $key = $sshKey->generate();
@@ -523,6 +531,16 @@ class PsAccountsService
                 throw new SshKeysNotFoundException('SshKeys not found');
             }
         }
+    }
+
+    /**
+     * @return void
+     *
+     * @throws SshKeysNotFoundException
+     */
+    public function regenerateSshKey()
+    {
+        $this->generateSshKey(true);
     }
 
     /**
