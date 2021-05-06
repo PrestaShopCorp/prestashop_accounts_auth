@@ -554,6 +554,16 @@ class PsAccountsService
             if (!empty($emailVerified)) {
                 $this->configuration->updateFirebaseEmailIsVerified('true' === $emailVerified);
             }
+            \Tools::redirectAdmin(
+                $this->context->link->getAdminLink(
+                    \Tools::getValue('controller'),
+                    true,
+                    [],
+                    [
+                        'adminToken' => $customToken,
+                    ]
+                )
+            );
         }
     }
 
