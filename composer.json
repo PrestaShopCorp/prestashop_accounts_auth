@@ -17,7 +17,7 @@
     "symfony/dotenv": "^3.4",
     "phpseclib/phpseclib": "^2.0",
     "ext-json": "*",
-    "guzzlehttp/guzzle": "~5.0",
+    "guzzlehttp/guzzle": "~6.5",
     "lcobucci/jwt": "^3.3",
     "sentry/sentry": "^1.0"
   },
